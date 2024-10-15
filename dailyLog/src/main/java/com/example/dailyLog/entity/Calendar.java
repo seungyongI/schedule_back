@@ -1,5 +1,6 @@
 package com.example.dailyLog.entity;
 
+import com.example.dailyLog.constant.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,11 @@ public class Calendar {
 
     @Column(name = "c_holiday")
     private String holiday;
+
+
+    @Column(name = "c_theme")
+    @Enumerated(EnumType.STRING)
+    private Calendar calendar;
 
 
     @OneToOne(mappedBy = "calendar")
