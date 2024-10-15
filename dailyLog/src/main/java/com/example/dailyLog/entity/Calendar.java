@@ -10,6 +10,7 @@ import lombok.*;
 @ToString
 public class Calendar {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cal_idx")
