@@ -1,8 +1,9 @@
 package com.example.dailyLog.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "image")
@@ -10,8 +11,7 @@ import lombok.ToString;
 @ToString
 public class Image {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "i_idx")
     private Long idx;
 

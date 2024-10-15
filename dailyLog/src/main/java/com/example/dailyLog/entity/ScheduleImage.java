@@ -1,8 +1,9 @@
 package com.example.dailyLog.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "schedule_image")

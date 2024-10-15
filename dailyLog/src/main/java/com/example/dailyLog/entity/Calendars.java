@@ -1,19 +1,19 @@
 package com.example.dailyLog.entity;
 
-import com.example.dailyLog.constant.Category;
-import jakarta.persistence.*;
+import com.example.dailyLog.constant.Theme;
 import lombok.*;
+
+import javax.persistence.*;
 
 
 @Entity
-@Table(name = "calendar")
+@Table(name = "calendars")
 @Getter
 @ToString
-public class Calendar {
+public class Calendars {
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cal_idx")
     private Long idx;
 
@@ -23,10 +23,10 @@ public class Calendar {
 
     @Column(name = "c_theme")
     @Enumerated(EnumType.STRING)
-    private Calendar calendar;
+    private Theme theme;
 
 
-    @OneToOne(mappedBy = "calendar")
+    @OneToOne(mappedBy = "calendars")
     @JoinColumn(name = "u_idx")
     private User user;
 
