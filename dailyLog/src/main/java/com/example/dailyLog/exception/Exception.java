@@ -1,4 +1,4 @@
 package com.example.dailyLog.exception;
 
-public class Exception {
+public enum Exception {
 }
