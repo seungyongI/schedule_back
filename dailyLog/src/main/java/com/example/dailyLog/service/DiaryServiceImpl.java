@@ -3,16 +3,17 @@ package com.example.dailyLog.service;
 import com.example.dailyLog.constant.Category;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Diary;
+import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,18 +24,43 @@ public class DiaryServiceImpl implements DiaryService{
     private final ModelMapper modelMapper;
 
 
+
+    // 월달력 전체 일기 조회
     @Transactional
     @Override
-    public List<Diary> findAllDiary() {
-        return null;
+    public List<Diary> findAllMonthDiary(int month){
+        LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
+        LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+
+        return diaryRepository.findByDateBetween(startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
+                .stream().sorted(Comparator.comparing(Diary::getDate))
+                .collect(Collectors.toList());
     }
 
+
+    // 개별 날짜 일기 조회
+    @Transactional
+    @Override
+    public List<Diary> findDiaryByDay(LocalDate date){
+
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(23, 59, 59);
+
+        return diaryRepository.findByDateBetween(startOfDay, endOfDay)
+                .stream().sorted(Comparator.comparing(Diary::getDate))
+                .collect(Collectors.toList());
+    }
+
+
+    // 카테고리별 일기 조회
     @Transactional
     @Override
     public List<Diary> findDiaryCategory(Long idx, Category category) {
         return diaryRepository.findByIdAndCategory(idx,category);
     }
 
+
+    // 일기 입력
     @Transactional
     @Override
     public Diary saveDiary(Diary diary) {
@@ -48,6 +74,8 @@ public class DiaryServiceImpl implements DiaryService{
         return diaryRepository.save(createDiary);
     }
 
+
+    // 일기 수정
     @Transactional
     @Override
     public Diary updateDiary(Diary diary) {
@@ -58,6 +86,8 @@ public class DiaryServiceImpl implements DiaryService{
         return diaryRepository.save(uploadDiary);
     }
 
+
+    // 일기 삭제
     @Transactional
     @Override
     public Diary deleteDiary(Long idx) {

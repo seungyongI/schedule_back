@@ -4,6 +4,7 @@ import com.example.dailyLog.constant.Theme;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 
 @Entity
@@ -21,7 +22,7 @@ public class Calendars {
     private String holiday;
 
 
-    @Column(name = "c_theme")
+    @Column(name = "c_theme", nullable = false)
     @Enumerated(EnumType.STRING)
     private Theme theme;
 

@@ -15,9 +15,9 @@ public class Image {
     @Column(name = "i_idx")
     private Long idx;
 
-    @Column(name = "i_name")
+    @Column(name = "i_name", nullable = false)
     private String name;
 
-    @Column(name = "i_path")
+    @Column(name = "i_path", nullable = false)
     private String path;
 }
