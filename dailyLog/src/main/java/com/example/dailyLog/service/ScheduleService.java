@@ -8,7 +8,7 @@ import java.util.List;
 public interface ScheduleService {
 
     public List<Schedule> findAllYearSchedule(int year);
-    public List<Schedule> findAllMonthSchedule(int month);
+    public List<Schedule> findAllMonthSchedule();
     public List<Schedule> findScheduleByDay(LocalDate date);
 
     public Schedule saveSchedule(Schedule schedule);

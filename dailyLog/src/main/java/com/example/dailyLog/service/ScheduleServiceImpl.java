@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +42,9 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 월달력 전체 일정 조회
     @Transactional
     @Override
-    public List<Schedule> findAllMonthSchedule(int month){
+    public List<Schedule> findAllMonthSchedule(){
+
+        Month month = LocalDate.now().getMonth();
 
         LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
@@ -76,6 +79,7 @@ public class ScheduleServiceImpl implements ScheduleService{
                    .start(schedule.getStart())
                    .end(schedule.getEnd())
                    .location(schedule.getLocation())
+                   .color(schedule.getColor())
                    .calendar(calendar)
                    .build();
 

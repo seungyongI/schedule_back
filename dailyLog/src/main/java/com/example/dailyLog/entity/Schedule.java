@@ -19,25 +19,25 @@ public class Schedule {
     @Column(name = "s_idx")
     private Long idx;
 
-    @Column(name = "s_title")
+    @Column(name = "s_title", nullable = false)
     private String title;
 
     @Column(name = "s_content")
     private String content;
 
-    @Column(name = "s_start")
+    @Column(name = "s_start", nullable = false)
     private LocalDateTime start;
 
-    @Column(name = "s_end")
+    @Column(name = "s_end", nullable = false)
     private LocalDateTime end;
 
     @Column(name = "s_location")
     private String location;
 
 
-    @Column(name = "s_color")
+    @Column(name = "s_color", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Color color;
+    private Color color = Color.ORANGE;
 
 
     @ManyToOne
