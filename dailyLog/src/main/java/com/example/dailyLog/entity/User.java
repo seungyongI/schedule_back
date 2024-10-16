@@ -1,25 +1,20 @@
 package com.example.dailyLog.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Table(name = "user")
 @Getter
 @ToString
-public class User implements UserDetails {
+public class User{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "u_idx")
     private Long idx;
 
@@ -35,21 +30,7 @@ public class User implements UserDetails {
 
     @OneToOne
     @JoinColumn(name = "cal_idx")
-    private Calendar calendar;
+    private Calendars calendars;
 
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return "";
-    }
-
-    @Override
-    public String getUsername() {
-        return "";
-    }
 }

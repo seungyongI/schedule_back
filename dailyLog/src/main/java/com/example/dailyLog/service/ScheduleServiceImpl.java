@@ -1,6 +1,6 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.entity.Calendar;
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,19 +8,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService{
 
     private final ScheduleRepository scheduleRepository;
-    private final Calendar calendar;
+    private final Calendars calendar;
     private final ModelMapper modelMapper;
 
 

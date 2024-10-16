@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class Schedule {
 
-    @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "s_idx")
     private Long idx;
 
@@ -43,5 +42,5 @@ public class Schedule {
 
     @ManyToOne
     @JoinColumn(name = "cal_idx")
-    private Calendar calendar;
+    private Calendars calendar;
 }
