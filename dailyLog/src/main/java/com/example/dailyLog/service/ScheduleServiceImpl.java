@@ -8,6 +8,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,25 +27,41 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 연달력 전체 일정 조회
     @Transactional
     @Override
-    public Schedule findAllSchedule(){
+    public List<Schedule> findAllYearSchedule(int year){
 
+        LocalDate startOfYear = LocalDate.of(year, 1, 1);
+        LocalDate endOfYear = LocalDate.of(year, 12, 31);
 
+        return scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59))
+                .stream().sorted(Comparator.comparing(Schedule::getStart))
+                .collect(Collectors.toList());
     }
 
 
     // 월달력 전체 일정 조회
+    @Transactional
+    @Override
+    public List<Schedule> findAllMonthSchedule(int month){
 
+        LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
+        LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+
+        return scheduleRepository.findByStartBetween(startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
+                .stream().sorted(Comparator.comparing(Schedule::getStart))
+                .collect(Collectors.toList());
+    }
 
 
     // 개별 날짜 일정 조회
     @Transactional
     @Override
-    public List<Schedule> findScheduleByDay(Date date){
+    public List<Schedule> findScheduleByDay(LocalDate date){
 
-        List<Schedule> allSchedules = scheduleRepository.findAll();
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(23, 59, 59);
 
-        return allSchedules.stream()
-                .filter(schedule -> schedule.getStart().getDayOfMonth() == date)
+        return scheduleRepository.findByStartBetween(startOfDay, endOfDay)
+                .stream().sorted(Comparator.comparing(Schedule::getStart))
                 .collect(Collectors.toList());
     }
 
