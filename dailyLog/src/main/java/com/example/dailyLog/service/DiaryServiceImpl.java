@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 public class DiaryServiceImpl implements DiaryService{
 
     private final DiaryRepository diaryRepository;
-    private final Calendars calendars;
     private final ModelMapper modelMapper;
 
 
@@ -56,7 +55,7 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public List<Diary> findDiaryCategory(Long idx, Category category) {
-        return diaryRepository.findByIdAndCategory(idx,category);
+        return diaryRepository.findByIdxAndCategory(idx,category);
     }
 
 
@@ -69,7 +68,7 @@ public class DiaryServiceImpl implements DiaryService{
                 .content(diary.getContent())
                 .date(diary.getDate())
                 .category(diary.getCategory())
-                .calendar(calendars)
+                .calendars(diary.getCalendars())
                 .build();
         return diaryRepository.save(createDiary);
     }

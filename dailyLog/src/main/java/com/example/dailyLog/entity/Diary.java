@@ -1,11 +1,11 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Category;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -16,7 +16,8 @@ import java.util.Date;
 @Builder
 public class Diary {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "d_idx")
     private Long idx;
 
@@ -37,5 +38,5 @@ public class Diary {
 
     @ManyToOne
     @JoinColumn(name = "cal_idx")
-    private Calendars calendar;
+    private Calendars calendars;
 }

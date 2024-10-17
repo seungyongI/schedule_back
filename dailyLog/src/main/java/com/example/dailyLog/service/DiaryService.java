@@ -12,7 +12,7 @@ public interface DiaryService {
     public List<Diary> findAllMonthDiary(int month);
     public List<Diary> findDiaryByDay(LocalDate date);
 
-    public List<Diary> findDiaryCategory(Long id, Category category);
+    public List<Diary> findDiaryCategory(Long idx, Category category);
     public Diary saveDiary(Diary diary);
     public Diary updateDiary(Diary diary);
     public Diary deleteDiary(Long idx);
