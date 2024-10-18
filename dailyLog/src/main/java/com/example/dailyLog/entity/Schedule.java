@@ -1,21 +1,22 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Color;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "schedule")
 @Getter
 @ToString
+@NoArgsConstructor
 @Builder
+@AllArgsConstructor
 public class Schedule {
 
-    @Id @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "s_idx")
     private Long idx;
 
@@ -42,5 +43,5 @@ public class Schedule {
 
     @ManyToOne
     @JoinColumn(name = "cal_idx")
-    private Calendars calendar;
+    private Calendars calendars;
 }

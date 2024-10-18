@@ -1,10 +1,8 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Theme;
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 
 @Entity
@@ -14,7 +12,8 @@ import javax.validation.constraints.NotNull;
 public class Calendars {
 
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cal_idx")
     private Long idx;
 

@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import com.example.dailyLog.constant.Category;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 

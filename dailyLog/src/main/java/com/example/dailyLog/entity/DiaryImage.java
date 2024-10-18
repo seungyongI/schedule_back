@@ -3,7 +3,8 @@ package com.example.dailyLog.entity;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.persistence.*;
+import com.example.dailyLog.constant.Category;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "diary_image")

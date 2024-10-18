@@ -1,5 +1,8 @@
 package com.example.dailyLog.service;
 
+import com.example.dailyLog.dto.ScheduleRequestDto;
+import com.example.dailyLog.dto.ScheduleResponseDto;
+import com.example.dailyLog.dto.UserRequestDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.repository.ScheduleRepository;
@@ -11,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.Year;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,14 +25,13 @@ import java.util.stream.Collectors;
 public class ScheduleServiceImpl implements ScheduleService{
 
     private final ScheduleRepository scheduleRepository;
-    private final Calendars calendar;
     private final ModelMapper modelMapper;
 
 
     // 연달력 전체 일정 조회
     @Transactional
     @Override
-    public List<Schedule> findAllYearSchedule(int year){
+    public List<Schedule> findAllYearSchedule(Long idx, int year){
 
         LocalDate startOfYear = LocalDate.of(year, 1, 1);
         LocalDate endOfYear = LocalDate.of(year, 12, 31);
@@ -42,15 +45,18 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 월달력 전체 일정 조회
     @Transactional
     @Override
-    public List<Schedule> findAllMonthSchedule(){
-
-        Month month = LocalDate.now().getMonth();
+    public List<ScheduleResponseDto> findAllMonthSchedule(Long idx , int month){
 
         LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-        return scheduleRepository.findByStartBetween(startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
-                .stream().sorted(Comparator.comparing(Schedule::getStart))
+        return scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
+                .stream().map(schedule ->
+                    ScheduleResponseDto.builder()
+                            .title(schedule.getTitle())
+                            .start(schedule.getStart())
+                            .build())
+                .sorted(Comparator.comparing(ScheduleResponseDto::getStart))
                 .collect(Collectors.toList());
     }
 
@@ -80,7 +86,7 @@ public class ScheduleServiceImpl implements ScheduleService{
                    .end(schedule.getEnd())
                    .location(schedule.getLocation())
                    .color(schedule.getColor())
-                   .calendar(calendar)
+                   .calendars(schedule.getCalendars())
                    .build();
 
            return scheduleRepository.save(createSchedule);
