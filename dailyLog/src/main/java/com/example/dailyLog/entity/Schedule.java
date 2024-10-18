@@ -2,9 +2,7 @@ package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Color;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +10,9 @@ import java.time.LocalDateTime;
 @Table(name = "schedule")
 @Getter
 @ToString
+@NoArgsConstructor
 @Builder
+@AllArgsConstructor
 public class Schedule {
 
     @Id

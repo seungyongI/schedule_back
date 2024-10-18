@@ -23,13 +23,13 @@ public class ScheduleController {
 
 
     // 홈페이지 첫화면 기본 창(월달력 조회)
-    @GetMapping("/{idx}/{month}")
-    public ResponseEntity<List<Schedule>> getAllMonthSchedule(
+    @GetMapping("/view/{idx}/{month}")
+    public ResponseEntity<List<ScheduleResponseDto>> getAllMonthSchedule(
             @PathVariable(name = "idx") Long idx,
             @PathVariable(name = "month") int month){
         System.out.println("일로오나");
-        List<Schedule> list = scheduleService.findAllMonthSchedule(idx,month);
-        return ResponseEntity.ok(list);
+        List<ScheduleResponseDto> scheduleResponseDto = scheduleService.findAllMonthSchedule(idx,month);
+        return ResponseEntity.ok(scheduleResponseDto);
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.dto.ScheduleRequestDto;
+import com.example.dailyLog.dto.ScheduleResponseDto;
 import com.example.dailyLog.dto.UserRequestDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
@@ -44,13 +45,18 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 월달력 전체 일정 조회
     @Transactional
     @Override
-    public List<Schedule> findAllMonthSchedule(Long idx , int month){
+    public List<ScheduleResponseDto> findAllMonthSchedule(Long idx , int month){
 
         LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
         LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
         return scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
-                .stream().sorted(Comparator.comparing(Schedule::getStart))
+                .stream().map(schedule ->
+                    ScheduleResponseDto.builder()
+                            .title(schedule.getTitle())
+                            .start(schedule.getStart())
+                            .build())
+                .sorted(Comparator.comparing(ScheduleResponseDto::getStart))
                 .collect(Collectors.toList());
     }
 
