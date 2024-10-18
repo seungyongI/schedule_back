@@ -7,6 +7,7 @@ import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +34,16 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public List<Schedule> findAllYearSchedule(Long idx, int year){
 
-        LocalDate startOfYear = LocalDate.of(year, 1, 1);
-        LocalDate endOfYear = LocalDate.of(year, 12, 31);
+        try {
+            LocalDate startOfYear = LocalDate.of(year, 1, 1);
+            LocalDate endOfYear = LocalDate.of(year, 12, 31);
 
-        return scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59))
-                .stream().sorted(Comparator.comparing(Schedule::getStart))
-                .collect(Collectors.toList());
+            return scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59))
+                    .stream().sorted(Comparator.comparing(Schedule::getStart))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
     }
 
 
@@ -47,17 +52,21 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public List<ScheduleResponseDto> findAllMonthSchedule(Long idx , int month){
 
-        LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
-        LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+        try {
+            LocalDate startOfMonth = LocalDate.of(LocalDate.now().getYear(), month, 1);
+            LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-        return scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
-                .stream().map(schedule ->
-                    ScheduleResponseDto.builder()
-                            .title(schedule.getTitle())
-                            .start(schedule.getStart())
-                            .build())
-                .sorted(Comparator.comparing(ScheduleResponseDto::getStart))
-                .collect(Collectors.toList());
+            return scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
+                    .stream().map(schedule ->
+                            ScheduleResponseDto.builder()
+                                    .title(schedule.getTitle())
+                                    .start(schedule.getStart())
+                                    .build())
+                    .sorted(Comparator.comparing(ScheduleResponseDto::getStart))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
     }
 
 
@@ -66,12 +75,16 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public List<Schedule> findScheduleByDay(LocalDate date){
 
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.atTime(23, 59, 59);
+        try {
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.atTime(23, 59, 59);
 
-        return scheduleRepository.findByStartBetween(startOfDay, endOfDay)
-                .stream().sorted(Comparator.comparing(Schedule::getStart))
-                .collect(Collectors.toList());
+            return scheduleRepository.findByStartBetween(startOfDay, endOfDay)
+                    .stream().sorted(Comparator.comparing(Schedule::getStart))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
     }
 
 
@@ -79,17 +92,21 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Transactional
     @Override
     public Schedule saveSchedule(Schedule schedule){
-           Schedule createSchedule = Schedule.builder()
-                   .title(schedule.getTitle())
-                   .content(schedule.getContent())
-                   .start(schedule.getStart())
-                   .end(schedule.getEnd())
-                   .location(schedule.getLocation())
-                   .color(schedule.getColor())
-                   .calendars(schedule.getCalendars())
-                   .build();
+        try {
+            Schedule createSchedule = Schedule.builder()
+                    .title(schedule.getTitle())
+                    .content(schedule.getContent())
+                    .start(schedule.getStart())
+                    .end(schedule.getEnd())
+                    .location(schedule.getLocation())
+                    .color(schedule.getColor())
+                    .calendars(schedule.getCalendars())
+                    .build();
 
-           return scheduleRepository.save(createSchedule);
+            return scheduleRepository.save(createSchedule);
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
     }
 
 
@@ -98,12 +115,16 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public Schedule updateSchedule(Schedule schedule){
 
-        Schedule uploadSchedule = scheduleRepository.findById(schedule.getIdx())
-                .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        try {
+            Schedule uploadSchedule = scheduleRepository.findById(schedule.getIdx())
+                    .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
 
-        modelMapper.map(schedule, uploadSchedule);
+            modelMapper.map(schedule, uploadSchedule);
 
-        return scheduleRepository.save(uploadSchedule);
+            return scheduleRepository.save(uploadSchedule);
+        }catch (Exception e) {
+            throw new ServiceException("",e);
+        }
     }
 
 
@@ -112,6 +133,10 @@ public class ScheduleServiceImpl implements ScheduleService{
     @Override
     public void deleteSchedule(Long idx){
 
-        scheduleRepository.deleteById(idx);
+        try {
+            scheduleRepository.deleteById(idx);
+        }catch (Exception e) {
+            throw new ServiceException("",e);
+        }
     }
 }
