@@ -10,11 +10,7 @@ import java.time.LocalDateTime;
 @Data
 public class ScheduleRequestDto {
 
-
-        private Long idx;
-
         @Schema(example = "제목을 넣어주세요")
-
         private String title;
 
         @Schema(example = "내용을 넣어주세요")
@@ -26,9 +22,8 @@ public class ScheduleRequestDto {
 
         private String location;
 
+        private Color color;
 
-        private Color color = Color.ORANGE;
-
-
-        private Calendars calendar;
+        @Schema(example = "c_idx")
+        private Long calendarsIdx;
 }
