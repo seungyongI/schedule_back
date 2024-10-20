@@ -25,8 +25,9 @@ INSERT INTO schedule (s_idx, s_title, s_content, s_start, s_end, s_location, s_c
 (6, 'Project Planning', 'Planning for new project', '2024-01-05 10:00:00', '2024-01-05 11:00:00', 'Office', 'PINK', 1),
 (7, 'Client Call', 'Discussion with client', '2024-01-06 15:00:00', '2024-01-06 16:00:00', 'Office', 'GRAY', 1),
 (8, 'Marketing Strategy', 'Team discussion on marketing', '2024-01-07 09:00:00', '2024-01-07 10:00:00', 'Office', 'BLUE', 1),
-(9, 'Team Building', 'Team-building activities', '2024-01-08 14:00:00', '2024-01-08 17:00:00', 'Outdoor Park', 'GREEN', 1),
-(10, 'Weekly Review', 'Review of the week', '2024-01-09 11:00:00', '2024-01-09 12:00:00', 'Conference Room', 'YELLOW', 1);
+(9, 'Team Building', 'Team-building activities', '2024-01-08 14:00:00', '2024-01-10 17:00:00', 'Outdoor Park', 'GREEN', 1),
+(10, 'Weekly Review', 'Review of the week', '2024-01-09 11:00:00', '2024-01-09 12:00:00', 'Conference Room', 'YELLOW', 1),
+(11, 'Weekly Review2', 'Review of the week2', '2024-01-09 13:00:00', '2024-01-09 15:00:00', 'Conference Room2', 'YELLOW', 1);
 
 -- INSERT INTO 'diary' table
 INSERT INTO diary (d_idx, d_title, d_content, d_date, d_category, cal_idx) VALUES
