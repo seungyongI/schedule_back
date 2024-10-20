@@ -2,9 +2,7 @@ package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Category;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -14,6 +12,8 @@ import java.util.Date;
 @Getter
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Diary {
 
     @Id
