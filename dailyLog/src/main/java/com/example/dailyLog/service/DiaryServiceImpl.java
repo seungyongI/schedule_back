@@ -1,12 +1,17 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.constant.Category;
-import com.example.dailyLog.dto.DiaryResponseCategoryDto;
-import com.example.dailyLog.dto.DiaryResponseDayDto;
-import com.example.dailyLog.dto.ScheduleResponseDayDto;
+import com.example.dailyLog.dto.request.DiaryRequestInsertDto;
+import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
+import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
+import com.example.dailyLog.dto.response.DiaryResponseDayDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Diary;
 import com.example.dailyLog.entity.Schedule;
+import com.example.dailyLog.entity.User;
+import com.example.dailyLog.exception.BizException;
+import com.example.dailyLog.exception.ErrorCode;
+import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
@@ -15,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +28,9 @@ import java.util.stream.Collectors;
 public class DiaryServiceImpl implements DiaryService{
 
     private final DiaryRepository diaryRepository;
+    private final CalendarRepository calendarRepository;
     private final ModelMapper modelMapper;
+
 
     // 전체 일기 조회
     @Transactional
@@ -45,6 +51,8 @@ public class DiaryServiceImpl implements DiaryService{
             throw new ServiceException("",e);
         }
     }
+
+
     // 카테고리별 전체 일기 조회
     @Transactional
     @Override
@@ -94,41 +102,63 @@ public class DiaryServiceImpl implements DiaryService{
     }
 
 
+    // 일기 입력
+    @Transactional
+    @Override
+    public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto) {
+
+        try {
+            Calendars calendar = calendarRepository.findById(diaryRequestInsertDto.getCalendarsIdx())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid calendar ID"));
+
+            User user = calendar.getUser();
+            if (user == null) {
+                throw new IllegalArgumentException("No user associated with the given calendar ID");
+            }
+
+            Diary createDiary = Diary.builder()
+                    .title(diaryRequestInsertDto.getTitle())
+                    .content(diaryRequestInsertDto.getContent())
+                    .date(diaryRequestInsertDto.getDate())
+                    .category(diaryRequestInsertDto.getCategory())
+                    .calendars(calendar)
+                    .build();
+            diaryRepository.save(createDiary);
+        } catch (Exception e) {
+            throw new ServiceException("", e);
+        }
+    }
 
 
+    // 일기 수정
+    @Transactional
+    @Override
+    public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto) {
 
-//    // 일기 입력
-//    @Transactional
-//    @Override
-//    public Diary saveDiary(Diary diary) {
-//        Diary createDiary = Diary.builder()
-//                .title(diary.getTitle())
-//                .content(diary.getContent())
-//                .date(diary.getDate())
-//                .category(diary.getCategory())
-//                .calendars(diary.getCalendars())
-//                .build();
-//        return diaryRepository.save(createDiary);
-//    }
-//
-//
-//    // 일기 수정
-//    @Transactional
-//    @Override
-//    public Diary updateDiary(Diary diary) {
-//        Diary uploadDiary = diaryRepository.findById(diary.getIdx())
-//                .orElseThrow(()-> new IllegalArgumentException("Diary not found"));
-//        modelMapper.map(diary,uploadDiary);
-//
-//        return diaryRepository.save(uploadDiary);
-//    }
-//
-//
-//    // 일기 삭제
-//    @Transactional
-//    @Override
-//    public Diary deleteDiary(Long idx) {
-//        diaryRepository.deleteById(idx);
-//        return null;
-//    }
+        try {
+            Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
+                    .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND));
+
+            modelMapper.getConfiguration().setSkipNullEnabled(true);
+            modelMapper.map(diaryRequestUpdateDto, updateDiary);
+
+            diaryRepository.save(updateDiary);
+
+        } catch (Exception e) {
+            throw new ServiceException("", e);
+        }
+    }
+
+
+    // 일기 삭제
+    @Transactional
+    @Override
+    public void deleteDiary(Long idx){
+
+        try {
+            diaryRepository.deleteById(idx);
+        }catch (Exception e) {
+            throw new ServiceException("",e);
+        }
+    }
 }

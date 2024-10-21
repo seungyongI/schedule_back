@@ -1,4 +1,4 @@
-package com.example.dailyLog.dto;
+package com.example.dailyLog.dto.response;
 
 import com.example.dailyLog.constant.Color;
 import lombok.Builder;

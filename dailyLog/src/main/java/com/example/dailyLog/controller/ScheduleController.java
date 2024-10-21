@@ -1,10 +1,10 @@
 package com.example.dailyLog.controller;
 
-import com.example.dailyLog.dto.ScheduleRequestDto;
-import com.example.dailyLog.dto.ScheduleResponseDayDto;
-import com.example.dailyLog.dto.ScheduleResponseMonthDto;
-import com.example.dailyLog.dto.ScheduleResponseYearDto;
-import com.example.dailyLog.entity.Schedule;
+import com.example.dailyLog.dto.request.ScheduleRequestInsertDto;
+import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
+import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
+import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
+import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -55,14 +55,40 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleResponseDayDto);
     }
 
+
+    // 일정 입력
     @PostMapping(value = "/create")
-    public ResponseEntity<String> save(@RequestBody ScheduleRequestDto scheduleRequestDto) {
+    public ResponseEntity<String> saveSchedule(@RequestBody ScheduleRequestInsertDto scheduleRequestInsertDto) {
         try {
-            scheduleService.saveSchedule(scheduleRequestDto);
+            scheduleService.saveSchedule(scheduleRequestInsertDto);
             return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create schedule: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create schedule: " + e.getMessage());
+        }
+    }
+
+
+    // 일정 수정
+    @PostMapping(value = "/update")
+    public ResponseEntity<String> updateSchedule(@RequestBody ScheduleRequestUpdateDto scheduleRequestUpdateDto){
+        try{
+            scheduleService.updateSchedule(scheduleRequestUpdateDto);
+            return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update schedule: "+e.getMessage());
+        }
+    }
+
+
+    // 일정 삭제
+    @PostMapping(value = "/delete/{idx}")
+    public ResponseEntity<String> deleteSchedule(@PathVariable(name = "idx") Long idx){
+        try{
+            scheduleService.deleteSchedule(idx);
+            return ResponseEntity.status(HttpStatus.OK).body("Schedule deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to delete schedule: "+e.getMessage());
         }
     }
 }
