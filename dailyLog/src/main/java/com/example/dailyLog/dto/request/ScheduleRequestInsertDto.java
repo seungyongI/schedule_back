@@ -1,14 +1,14 @@
-package com.example.dailyLog.dto;
+package com.example.dailyLog.dto.request;
 
 import com.example.dailyLog.constant.Color;
-import com.example.dailyLog.entity.Calendars;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Data
-public class ScheduleRequestDto {
+@Getter
+public class ScheduleRequestInsertDto {
 
         @Schema(example = "제목을 넣어주세요")
         private String title;

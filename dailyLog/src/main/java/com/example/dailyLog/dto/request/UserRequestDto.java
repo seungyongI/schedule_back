@@ -1,4 +1,4 @@
-package com.example.dailyLog.dto;
+package com.example.dailyLog.dto.request;
 
 import com.example.dailyLog.entity.Calendars;
 import lombok.Data;

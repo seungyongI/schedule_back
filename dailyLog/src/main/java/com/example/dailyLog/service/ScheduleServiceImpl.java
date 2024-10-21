@@ -1,9 +1,10 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.dto.ScheduleRequestDto;
-import com.example.dailyLog.dto.ScheduleResponseDayDto;
-import com.example.dailyLog.dto.ScheduleResponseMonthDto;
-import com.example.dailyLog.dto.ScheduleResponseYearDto;
+import com.example.dailyLog.dto.request.ScheduleRequestInsertDto;
+import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
+import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
+import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
+import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.entity.User;
@@ -33,29 +34,6 @@ public class ScheduleServiceImpl implements ScheduleService{
     private final ModelMapper modelMapper;
 
 
-    // 연달력 전체 일정 조회
-    @Transactional
-    @Override
-    public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year){
-
-        try {
-            LocalDate startOfYear = LocalDate.of(year, 1, 1);
-            LocalDate endOfYear = LocalDate.of(year, 12, 31);
-
-            return scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59))
-                    .stream().map(schedule ->
-                            ScheduleResponseYearDto.builder()
-                                    .start(schedule.getStart())
-                                    .color(schedule.getColor())
-                                    .build())
-                    .sorted(Comparator.comparing(ScheduleResponseYearDto::getStart))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new ServiceException("",e);
-        }
-    }
-
-
     // 월달력 전체 일정 조회
     @Transactional
     @Override
@@ -73,6 +51,29 @@ public class ScheduleServiceImpl implements ScheduleService{
                                     .color(schedule.getColor())
                                     .build())
                     .sorted(Comparator.comparing(ScheduleResponseMonthDto::getStart))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
+    }
+
+
+    // 연달력 전체 일정 조회
+    @Transactional
+    @Override
+    public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year){
+
+        try {
+            LocalDate startOfYear = LocalDate.of(year, 1, 1);
+            LocalDate endOfYear = LocalDate.of(year, 12, 31);
+
+            return scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59))
+                    .stream().map(schedule ->
+                            ScheduleResponseYearDto.builder()
+                                    .start(schedule.getStart())
+                                    .color(schedule.getColor())
+                                    .build())
+                    .sorted(Comparator.comparing(ScheduleResponseYearDto::getStart))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new ServiceException("",e);
@@ -113,9 +114,9 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 일정 입력
     @Transactional
     @Override
-    public void saveSchedule(ScheduleRequestDto scheduleRequestDto){
+    public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto){
         try {
-            Calendars calendar = calendarRepository.findById(scheduleRequestDto.getCalendarsIdx())
+            Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid calendar ID"));
 
             User user = calendar.getUser();
@@ -124,12 +125,12 @@ public class ScheduleServiceImpl implements ScheduleService{
             }
 
             Schedule createSchedule = Schedule.builder()
-                    .title(scheduleRequestDto.getTitle())
-                    .content(scheduleRequestDto.getContent())
-                    .start(scheduleRequestDto.getStart())
-                    .end(scheduleRequestDto.getEnd())
-                    .location(scheduleRequestDto.getLocation())
-                    .color(scheduleRequestDto.getColor())
+                    .title(scheduleRequestInsertDto.getTitle())
+                    .content(scheduleRequestInsertDto.getContent())
+                    .start(scheduleRequestInsertDto.getStart())
+                    .end(scheduleRequestInsertDto.getEnd())
+                    .location(scheduleRequestInsertDto.getLocation())
+                    .color(scheduleRequestInsertDto.getColor())
                     .calendars(calendar)
                     .build();
             scheduleRepository.save(createSchedule);
@@ -143,17 +144,19 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 일정 수정
     @Transactional
     @Override
-    public Schedule updateSchedule(Schedule schedule){
+    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto){
 
         try {
-            Schedule uploadSchedule = scheduleRepository.findById(schedule.getIdx())
+            Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
                     .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND));
 
-            modelMapper.map(schedule, uploadSchedule);
+            modelMapper.getConfiguration().setSkipNullEnabled(true);
+            modelMapper.map(scheduleRequestUpdateDto, updateSchedule);
 
-            return scheduleRepository.save(uploadSchedule);
-        }catch (Exception e) {
-            throw new ServiceException("",e);
+            scheduleRepository.save(updateSchedule);
+
+        } catch (Exception e) {
+            throw new ServiceException("", e);
         }
     }
 
