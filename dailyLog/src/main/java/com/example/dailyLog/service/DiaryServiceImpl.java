@@ -5,6 +5,8 @@ import com.example.dailyLog.dto.request.DiaryRequestInsertDto;
 import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
 import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
+import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
+import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Diary;
 import com.example.dailyLog.entity.Schedule;
@@ -30,6 +32,29 @@ public class DiaryServiceImpl implements DiaryService{
     private final DiaryRepository diaryRepository;
     private final CalendarRepository calendarRepository;
     private final ModelMapper modelMapper;
+
+
+    // 월달력 전체 일기 조회(마커)
+    @Transactional
+    @Override
+    public List<DiaryResponseMonthDto> findAllMonthDiary(Long idx, int year, int month){
+
+        try {
+            LocalDate startOfMonth = LocalDate.of(year, month, 1);
+            LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+
+            return diaryRepository.findByCalendarsUserIdxAndDateBetween(idx, startOfMonth, endOfMonth)
+                    .stream().map(diary ->
+                            DiaryResponseMonthDto.builder()
+                                    .title(diary.getTitle())
+                                    .date(diary.getDate())
+                                    .build())
+                    .sorted(Comparator.comparing(DiaryResponseMonthDto::getDate))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
+    }
 
 
     // 전체 일기 조회

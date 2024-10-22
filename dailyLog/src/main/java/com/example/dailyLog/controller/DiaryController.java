@@ -6,6 +6,8 @@ import com.example.dailyLog.dto.request.ScheduleRequestInsertDto;
 import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
 import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
+import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
+import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,9 +19,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/diary")
 @RequiredArgsConstructor
+@CrossOrigin
 public class DiaryController {
 
     private final DiaryService diaryService;
+
+
+    // 홈페이지 첫화면 기본 창(월달력 조회)
+    @GetMapping("/{idx}/{year}/{month}")
+    public ResponseEntity<List<DiaryResponseMonthDto>> getAllMonthDiary(
+            @PathVariable(name = "idx") Long idx,
+            @PathVariable(name = "year") int year,
+            @PathVariable(name = "month") int month){
+        List<DiaryResponseMonthDto> diaryResponseMonthDto = diaryService.findAllMonthDiary(idx, year, month);
+        return ResponseEntity.ok(diaryResponseMonthDto);
+    }
 
 
     //받은 날짜 값의 모든 다이어리 조회

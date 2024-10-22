@@ -4,16 +4,17 @@ import com.example.dailyLog.constant.Color;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
 @Getter
 public class ScheduleRequestInsertDto {
 
-        @Schema(example = "제목을 넣어주세요")
+        @Length(min = 1, max = 50)
         private String title;
 
-        @Schema(example = "내용을 넣어주세요")
+        @Length(max = 3000)
         private String content;
 
         private LocalDateTime start;
@@ -24,6 +25,6 @@ public class ScheduleRequestInsertDto {
 
         private Color color;
 
-        @Schema(example = "c_idx")
+        @Schema(example = "c_idx", hidden = true)
         private Long calendarsIdx;
 }
