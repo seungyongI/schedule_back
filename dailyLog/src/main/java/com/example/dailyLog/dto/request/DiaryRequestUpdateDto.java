@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 
@@ -15,12 +16,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DiaryRequestUpdateDto {
 
+    @Schema(hidden = true)
     private Long idx;
 
-    @Schema(example = "제목을 넣어주세요")
+    @Length(min = 1, max = 50)
     private String title;
 
-    @Schema(example = "내용을 넣어주세요")
+    @Length(max = 3000)
     private String content;
 
     private LocalDate date;
