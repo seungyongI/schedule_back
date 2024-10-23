@@ -60,13 +60,12 @@ public class ScheduleController {
     // 일정 입력
     @PostMapping(value = "/create")
     public ResponseEntity<String> saveSchedule(@RequestBody ScheduleRequestInsertDto scheduleRequestInsertDto) {
-        try {
+//        try {
             scheduleService.saveSchedule(scheduleRequestInsertDto);
             return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create schedule: " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create schedule: " + e.getMessage());
+//        }
     }
 
 

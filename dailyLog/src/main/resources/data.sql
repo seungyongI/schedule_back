@@ -6,13 +6,14 @@ INSERT INTO calendars (cal_idx, c_holiday, c_theme) VALUES
 (4, '2024-01-04', 'JHI'),
 (5, '2024-01-05', 'LIGHT');
 
--- INSERT INTO 'user' table
---INSERT INTO user (u_idx, u_nickname, u_img, u_joinday, cal_idx) VALUES
---(1, 'JohnDoe', 'profile1.jpg', '2024-01-01 09:00:00', 1),
---(2, 'JaneSmith', 'profile2.jpg', '2024-01-02 10:00:00', 2),
---(3, 'MikeJohnson', 'profile3.jpg', '2024-01-03 11:00:00', 3),
---(4, 'AliceWong', 'profile4.jpg', '2024-01-04 12:00:00', 4),
---(5, 'DavidLee', 'profile5.jpg', '2024-01-05 13:00:00', 5);
+-- user 테이블에 대한 더미 데이터 삽입
+INSERT INTO user (u_idx, u_email, u_password, u_nickname, u_img, u_joinday, cal_idx, provider) VALUES
+(1, 'johndoe@example.com', 'password123', 'JohnDoe', 'profile1.jpg', '2024-01-01 09:00:00', 1, 'LOCAL'),
+(2, 'janesmith@example.com', 'password456', 'JaneSmith', 'profile2.jpg', '2024-01-02 10:00:00', 2, 'LOCAL'),
+(3, 'mikejohnson@example.com', 'password789', 'MikeJohnson', 'profile3.jpg', '2024-01-03 11:00:00', 3, 'LOCAL'),
+(4, 'alicewong@example.com', 'password101', 'AliceWong', 'profile4.jpg', '2024-01-04 12:00:00', 4, 'LOCAL'),
+(5, 'davidlee@example.com', 'password202', 'DavidLee', 'profile5.jpg', '2024-01-05 13:00:00', 5, 'LOCAL');
+
 
 -- INSERT INTO 'schedule' table
 INSERT INTO schedule (s_idx, s_title, s_content, s_start, s_end, s_location, s_color, cal_idx) VALUES

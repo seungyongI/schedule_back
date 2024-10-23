@@ -1,9 +1,7 @@
 package com.example.dailyLog.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import com.example.dailyLog.constant.Category;
@@ -16,6 +14,8 @@ import java.util.Calendar;
 @Getter
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
