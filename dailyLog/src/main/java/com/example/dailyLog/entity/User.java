@@ -1,11 +1,13 @@
 package com.example.dailyLog.entity;
 
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import com.example.dailyLog.constant.Category;
-import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Calendar;
 
@@ -13,12 +15,17 @@ import java.util.Calendar;
 @Table(name = "user")
 @Getter
 @ToString
-public class User{
+@Builder
+public class User {
 
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "u_idx")
     private Long idx;
+    @Column(name = "u_email", nullable = false, unique = true)
+    private String email;
+    @Column(name = "u_password", nullable = false)
+    private String password;
 
     @Column(name = "u_nickname", nullable = false, unique = true)
     private String userName;
@@ -34,5 +41,7 @@ public class User{
     @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
 
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
 }
