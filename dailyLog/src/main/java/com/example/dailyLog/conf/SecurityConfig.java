@@ -29,7 +29,7 @@ public class SecurityConfig {
 
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/login/**","/join/**")
+                        .requestMatchers("/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

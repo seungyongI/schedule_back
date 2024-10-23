@@ -121,7 +121,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 
             User user = calendar.getUser();
             if (user == null) {
-                throw new IllegalArgumentException("No user associated with the given calendar ID");
+                throw new BizException(ErrorCode.USER_NOT_FOUND);
             }
 
             Schedule createSchedule = Schedule.builder()
