@@ -1,13 +1,11 @@
 package com.example.dailyLog.entity;
 
+import com.example.dailyLog.constant.Provider;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
-import com.example.dailyLog.constant.Category;
-
 import java.time.LocalDateTime;
-import java.util.Calendar;
 
 @Entity
 @Table(name = "user")

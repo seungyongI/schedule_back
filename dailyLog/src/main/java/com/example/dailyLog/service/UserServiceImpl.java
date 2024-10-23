@@ -1,13 +1,11 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
-import com.example.dailyLog.entity.Provider;
+import com.example.dailyLog.constant.Provider;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
