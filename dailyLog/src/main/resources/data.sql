@@ -50,4 +50,13 @@ INSERT INTO diary (d_idx, d_title, d_content, d_date, d_category, cal_idx) VALUE
 (17, 'Day 16', 'Random thoughts again', '2024-01-16', 'ETC', 5),
 (18, 'Day 17', 'Exploring a new park', '2024-01-17', 'TRIP', 4),
 (19, 'Day 18', 'Work meeting', '2024-01-18', 'DAILY', 1),
-(20, 'Day 19', 'Started learning guitar', '2024-01-19', 'GROWTH', 2);
+(20, 'Day 19', 'Started learning guitar', '2024-10-19', 'GROWTH', 2),
+(21, 'Day 19', 'Started learning guitar2', '2024-10-19', 'GROWTH', 1),
+(22, 'Day 19', 'Started learning guitar3', '2024-10-20', 'GROWTH', 1),
+(23, 'Day 19', 'Started learning guitar4', '2024-10-25', 'GROWTH', 1),
+(24, 'Day 19', 'Started learning guitar5', '2024-10-19', 'GROWTH', 1),
+(25, 'Day 19', 'Started learning guitar', '2024-10-23', 'GROWTH', 1),
+(26, 'Day 19', 'Started learning guitar2', '2024-10-23', 'GROWTH', 1),
+(27, 'Day 19', 'Started learning guitar3', '2024-10-23', 'GROWTH', 1),
+(28, 'Day 19', 'Started learning guitar4', '2024-10-23', 'GROWTH', 1),
+(29, 'Day 19', 'Started learning guitar5', '2024-10-23', 'GROWTH', 1);
