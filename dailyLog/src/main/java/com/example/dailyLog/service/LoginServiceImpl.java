@@ -1,9 +1,9 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.details.LoginDetails;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +14,13 @@ public class LoginServiceImpl implements LoginService {
 
 
     @Override
-    public LoginDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-       User user = userRepository.findByUserName(userName).orElseThrow(() -> new UsernameNotFoundException(userName));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+       User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
 
-        return new LoginDetails(user);
+       UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword()).build();
+
+       return userDetails;
     }
 }

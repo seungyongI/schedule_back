@@ -4,6 +4,7 @@ import com.example.dailyLog.constant.Provider;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,14 +15,17 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "u_idx")
     private Long idx;
+
     @Column(name = "u_email", nullable = false, unique = true)
     private String email;
+
     @Column(name = "u_password", nullable = false)
     private String password;
 
@@ -36,7 +40,7 @@ public class User {
     private LocalDateTime joinDate;
 
     @OneToOne
-    @JoinColumn(name = "cal_idx", nullable = false)
+    @JoinColumn(name = "cal_idx")
     private Calendars calendars;
 
     @Enumerated(EnumType.STRING)

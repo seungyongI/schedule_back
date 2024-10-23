@@ -21,13 +21,19 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public User createUser(UserRequestInsertDto userRequestInsertDto) {
         try{
+            if(userRequestInsertDto.getPassword() == null) {
+                throw new IllegalArgumentException("비밀번호는 필수 입력 값입니다.");
+            }
             User user = User.builder()
                     .email(userRequestInsertDto.getEmail())
                     .password(passwordEncoder.encode(userRequestInsertDto.getPassword()))
                     .userName(userRequestInsertDto.getUserName())
                     .provider(Provider.LOCAL)
+                    .joinDate(userRequestInsertDto.getJoinDate())
                     .build();
             userRepository.save(user);
+
+            System.out.println("save");
         } catch (DuplicateKeyException e) { // 아이디 중복 예외 처리
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         } catch (Exception e) { // 기타 예외 처리
