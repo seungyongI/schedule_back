@@ -17,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
+@CrossOrigin
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -82,7 +83,7 @@ public class ScheduleController {
 
 
     // 일정 삭제
-    @PostMapping(value = "/delete/{idx}")
+    @DeleteMapping(value = "/delete/{idx}")
     public ResponseEntity<String> deleteSchedule(@PathVariable(name = "idx") Long idx){
         try{
             scheduleService.deleteSchedule(idx);

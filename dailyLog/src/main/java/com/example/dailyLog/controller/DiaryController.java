@@ -80,7 +80,7 @@ public class DiaryController {
     }
 
 
-    // 일정 수정
+    // 일기 수정
     @PostMapping(value = "/update")
     public ResponseEntity<String> updateDiary(@RequestBody DiaryRequestUpdateDto diaryRequestUpdateDto) {
         try {
@@ -92,8 +92,8 @@ public class DiaryController {
     }
 
 
-    // 일정 삭제
-    @PostMapping(value = "/delete/{idx}")
+    // 일기 삭제
+    @DeleteMapping(value = "/delete/{idx}")
     public ResponseEntity<String> deleteDiary(@PathVariable(name = "idx") Long idx) {
         try {
             diaryService.deleteDiary(idx);
