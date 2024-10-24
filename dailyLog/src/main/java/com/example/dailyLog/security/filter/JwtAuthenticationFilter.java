@@ -1,6 +1,6 @@
-package com.example.dailyLog.filter;
+package com.example.dailyLog.security.filter;
 
-import com.example.dailyLog.providers.JwtTokenProvider;
+import com.example.dailyLog.security.providers.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

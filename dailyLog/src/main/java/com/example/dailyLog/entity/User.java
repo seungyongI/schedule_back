@@ -33,7 +33,7 @@ public class User {
     private String userName;
 
     @Column(name = "u_img")
-    private String proFile;
+    private String profile;
 
     @CreatedDate
     @Column(name = "u_joinday", updatable = false)

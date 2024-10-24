@@ -1,4 +1,4 @@
-package com.example.dailyLog.providers;
+package com.example.dailyLog.security.providers;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

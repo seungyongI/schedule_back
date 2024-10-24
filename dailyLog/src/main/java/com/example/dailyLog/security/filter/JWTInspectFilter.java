@@ -1,4 +1,4 @@
-package com.example.dailyLog.filter;
+package com.example.dailyLog.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

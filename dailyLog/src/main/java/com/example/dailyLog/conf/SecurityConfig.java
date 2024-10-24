@@ -1,7 +1,7 @@
 package com.example.dailyLog.conf;
 
-import com.example.dailyLog.filter.JwtAuthenticationFilter;
-import com.example.dailyLog.providers.JwtTokenProvider;
+import com.example.dailyLog.security.filter.JwtAuthenticationFilter;
+import com.example.dailyLog.security.providers.JwtTokenProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
