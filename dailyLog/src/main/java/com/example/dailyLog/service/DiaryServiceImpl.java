@@ -57,46 +57,35 @@ public class DiaryServiceImpl implements DiaryService{
     }
 
 
-    // 전체 일기 조회
-    @Transactional
-    @Override
-    public List<DiaryResponseCategoryDto> findDiaryCategoryAll(Long idx) {
-        try {
-            return diaryRepository.findByCalendarsUserIdx(idx)
-                    .stream()
-                    .map(diary ->
-                            DiaryResponseCategoryDto.builder()
-                                    .title(diary.getTitle())
-                                    .date(diary.getDate())
-                                    .category(diary.getCategory())
-                                    .build())
-                    .sorted(Comparator.comparing(DiaryResponseCategoryDto::getDate))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new ServiceException("",e);
-        }
-    }
-
-
-    // 카테고리별 전체 일기 조회
+    // 전체 및 카테고리별 전체 일기 조회
     @Transactional
     @Override
     public List<DiaryResponseCategoryDto> findDiaryCategory(Long idx, String category) {
         try {
-
-            Category categoryEnum = Category.valueOf(category.toUpperCase());
-            return diaryRepository.findByCalendarsUserIdxAndCategory(idx,categoryEnum)
-                    .stream()
-                    .map(diary ->
-                            DiaryResponseCategoryDto.builder()
-                                    .title(diary.getTitle())
-                                    .date(diary.getDate())
-                                    .category(diary.getCategory())
-                                    .build())
-                    .sorted(Comparator.comparing(DiaryResponseCategoryDto::getDate))
-                    .collect(Collectors.toList());
+            if (category.equals("ALL")) {
+                return diaryRepository.findByCalendarsUserIdx(idx)
+                        .stream()
+                        .map(diary -> DiaryResponseCategoryDto.builder()
+                                .title(diary.getTitle())
+                                .date(diary.getDate())
+                                .category(diary.getCategory())
+                                .build())
+                        .sorted(Comparator.comparing(DiaryResponseCategoryDto::getDate))
+                        .collect(Collectors.toList());
+            } else {
+                Category categoryEnum = Category.valueOf(category.toUpperCase());
+                return diaryRepository.findByCalendarsUserIdxAndCategory(idx, categoryEnum)
+                        .stream()
+                        .map(diary -> DiaryResponseCategoryDto.builder()
+                                .title(diary.getTitle())
+                                .date(diary.getDate())
+                                .category(diary.getCategory())
+                                .build())
+                        .sorted(Comparator.comparing(DiaryResponseCategoryDto::getDate))
+                        .collect(Collectors.toList());
+            }
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Error fetching diaries", e);
         }
     }
 

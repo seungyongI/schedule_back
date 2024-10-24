@@ -48,15 +48,6 @@ public class DiaryController {
     }
 
 
-    //받은 id 값에 해당하는 모든 다이어리 조회
-    @GetMapping("/{idx}")
-    public ResponseEntity<List<DiaryResponseCategoryDto>> getAllCategoryDiary(
-            @PathVariable(name = "idx") Long idx) {
-        List<DiaryResponseCategoryDto> diaryResponseAllDto = diaryService.findDiaryCategoryAll(idx);
-        return ResponseEntity.ok(diaryResponseAllDto);
-    }
-
-
     //해당 유저의 카테고리에 대한하는 다이어리만 조회
     @GetMapping("/{idx}/{category}")
     public ResponseEntity<List<DiaryResponseCategoryDto>> getCategoryDiary(
