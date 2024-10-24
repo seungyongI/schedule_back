@@ -6,6 +6,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
@@ -31,6 +32,17 @@ public class ErrorController {
                 .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                 .localDateTime(LocalDateTime.now())
             .build()
+        );
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> sqlIntegrityConstraintViolationException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                ErrorResponse.builder()
+                        .message("email 중복입니다.")
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .localDateTime(LocalDateTime.now())
+                        .build()
         );
     }
 

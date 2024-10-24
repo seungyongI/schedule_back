@@ -33,10 +33,10 @@ public class User {
     private String userName;
 
     @Column(name = "u_img")
-    private String Profile;
+    private String proFile;
 
     @CreatedDate
-    @Column(name = "u_joinday", updatable = false, nullable = false)
+    @Column(name = "u_joinday", updatable = false)
     private LocalDateTime joinDate;
 
     @OneToOne
