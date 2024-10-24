@@ -8,8 +8,8 @@ import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.entity.User;
-import com.example.dailyLog.exception.BizException;
-import com.example.dailyLog.exception.ErrorCode;
+import com.example.dailyLog.exception.commonException.BizException;
+import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +121,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 
             User user = calendar.getUser();
             if (user == null) {
-                throw new BizException(ErrorCode.USER_NOT_FOUND);
+                throw new BizException(CommonErrorCode.USER_NOT_FOUND);
             }
 
             Schedule createSchedule = Schedule.builder()
@@ -148,7 +148,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 
         try {
             Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND));
+                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
 
             modelMapper.getConfiguration().setSkipNullEnabled(true);
             modelMapper.map(scheduleRequestUpdateDto, updateSchedule);

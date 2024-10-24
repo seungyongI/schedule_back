@@ -6,13 +6,11 @@ import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
 import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
 import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
-import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Diary;
-import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.entity.User;
-import com.example.dailyLog.exception.BizException;
-import com.example.dailyLog.exception.ErrorCode;
+import com.example.dailyLog.exception.commonException.BizException;
+import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
@@ -151,7 +149,7 @@ public class DiaryServiceImpl implements DiaryService{
 
         try {
             Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new BizException(ErrorCode.NOT_FOUND));
+                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
 
             modelMapper.getConfiguration().setSkipNullEnabled(true);
             modelMapper.map(diaryRequestUpdateDto, updateDiary);
