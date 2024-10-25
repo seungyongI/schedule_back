@@ -18,10 +18,10 @@ public class DiaryImage {
 
 
     @ManyToOne
-    @JoinColumn(name = "d_idx")
+    @JoinColumn(name = "d_idx", nullable = false)
     private Diary diary;
 
     @ManyToOne
-    @JoinColumn(name = "i_idx")
+    @JoinColumn(name = "i_idx", nullable = false)
     private Image image;
 }

@@ -18,10 +18,10 @@ public class ScheduleImage {
 
 
     @ManyToOne
-    @JoinColumn(name = "s_idx")
+    @JoinColumn(name = "s_idx", nullable = false)
     private Schedule schedule;
 
     @ManyToOne
-    @JoinColumn(name = "i_idx")
+    @JoinColumn(name = "i_idx", nullable = false)
     private Image image;
 }

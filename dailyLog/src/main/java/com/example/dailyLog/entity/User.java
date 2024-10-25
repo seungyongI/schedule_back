@@ -2,6 +2,7 @@ package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Provider;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,6 +31,7 @@ public class User {
     private String password;
 
     @Column(name = "u_nickname", nullable = false, unique = true)
+    @NotNull
     private String userName;
 
     @Column(name = "u_img")
@@ -40,10 +42,11 @@ public class User {
     private LocalDateTime joinDate;
 
     @OneToOne
-    @JoinColumn(name = "cal_idx")
+    @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Provider provider;
 
 }
