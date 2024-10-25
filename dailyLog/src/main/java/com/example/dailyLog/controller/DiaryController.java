@@ -61,13 +61,13 @@ public class DiaryController {
     // 일기 입력
     @PostMapping(value = "/create")
     public ResponseEntity<String> saveDiary(@RequestBody DiaryRequestInsertDto diaryRequestInsertDto) {
-        try {
+//        try {
             diaryService.saveDiary(diaryRequestInsertDto);
             return ResponseEntity.status(HttpStatus.CREATED).body("Diary created successfully");
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create diary: " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create diary: " + e.getMessage());
+//        }
     }
 
 

@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
-@Getter
+@Data
 public class ScheduleRequestInsertDto {
 
         @Length(min = 1, max = 50)
