@@ -34,21 +34,18 @@ public class AuthController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            String userName = userDetails.getUsername();
-            String profile = ((CustomUserDetails) userDetails).getProfile();
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
             String token = jwtTokenProvider.createToken(userDetails.getUsername(), request);
 
             LoginResponseDto responseDto = new LoginResponseDto();
             responseDto.setAccessToken(token);
-            responseDto.setUserName(userName); // userName 설정
-            responseDto.setProfile(profile); // profile 설정
+            responseDto.setUserName(userDetails.getUserName()); // userName 설정
+            responseDto.setProfile(userDetails.getProfile()); // profile 설정
 
             return ResponseEntity.ok(responseDto);
         } catch (AuthenticationException e) {
-            return ResponseEntity.badRequest().body(new LoginResponseDto());
+            return ResponseEntity.badRequest().body(new LoginResponseDto(e.getMessage()));
         }
     }
 }
