@@ -24,7 +24,7 @@ public class Diary {
     @Column(name = "d_title", nullable = false)
     private String title;
 
-    @Column(name = "d_content")
+    @Column(name = "d_content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "d_date", nullable = false)
@@ -37,6 +37,6 @@ public class Diary {
 
 
     @ManyToOne
-    @JoinColumn(name = "cal_idx")
+    @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
 }

@@ -25,9 +25,8 @@ public class Calendars {
     @Enumerated(EnumType.STRING)
     private Theme theme;
 
-
     @OneToOne(mappedBy = "calendars")
-    @JoinColumn(name = "u_idx")
+    @JoinColumn(name = "u_idx", nullable = false)
     private User user;
 
 }
