@@ -18,17 +18,14 @@ public class LoginServiceImpl implements LoginService {
 
     private final UserRepository userRepository;
 
+    private final ModelMapper modelMapper;
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
 
         // CustomUserDetails 객체 생성
-        return new CustomUserDetails(
-                user.getEmail(),
-                user.getPassword(),
-                user.getUserName(),
-                user.getProfile() // profile 설정
-        );
+        return modelMapper.map(user, CustomUserDetails.class);
     }
 }

@@ -1,7 +1,9 @@
 package com.example.dailyLog.service;
 
+import com.example.dailyLog.constant.Theme;
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.constant.Provider;
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,24 +23,25 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public User createUser(UserRequestInsertDto userRequestInsertDto) {
         try{
-            if(userRequestInsertDto.getPassword() == null) {
-                throw new IllegalArgumentException("비밀번호는 필수 입력 값입니다.");
-            }
+            Calendars calendars = Calendars.builder()
+                    .theme(Theme.LIGHT)
+                    .build();
+
             User user = User.builder()
                     .email(userRequestInsertDto.getEmail())
                     .password(passwordEncoder.encode(userRequestInsertDto.getPassword()))
                     .userName(userRequestInsertDto.getUserName())
                     .provider(Provider.LOCAL)
+                    .calendars(calendars)
                     .build();
-            userRepository.save(user);
 
-            System.out.println("save");
+            return userRepository.save(user);
+
         } catch (DuplicateKeyException e) { // 아이디 중복 예외 처리
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         } catch (Exception e) { // 기타 예외 처리
             throw new RuntimeException("회원 가입 중 오류 발생", e);
         }
-        return null;
     }
 
     @Override

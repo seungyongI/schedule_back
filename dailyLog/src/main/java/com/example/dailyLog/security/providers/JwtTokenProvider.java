@@ -22,7 +22,7 @@ public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    private final long tokenValidTime = 30 * 60 * 1000L; // 30분
+    private static final long TOKEN_VALID_TIME = 30 * 60 * 1000L; // 30분
 
     private final UserDetailsService userDetailsService;
 
@@ -36,12 +36,13 @@ public class JwtTokenProvider {
     }
 
     public String createToken(String userPk, HttpServletRequest request) {
-        Claims claims = Jwts.claims().setSubject(userPk); // role 정보 제거
+        Claims claims = Jwts.claims().setSubject(userPk);
+        // 사용자의 권한 정보를 담는 claim. role 정보는 현재 사용하지 않으므로 제거
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenValidTime))
+                .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
