@@ -1,6 +1,7 @@
 package com.example.dailyLog.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import com.example.dailyLog.constant.Category;
@@ -8,7 +9,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "diary_image")
-@Getter
+@Getter @Setter
 @ToString
 public class DiaryImage {
 

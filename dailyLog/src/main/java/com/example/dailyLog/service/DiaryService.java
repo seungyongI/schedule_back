@@ -5,6 +5,7 @@ import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
 import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
 import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface DiaryService {
     public List<DiaryResponseDayDto> findDiaryByDay(Long idx, int year,
                                                     int month, int day);
 
-    public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto);
+    public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto,List<MultipartFile> imageFileList);
     public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto);
     public void deleteDiary(Long idx);
 }
