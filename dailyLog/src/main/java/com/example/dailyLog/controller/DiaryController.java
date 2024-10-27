@@ -11,8 +11,10 @@ import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,10 +61,14 @@ public class DiaryController {
 
 
     // 일기 입력
-    @PostMapping(value = "/create")
-    public ResponseEntity<String> saveDiary(@RequestBody DiaryRequestInsertDto diaryRequestInsertDto) {
+    @PostMapping(value = "/create",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> saveDiary(@RequestPart(name = "diaryRequest")  DiaryRequestInsertDto diaryRequestInsertDto,
+                                            @RequestPart(name = "imageFiles") List<MultipartFile> imageFileList) {
         try {
-            diaryService.saveDiary(diaryRequestInsertDto);
+            System.out.println("DiaryRequest: " + diaryRequestInsertDto);
+            System.out.println("Image files count: " + imageFileList.size());
+
+            diaryService.saveDiary(diaryRequestInsertDto,imageFileList);
             return ResponseEntity.status(HttpStatus.CREATED).body("Diary created successfully");
 
         } catch (Exception e) {

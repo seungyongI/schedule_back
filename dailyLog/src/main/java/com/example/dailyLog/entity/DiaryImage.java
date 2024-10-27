@@ -1,6 +1,7 @@
 package com.example.dailyLog.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import com.example.dailyLog.constant.Category;
@@ -8,7 +9,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "diary_image")
-@Getter
+@Getter @Setter
 @ToString
 public class DiaryImage {
 
@@ -18,10 +19,10 @@ public class DiaryImage {
 
 
     @ManyToOne
-    @JoinColumn(name = "d_idx")
+    @JoinColumn(name = "d_idx", nullable = false)
     private Diary diary;
 
     @ManyToOne
-    @JoinColumn(name = "i_idx")
+    @JoinColumn(name = "i_idx", nullable = false)
     private Image image;
 }

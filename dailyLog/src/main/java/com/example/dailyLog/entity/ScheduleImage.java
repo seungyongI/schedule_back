@@ -16,7 +16,6 @@ public class ScheduleImage {
     @Column(name = "si_idx")
     private Long idx;
 
-
     @ManyToOne
     @JoinColumn(name = "s_idx")
     private Schedule schedule;

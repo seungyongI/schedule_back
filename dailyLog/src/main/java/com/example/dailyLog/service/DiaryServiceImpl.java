@@ -6,18 +6,18 @@ import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
 import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
 import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
-import com.example.dailyLog.entity.Calendars;
-import com.example.dailyLog.entity.Diary;
-import com.example.dailyLog.entity.User;
+import com.example.dailyLog.entity.*;
 import com.example.dailyLog.exception.commonException.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
+import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -30,6 +30,8 @@ public class DiaryServiceImpl implements DiaryService{
     private final DiaryRepository diaryRepository;
     private final CalendarRepository calendarRepository;
     private final ModelMapper modelMapper;
+    private final ImageService imageService;
+    private final DiaryImageRepository diaryImageRepository;
 
 
     // 월달력 전체 일기 조회(마커)
@@ -117,8 +119,7 @@ public class DiaryServiceImpl implements DiaryService{
     // 일기 입력
     @Transactional
     @Override
-    public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto) {
-
+    public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto,List<MultipartFile> imageFileList) {
         try {
             Calendars calendar = calendarRepository.findById(diaryRequestInsertDto.getCalendarsIdx())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid calendar ID"));
@@ -136,8 +137,21 @@ public class DiaryServiceImpl implements DiaryService{
                     .calendars(calendar)
                     .build();
             diaryRepository.save(createDiary);
+
+            for (MultipartFile file : imageFileList) {
+                if (!file.isEmpty()) {
+                    // 이미지 파일 저장
+                    Image image = imageService.saveImage(file);
+
+                    // 다이어리와 이미지를 연결하는 DiaryImage 생성 및 저장
+                    DiaryImage diaryImage = new DiaryImage();
+                    diaryImage.setDiary(createDiary);
+                    diaryImage.setImage(image);
+                    diaryImageRepository.save(diaryImage); // 새로 추가된 DiaryImageRepository를 사용
+                }
+            }
         } catch (Exception e) {
-            throw new ServiceException("", e);
+            throw new ServiceException("Failed to save diary with images", e);
         }
     }
 
