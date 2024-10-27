@@ -69,11 +69,12 @@ public class DiaryController {
             System.out.println("Image files count: " + imageFileList.size());
 
             diaryService.saveDiary(diaryRequestInsertDto,imageFileList);
+
             return ResponseEntity.status(HttpStatus.CREATED).body("Diary created successfully");
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create diary: " + e.getMessage());
-        }
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create diary: " + e.getMessage());
+       }
     }
 
 

@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 
-@Getter
+@Data
 public class DiaryRequestInsertDto {
 
     @Length(min = 1, max = 50)

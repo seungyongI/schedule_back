@@ -1,5 +1,6 @@
 package com.example.dailyLog.security;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -32,7 +33,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userName;
+        return email;
     }
 
     @Override
@@ -57,5 +58,10 @@ public class CustomUserDetails implements UserDetails {
 
     public String getProfile() {
         return profile;
+    }
+
+
+    public String getUserName() {
+        return userName;
     }
 }

@@ -23,7 +23,7 @@ public class Schedule {
     @Column(name = "s_title", nullable = false)
     private String title;
 
-    @Column(name = "s_content")
+    @Column(name = "s_content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "s_start", nullable = false)
@@ -42,6 +42,6 @@ public class Schedule {
 
 
     @ManyToOne
-    @JoinColumn(name = "cal_idx")
+    @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
 }
