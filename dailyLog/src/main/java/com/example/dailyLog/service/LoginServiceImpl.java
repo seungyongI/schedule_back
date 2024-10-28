@@ -3,6 +3,7 @@ package com.example.dailyLog.service;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
+import com.example.dailyLog.security.providers.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,14 +19,12 @@ public class LoginServiceImpl implements LoginService {
 
     private final UserRepository userRepository;
 
-    private final ModelMapper modelMapper;
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
 
         // CustomUserDetails 객체 생성
-        return modelMapper.map(user, CustomUserDetails.class);
+        return new ModelMapper().map(user, CustomUserDetails.class);
     }
 }

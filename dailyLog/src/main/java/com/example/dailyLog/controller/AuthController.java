@@ -7,6 +7,7 @@ import com.example.dailyLog.security.CustomUserDetails;
 import com.example.dailyLog.security.providers.JwtTokenProvider;
 import com.example.dailyLog.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,8 +15,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -28,31 +32,43 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto, HttpServletRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        String token = jwtTokenProvider.createToken(userDetails.getUsername(), request);
+            String token = jwtTokenProvider.createToken(userDetails.getUsername()); // HttpServletRequest 제거
 
-        LoginResponseDto responseDto = new LoginResponseDto();
-        responseDto.setAccessToken(token);
-        responseDto.setUserName(userDetails.getUserName());
-        responseDto.setProfile(userDetails.getProfile());
+            LoginResponseDto responseDto = LoginResponseDto.builder()
+                    .accessToken(token)
+                    .userName(userDetails.getUserName())
+                    .profile(userDetails.getProfile())
+                    .build();
 
-        return ResponseEntity.ok(responseDto);
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<LoginResponseDto> handleAuthenticationException(AuthenticationException e) {
-        return ResponseEntity.badRequest().body(new LoginResponseDto(e.getMessage()));
+            return ResponseEntity.ok(responseDto);
+        } catch (AuthenticationException e) {
+            return ResponseEntity.badRequest().body(new LoginResponseDto(null, null, null, e.getMessage())); // 에러 메시지 포함
+        }
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> join(@RequestBody UserRequestInsertDto userRequestInsertDto) {
+    public ResponseEntity<String> join(@Valid @RequestBody UserRequestInsertDto userRequestInsertDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // 유효성 검사 오류 처리
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            for (FieldError fieldError : fieldErrors) {
+                // 오류 메시지 처리
+                System.out.println(fieldError.getField() + ": " + fieldError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body("비밀번호는 8자~20자 사이여야 하며, 영문, 숫자, 특수문자를 각 하나씩 사용하셔야 합니다.");
+        }
+
         userService.createUser(userRequestInsertDto);
-        return ResponseEntity.ok("success");
+        return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
+
+
 }

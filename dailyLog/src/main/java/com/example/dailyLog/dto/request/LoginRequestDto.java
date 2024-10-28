@@ -1,8 +1,8 @@
 package com.example.dailyLog.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginRequestDto {
     @NotBlank(message = "아이디를 입력해주세요.")
+    @Email(message = "이메일 형식을 지켜주세요.")
     private String email;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")

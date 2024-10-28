@@ -8,8 +8,10 @@ import lombok.*;
 @Entity
 @Table(name = "calendars")
 @Getter
-@Builder
 @ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Calendars {
 
 
