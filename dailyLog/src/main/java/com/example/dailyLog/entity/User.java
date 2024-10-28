@@ -46,4 +46,8 @@ public class User {
     @Column(nullable = false)
     private Provider provider;
 
+    @OneToOne
+    @JoinColumn(name = "p_idx")
+    private ProfileImage profileImage;
+
 }
