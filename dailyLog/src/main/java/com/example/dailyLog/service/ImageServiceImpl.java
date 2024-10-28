@@ -1,10 +1,9 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.entity.Diary;
-import com.example.dailyLog.entity.DiaryImage;
 import com.example.dailyLog.entity.Image;
-import com.example.dailyLog.repository.DiaryImageRepository;
+import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.repository.ImageRepository;
+import com.example.dailyLog.repository.ProfileImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,8 @@ public class ImageServiceImpl implements ImageService {
     private String imageLocation;
 
     private final ImageRepository imageRepository;
+    private final ProfileImageRepository profileImageRepository;
     private final FileService fileService;
-    private final DiaryImageRepository diaryImageRepository;
 
     public Image saveImage(MultipartFile imageFile) throws Exception {
         if (!imageFile.isEmpty()) {
@@ -36,6 +35,23 @@ public class ImageServiceImpl implements ImageService {
             image.setOriImgName(oriImgName);
             image.setImgUrl(imageUrl);
             return imageRepository.save(image);
+
+        }
+        return null;
+    }
+    public ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception {
+        if (!imageFile.isEmpty()) {
+
+            String oriImgName = imageFile.getOriginalFilename();
+            String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
+            String imageUrl = "/images/" + savedFileName;
+
+            // ProfileImage 엔티티 생성 및 설정
+            ProfileImage profileImage = new ProfileImage();
+            profileImage.setImgName(savedFileName);
+            profileImage.setOriImgName(oriImgName);
+            profileImage.setImgUrl(imageUrl);
+            return profileImageRepository.save(profileImage);
 
         }
         return null;

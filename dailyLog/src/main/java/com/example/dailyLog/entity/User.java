@@ -34,9 +34,6 @@ public class User {
     @Column(name = "u_nickname", nullable = false, unique = true)
     private String userName;
 
-    @Column(name = "u_img")
-    private String profile;
-
     @CreatedDate
     @Column(name = "u_joinday", updatable = false)
     private LocalDateTime joinDate;
