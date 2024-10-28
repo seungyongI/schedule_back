@@ -1,27 +1,26 @@
 package com.example.dailyLog.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import jakarta.persistence.*;
 
 @Entity
-@Table(name = "image")
+@Table(name = "profile_image")
 @Getter @Setter
 @ToString
-public class Image {
+public class ProfileImage {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "i_idx")
+    @Column(name = "p_idx")
     private Long idx;
 
-    @Column(name = "img_name", nullable = false)
+    @Column(name = "p_img_name" , nullable = false)
     private String imgName;
 
-    @Column(name = "ori_img_name", nullable = false)
+    @Column(name = "p_ori_img_name" , nullable = false)
     private String oriImgName;
 
-    @Column(name = "img_url", nullable = false)
+    @Column(name = "p_img_url", nullable = false)
     private String imgUrl;
-
 }
