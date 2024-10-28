@@ -1,5 +1,6 @@
-package com.example.dailyLog.exception.commonException;
+package com.example.dailyLog.exception.commonException.error;
 
+import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
