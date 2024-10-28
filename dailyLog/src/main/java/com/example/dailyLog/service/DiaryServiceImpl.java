@@ -7,7 +7,7 @@ import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
 import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
 import com.example.dailyLog.entity.*;
-import com.example.dailyLog.exception.commonException.BizException;
+import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.DiaryImageRepository;

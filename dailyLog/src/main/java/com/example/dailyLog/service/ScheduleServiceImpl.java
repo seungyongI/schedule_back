@@ -8,7 +8,7 @@ import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import com.example.dailyLog.entity.User;
-import com.example.dailyLog.exception.commonException.BizException;
+import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ScheduleRepository;
