@@ -22,9 +22,14 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+                .orElseThrow(() -> new UsernameNotFoundException("email을 다시 확인해 주세요." + email));
 
-        // CustomUserDetails 객체 생성
-        return new ModelMapper().map(user, CustomUserDetails.class);
+        // CustomUserDetails 객체 직접 생성
+        return new CustomUserDetails(
+                user.getEmail(),
+                user.getPassword(),
+                user.getUserName(),
+                user.getProfile()
+        );
     }
 }
