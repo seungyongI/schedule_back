@@ -64,9 +64,6 @@ public class DiaryController {
     public ResponseEntity<String> saveDiary(@RequestPart(name = "diaryRequest")  DiaryRequestInsertDto diaryRequestInsertDto,
                                             @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
         try {
-            System.out.println("DiaryRequest: " + diaryRequestInsertDto);
-            System.out.println("Image files count: " + imageFileList.size());
-
             diaryService.saveDiary(diaryRequestInsertDto,imageFileList);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Diary created successfully");
