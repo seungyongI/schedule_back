@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/diary")
 @RequiredArgsConstructor
-@CrossOrigin
 public class DiaryController {
 
     private final DiaryService diaryService;
@@ -61,9 +60,9 @@ public class DiaryController {
 
 
     // 일기 입력
-    @PostMapping(value = "/create",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveDiary(@RequestPart(name = "diaryRequest")  DiaryRequestInsertDto diaryRequestInsertDto,
-                                            @RequestPart(name = "imageFiles") List<MultipartFile> imageFileList) {
+                                            @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
         try {
             System.out.println("DiaryRequest: " + diaryRequestInsertDto);
             System.out.println("Image files count: " + imageFileList.size());
