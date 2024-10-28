@@ -1,6 +1,8 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
+import com.example.dailyLog.dto.request.UserRequestUpdateDto;
+import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 
 public interface UserService {
@@ -8,7 +10,7 @@ public interface UserService {
 
     User findUserById(Long id);
 
-    User updateUser(User user);
+    public void updateUser(UserRequestUpdateDto userRequestUpdateDto, ProfileImage profileImage);
 
     void deleteUser(Long id);
 }

@@ -1,5 +1,6 @@
 package com.example.dailyLog.security;
 
+import com.example.dailyLog.entity.ProfileImage;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,7 @@ public class CustomUserDetails implements UserDetails {
     private String email;
     private String password;
     private String userName;
-    private String profile;
+    private ProfileImage profileImage;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

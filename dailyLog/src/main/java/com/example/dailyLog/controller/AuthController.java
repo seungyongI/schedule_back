@@ -44,7 +44,7 @@ public class AuthController {
                     .accessToken(token)
                     .email(userDetails.getEmail())
                     .userName(userDetails.getUserName())
-                    .profile(userDetails.getProfile())
+                    .profileImage(userDetails.getProfileImage())
                     .build();
 
             return ResponseEntity.ok(responseDto);

@@ -11,16 +11,22 @@ import lombok.ToString;
 @ToString
 public class ProfileImage {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "p_idx")
     private Long idx;
 
-    @Column(name = "p_img_name" , nullable = false)
+    @Column(name = "p_img_name", nullable = false)
     private String imgName;
 
-    @Column(name = "p_ori_img_name" , nullable = false)
+    @Column(name = "p_ori_img_name", nullable = false)
     private String oriImgName;
 
     @Column(name = "p_img_url", nullable = false)
     private String imgUrl;
+
+    @OneToOne
+    @JoinColumn(name = "u_idx",unique = true)
+    private User user;
+
 }
