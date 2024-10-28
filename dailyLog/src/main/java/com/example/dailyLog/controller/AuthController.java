@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -43,6 +42,7 @@ public class AuthController {
 
             LoginResponseDto responseDto = LoginResponseDto.builder()
                     .accessToken(token)
+                    .email(userDetails.getEmail())
                     .userName(userDetails.getUserName())
                     .profileImage(userDetails.getProfileImage())
                     .build();
@@ -65,6 +65,4 @@ public class AuthController {
         userService.createUser(userRequestInsertDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
-
-
 }
