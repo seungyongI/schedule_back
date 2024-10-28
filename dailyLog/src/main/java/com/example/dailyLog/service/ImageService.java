@@ -6,6 +6,7 @@ import com.example.dailyLog.entity.ProfileImage;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageService {
-    public Image saveImage(MultipartFile imageFile) throws Exception;
-    public ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception;
+    Image saveImage(MultipartFile imageFile) throws Exception;
+    ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception;
+    void deleteProfileImage(ProfileImage profileImage);
 }

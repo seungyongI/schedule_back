@@ -1,5 +1,6 @@
 package com.example.dailyLog.dto.response;
 
+import com.example.dailyLog.entity.ProfileImage;
 import lombok.*;
 
 @Getter
@@ -7,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 public class LoginResponseDto {
     private final String accessToken;
+    private final String email;
     private final String userName;
-    private final String profile;
+    private final ProfileImage profileImage;
 }

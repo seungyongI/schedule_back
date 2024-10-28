@@ -8,9 +8,9 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
 
-#    url: jdbc:mariadb://localhost:3307/mariadb
+    url: jdbc:mariadb://localhost:3307/mariadb
 #    url: jdbc:mariadb://localhost:3333/mariadb
-    url: jdbc:mariadb://localhost:3306/newjeans?serverTimezone=Asia/Seoul
+#    url: jdbc:mariadb://localhost:3306/newjeans?serverTimezone=Asia/Seoul
 
     username: root
     password: 1234
@@ -38,8 +38,9 @@ spring:
 my:
   value: "welcome to my value"
 
-itemImgLocation: "D:/files"
-uploadPath: "file:///D:/files/"
+ImgLocation: "C:/Images"
+ProfileImgLocation: "C:/profileImages"
+uploadPath: "file:///C:/files/"
 
 
 

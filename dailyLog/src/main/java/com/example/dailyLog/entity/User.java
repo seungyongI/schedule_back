@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
-@Getter
+@Getter @Setter
 @ToString(exclude = "password")
 @Builder
 @NoArgsConstructor
@@ -45,5 +45,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Provider provider;
+
+    @OneToOne(mappedBy = "user")
+    private ProfileImage profileImage;
+
 
 }
