@@ -1,18 +1,18 @@
 -- INSERT INTO 'calendars' table
 INSERT INTO calendars (cal_idx, c_holiday, c_theme) VALUES
 (1, '2024-01-01', 'LIGHT'),
-(2, '2024-01-02', 'DARK'),
-(3, '2024-01-03', 'HYS'),
-(4, '2024-01-04', 'JHI'),
+(2, '2024-01-02', 'LIGHT'),
+(3, '2024-01-03', 'LIGHT'),
+(4, '2024-01-04', 'LIGHT'),
 (5, '2024-01-05', 'LIGHT');
 
 -- user 테이블에 대한 더미 데이터 삽입
 INSERT INTO user (u_idx, u_email, u_password, u_nickname, u_img, u_joinday, cal_idx, provider) VALUES
-(1, 'johndoe@example.com', '$10$nc/wV1g1Pyj1LJLzTYMzO.BRWq2wrOIhbULyn6W0OA80sRGd3Fof6', 'JohnDoe', 'profile1.jpg', '2024-01-01 09:00:00', 1, 'LOCAL'),
-(2, 'janesmith@example.com', '$10$nc/wV1g1Pyj1LJLzTYMzO.BRWq2wrOIhbULyn6W0OA80sRGd3Fof6', 'JaneSmith', 'profile2.jpg', '2024-01-02 10:00:00', 2, 'LOCAL'),
-(3, 'mikejohnson@example.com', '$10$nc/wV1g1Pyj1LJLzTYMzO.BRWq2wrOIhbULyn6W0OA80sRGd3Fof6', 'MikeJohnson', 'profile3.jpg', '2024-01-03 11:00:00', 3, 'LOCAL'),
-(4, 'alicewong@example.com', '$10$nc/wV1g1Pyj1LJLzTYMzO.BRWq2wrOIhbULyn6W0OA80sRGd3Fof6', 'AliceWong', 'profile4.jpg', '2024-01-04 12:00:00', 4, 'LOCAL'),
-(5, 'davidlee@example.com', '$10$nc/wV1g1Pyj1LJLzTYMzO.BRWq2wrOIhbULyn6W0OA80sRGd3Fof6', 'DavidLee', 'profile5.jpg', '2024-01-05 13:00:00', 5, 'LOCAL');
+(1, 'johndoe@example.com', '$2a$10$G1ftYEFC6HTesuwRy9Z6v.kq5KSHLphPOVCxx3NBnnmQ03sgDuVFW', 'JohnDoe', 'profile1.jpg', '2024-01-01 09:00:00', 1, 'LOCAL'),
+(2, 'janesmith@example.com', '$2a$10$G1ftYEFC6HTesuwRy9Z6v.kq5KSHLphPOVCxx3NBnnmQ03sgDuVFW', 'JaneSmith', 'profile2.jpg', '2024-01-02 10:00:00', 2, 'LOCAL'),
+(3, 'mikejohnson@example.com', '$2a$10$G1ftYEFC6HTesuwRy9Z6v.kq5KSHLphPOVCxx3NBnnmQ03sgDuVFW', 'MikeJohnson', 'profile3.jpg', '2024-01-03 11:00:00', 3, 'LOCAL'),
+(4, 'alicewong@example.com', '$2a$10$G1ftYEFC6HTesuwRy9Z6v.kq5KSHLphPOVCxx3NBnnmQ03sgDuVFW', 'AliceWong', 'profile4.jpg', '2024-01-04 12:00:00', 4, 'LOCAL'),
+(5, 'davidlee@example.com', '$2a$10$G1ftYEFC6HTesuwRy9Z6v.kq5KSHLphPOVCxx3NBnnmQ03sgDuVFW', 'DavidLee', 'profile5.jpg', '2024-01-05 13:00:00', 5, 'LOCAL');
 
 
 -- INSERT INTO 'schedule' table

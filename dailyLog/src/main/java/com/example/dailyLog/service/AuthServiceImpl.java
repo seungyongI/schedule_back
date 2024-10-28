@@ -5,15 +5,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+// AuthService.java
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    public String generateToken(String userPk) {
-        return jwtTokenProvider.createToken(userPk);
+    // JwtTokenProvider를 사용하는 메서드 예시
+    public String generateToken(String userPk, HttpServletRequest request) {
+        return jwtTokenProvider.createToken(userPk, request);
     }
-
 }

@@ -33,7 +33,7 @@ spring:
 
 
   jwt:
-    secret: abcdefghijklmnopqrstuvwxyz0qfeewffsdfsdfsafsafsf
+    secret: abcdefghijklmnopqrstuvwxyz0dscvdsvcsdvqfeewffsdfsdfsafsafsf
 
 my:
   value: "welcome to my value"

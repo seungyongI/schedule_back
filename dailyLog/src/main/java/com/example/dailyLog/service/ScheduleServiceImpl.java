@@ -11,12 +11,15 @@ import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
+import com.example.dailyLog.repository.DiaryImageRepository;
+import com.example.dailyLog.repository.ScheduleImageRepository;
 import com.example.dailyLog.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +35,8 @@ public class ScheduleServiceImpl implements ScheduleService{
     private final ScheduleRepository scheduleRepository;
     private final CalendarRepository calendarRepository;
     private final ModelMapper modelMapper;
+    private final ImageService imageService;
+    private final ScheduleImageRepository scheduleImageRepository;
 
 
     // 월달력 전체 일정 조회
@@ -114,7 +119,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 일정 입력
     @Transactional
     @Override
-    public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto){
+    public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList){
         try {
             Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid calendar ID"));
@@ -134,6 +139,19 @@ public class ScheduleServiceImpl implements ScheduleService{
                     .calendars(calendar)
                     .build();
             scheduleRepository.save(createSchedule);
+
+            for (MultipartFile file : imageFileList) {
+                if (!file.isEmpty()) {
+                    // 이미지 파일 저장
+                    Image image = imageService.saveImage(file);
+
+                    // 다이어리와 이미지를 연결하는 DiaryImage 생성 및 저장
+                    ScheduleImage scheduleImage = new ScheduleImage();
+                    scheduleImage.setSchedule(createSchedule);
+                    scheduleImage.setImage(image);
+                    scheduleImageRepository.save(scheduleImage); // 새로 추가된 DiaryImageRepository를 사용
+                }
+            }
 
         } catch (Exception e) {
             throw new ServiceException("",e);

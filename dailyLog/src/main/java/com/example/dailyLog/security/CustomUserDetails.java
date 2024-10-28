@@ -1,25 +1,22 @@
 package com.example.dailyLog.security;
 
-import org.springframework.context.annotation.Bean;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Builder
 public class CustomUserDetails implements UserDetails {
 
-    private final String email;
-    private final String password;
-    private final String userName;
-    private final String profile;
-
-    public CustomUserDetails(String email, String password, String userName, String profile) {
-        this.email = email;
-        this.password = password;
-        this.userName = userName;
-        this.profile = profile;
-    }
+    private String email;
+    private String password;
+    private String userName;
+    private String profile;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -55,11 +52,6 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    public String getProfile() {
-        return profile;
-    }
-
 
     public String getUserName() {
         return userName;

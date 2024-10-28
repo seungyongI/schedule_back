@@ -8,8 +8,10 @@ import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -57,14 +59,17 @@ public class ScheduleController {
 
 
     // 일정 입력
-    @PostMapping(value = "/create")
-    public ResponseEntity<String> saveSchedule(@RequestBody ScheduleRequestInsertDto scheduleRequestInsertDto) {
-//        try {
-            scheduleService.saveSchedule(scheduleRequestInsertDto);
+    @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> saveSchedule(@RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
+                                               @RequestPart(name = "imageFiles",required = false)List<MultipartFile> imageFileList) {
+        try {
+            scheduleService.saveSchedule(scheduleRequestInsertDto,imageFileList);
+
             return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create schedule: " + e.getMessage());
-//        }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create shedule: " + e.getMessage());
+        }
     }
 
 

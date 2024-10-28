@@ -31,8 +31,7 @@ public class AuthController {
     private final UserService userService; // UserService 주입
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto) {
-        try {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto, HttpServletRequest request) {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
             );
@@ -40,7 +39,7 @@ public class AuthController {
 
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            String token = jwtTokenProvider.createToken(userDetails.getUserName()); // HttpServletRequest 제거
+            String token = jwtTokenProvider.createToken(userDetails.getUserName(), request); // HttpServletRequest 제거
 
             LoginResponseDto responseDto = LoginResponseDto.builder()
                     .accessToken(token)
@@ -49,13 +48,6 @@ public class AuthController {
                     .build();
 
             return ResponseEntity.ok(responseDto);
-        } catch (AuthenticationException e) {
-            return ResponseEntity.badRequest().body(
-                    LoginResponseDto.builder()
-                            .errorMessage(e.getMessage())
-                            .build()
-            );
-        }
     }
 
     @PostMapping("/join")
