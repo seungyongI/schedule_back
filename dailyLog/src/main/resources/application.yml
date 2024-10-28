@@ -38,8 +38,8 @@ spring:
 my:
   value: "welcome to my value"
 
-itemImgLocation: "C:/files"
-uploadPath: "file:///C:/files/"
+itemImgLocation: "D:/files"
+uploadPath: "file:///D:/files/"
 
 
 

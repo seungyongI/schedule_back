@@ -26,7 +26,7 @@ public class Image {
     @Column(name = "img_url", nullable = false)
     private String imgUrl;
 
-    @Column(name = "i_path", nullable = false, columnDefinition = "TEXT")
-    private String path;
+//    @Column(name = "i_path", nullable = false, columnDefinition = "TEXT")
+//    private String path;
 
 }
