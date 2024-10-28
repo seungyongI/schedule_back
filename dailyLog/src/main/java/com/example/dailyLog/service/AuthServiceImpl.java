@@ -12,8 +12,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public String generateToken(String userPk, HttpServletRequest request) {
-        return jwtTokenProvider.createToken(userPk, request);
+    public String generateToken(String userPk) {
+        return jwtTokenProvider.createToken(userPk);
     }
 
 }

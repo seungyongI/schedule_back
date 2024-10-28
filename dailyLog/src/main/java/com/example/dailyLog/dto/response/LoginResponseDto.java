@@ -10,4 +10,5 @@ public class LoginResponseDto {
     private String accessToken;
     private String userName;
     private String profile;
+    private String errorMessage;
 }

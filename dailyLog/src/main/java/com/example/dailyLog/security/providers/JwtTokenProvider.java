@@ -35,7 +35,7 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String userPk, HttpServletRequest request) {
+    public String createToken(String userPk) {
         Claims claims = Jwts.claims().setSubject(userPk);
         // 사용자의 권한 정보를 담는 claim. role 정보는 현재 사용하지 않으므로 제거
         Date now = new Date();
