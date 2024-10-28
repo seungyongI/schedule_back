@@ -18,7 +18,7 @@ public class Image {
     @Column(name = "img_name", nullable = false)
     private String imgName;
 
-    @Column(name = "ori_img_name", nullable = false)
+    @Column(name = "ori_img_name",  nullable = false)
     private String oriImgName;
 
     @Column(name = "img_url", nullable = false)
