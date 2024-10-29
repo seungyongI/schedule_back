@@ -42,7 +42,7 @@ public class DiaryController {
         return ResponseEntity.ok(diaryResponseCategoryDto);
     }
 
-    //받은 날짜 값의 모든 다이어리(모든카테고리) 조회
+    // 핑크창?
     @GetMapping("/{idx}/{year}/{month}/{day}")
     public ResponseEntity<List<DiaryResponseDayListDto>> getDayListDiary(
             @PathVariable(name = "idx") Long idx,
@@ -54,7 +54,7 @@ public class DiaryController {
     }
 
     // 특정 일기 전체내용 조회
-    @GetMapping("/{idx}/")
+    @GetMapping("/{idx}")
     public ResponseEntity<DiaryResponseDayDto> getDiary(
             @PathVariable(name = "idx") Long idx ){
         DiaryResponseDayDto diaryResponseDayDto = diaryService.findDiaryByDay(idx);
