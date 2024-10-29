@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ScheduleServiceImpl implements ScheduleService{
+public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final CalendarRepository calendarRepository;
@@ -47,7 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 월달력 전체 일정 조회
     @Transactional
     @Override
-    public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx , int year, int month){
+    public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx, int year, int month) {
 
         try {
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
@@ -71,7 +71,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 연달력 전체 일정 조회
     @Transactional
     @Override
-    public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year){
+    public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year) {
 
         try {
             LocalDate startOfYear = LocalDate.of(year, 1, 1);
@@ -94,7 +94,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 개별 날짜 일정 조회
     @Transactional
     @Override
-    public List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day){
+    public List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day) {
 
         try {
             LocalDate date = LocalDate.of(year, month, day);
@@ -124,16 +124,16 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 일정 입력
     @Transactional
     @Override
-    public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList){
+    public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList) {
+
+        Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
+                .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
+
+        User user = calendar.getUser();
+        if (user == null) {
+            throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
+        }
         try {
-            Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
-                    .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
-
-            User user = calendar.getUser();
-            if (user == null) {
-                throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
-            }
-
             Schedule createSchedule = Schedule.builder()
                     .title(scheduleRequestInsertDto.getTitle())
                     .content(scheduleRequestInsertDto.getContent())
@@ -157,7 +157,6 @@ public class ScheduleServiceImpl implements ScheduleService{
                     scheduleImageRepository.save(scheduleImage); // 새로 추가된 DiaryImageRepository를 사용
                 }
             }
-
         } catch (Exception e) {
             throw new ServiceException("Failed to find schedule in ScheduleService.saveSchedule", e);
         }
@@ -167,12 +166,12 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 일정 수정
     @Transactional
     @Override
-    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto){
+    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto) {
 
-        try {
             Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
                     .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
+        try {
             modelMapper.getConfiguration().setSkipNullEnabled(true);
             modelMapper.map(scheduleRequestUpdateDto, updateSchedule);
 
@@ -187,11 +186,11 @@ public class ScheduleServiceImpl implements ScheduleService{
     // 일정 삭제
     @Transactional
     @Override
-    public void deleteSchedule(Long idx){
+    public void deleteSchedule(Long idx) {
 
         try {
             scheduleRepository.deleteById(idx);
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new ServiceException("Failed to find schedule in ScheduleService.deleteSchedule", e);
         }
     }
