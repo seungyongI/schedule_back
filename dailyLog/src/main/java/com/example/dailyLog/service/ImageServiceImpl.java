@@ -27,6 +27,7 @@ public class ImageServiceImpl implements ImageService {
     private final ProfileImageRepository profileImageRepository;
     private final FileService fileService;
 
+
     public Image saveImage(MultipartFile imageFile) throws Exception {
         if (!imageFile.isEmpty()) {
 

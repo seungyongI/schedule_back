@@ -5,6 +5,7 @@ import com.example.dailyLog.dto.request.DiaryRequestInsertDto;
 import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
 import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayDto;
+import com.example.dailyLog.dto.response.DiaryResponseDayListDto;
 import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
 import com.example.dailyLog.entity.*;
 import com.example.dailyLog.exception.commonException.error.BizException;
@@ -12,9 +13,12 @@ import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.DiaryRepository;
+import com.example.dailyLog.repository.ImageRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +36,7 @@ public class DiaryServiceImpl implements DiaryService{
     private final ModelMapper modelMapper;
     private final ImageService imageService;
     private final DiaryImageRepository diaryImageRepository;
+    private final ImageRepository imageRepository;
 
 
     // 월달력 전체 일기 조회(마커)
@@ -56,6 +61,28 @@ public class DiaryServiceImpl implements DiaryService{
         }
     }
 
+    // 개별 날짜 모든 다이어리 조회
+    @Transactional
+    @Override
+    public List<DiaryResponseDayListDto> findDiaryByDayList(Long idx, int year, int month, int day){
+        try {
+            LocalDate date = LocalDate.of(year, month, day);
+
+            return diaryRepository.findByCalendarsUserIdxAndDate(idx,date)
+                    .stream()
+                    .map(diary ->
+                            DiaryResponseDayListDto.builder()
+                                    .title(diary.getTitle())
+                                    .content(diary.getContent())
+                                    .date(diary.getDate())
+                                    .category(diary.getCategory())
+                                    .build())
+                    .sorted(Comparator.comparing(DiaryResponseDayListDto::getDate))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new ServiceException("",e);
+        }
+    }
 
     // 전체 및 카테고리별 전체 일기 조회
     @Transactional
@@ -89,30 +116,25 @@ public class DiaryServiceImpl implements DiaryService{
         }
     }
 
-
-    // 개별 날짜 일기 조회
+    //개별 다이어리 조회
     @Transactional
     @Override
-    public List<DiaryResponseDayDto> findDiaryByDay(Long idx, int year, int month, int day){
+    public DiaryResponseDayDto findDiaryByDay(Long idx){
+        Diary diary = diaryRepository.findById(idx)
+                .orElseThrow(() ->  new EntityNotFoundException("Diary not found"));
 
-        try {
-            LocalDate date = LocalDate.of(year, month, day);
+        List<String> imageUrls = diaryImageRepository.findByDiaryIdx(idx)
+                .stream()
+                .map(diaryImage -> diaryImage.getImage().getImgUrl())
+                .collect(Collectors.toList());
 
-            return diaryRepository.findByCalendarsUserIdxAndDate(idx,date)
-                    .stream()
-                    .map(diary ->
-                            DiaryResponseDayDto.builder()
-                                    .title(diary.getTitle())
-                                    .content(diary.getContent())
-                                    .date(diary.getDate())
-                                    .category(diary.getCategory())
-                                    .build())
-                    .sorted(Comparator.comparing(DiaryResponseDayDto::getDate))
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            throw new ServiceException("",e);
-        }
+        return DiaryResponseDayDto.builder()
+                .title(diary.getTitle())
+                .content(diary.getContent())
+                .date(diary.getDate())
+                .category(diary.getCategory())
+                .images(imageUrls) // 이미지 URL 리스트로 설정
+                .build();
     }
 
 
@@ -140,14 +162,12 @@ public class DiaryServiceImpl implements DiaryService{
 
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
-                    // 이미지 파일 저장
                     Image image = imageService.saveImage(file);
 
-                    // 다이어리와 이미지를 연결하는 DiaryImage 생성 및 저장
                     DiaryImage diaryImage = new DiaryImage();
                     diaryImage.setDiary(createDiary);
                     diaryImage.setImage(image);
-                    diaryImageRepository.save(diaryImage); // 새로 추가된 DiaryImageRepository를 사용
+                    diaryImageRepository.save(diaryImage);
                 }
             }
         } catch (Exception e) {
