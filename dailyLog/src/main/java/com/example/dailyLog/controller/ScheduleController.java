@@ -62,37 +62,25 @@ public class ScheduleController {
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveSchedule(@RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
                                                @RequestPart(name = "imageFiles",required = false)List<MultipartFile> imageFileList) {
-        try {
             scheduleService.saveSchedule(scheduleRequestInsertDto,imageFileList);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create shedule: " + e.getMessage());
-        }
     }
 
 
     // 일정 수정
     @PostMapping(value = "/update")
     public ResponseEntity<String> updateSchedule(@RequestBody ScheduleRequestUpdateDto scheduleRequestUpdateDto){
-        try{
             scheduleService.updateSchedule(scheduleRequestUpdateDto);
             return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update schedule: "+e.getMessage());
-        }
     }
 
 
     // 일정 삭제
     @DeleteMapping(value = "/delete/{idx}")
     public ResponseEntity<String> deleteSchedule(@PathVariable(name = "idx") Long idx){
-        try{
             scheduleService.deleteSchedule(idx);
             return ResponseEntity.status(HttpStatus.OK).body("Schedule deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to delete schedule: "+e.getMessage());
-        }
     }
 }

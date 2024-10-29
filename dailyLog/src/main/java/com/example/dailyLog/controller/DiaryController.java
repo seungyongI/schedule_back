@@ -66,37 +66,25 @@ public class DiaryController {
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveDiary(@RequestPart(name = "diaryRequest")  DiaryRequestInsertDto diaryRequestInsertDto,
                                             @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
-        try {
             diaryService.saveDiary(diaryRequestInsertDto,imageFileList);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Diary created successfully");
 
-       } catch (Exception e) {
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create diary: " + e.getMessage());
-       }
     }
 
 
     // 일기 수정
     @PostMapping(value = "/update")
     public ResponseEntity<String> updateDiary(@RequestBody DiaryRequestUpdateDto diaryRequestUpdateDto) {
-        try {
             diaryService.updateDiary(diaryRequestUpdateDto);
             return ResponseEntity.status(HttpStatus.OK).body("Diary updated successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update diary: " + e.getMessage());
-        }
     }
 
 
     // 일기 삭제
     @DeleteMapping(value = "/delete/{idx}")
     public ResponseEntity<String> deleteDiary(@PathVariable(name = "idx") Long idx) {
-        try {
             diaryService.deleteDiary(idx);
             return ResponseEntity.status(HttpStatus.OK).body("Diary deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to delete diary: "+e.getMessage());
-        }
     }
 }
