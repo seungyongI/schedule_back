@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Getter
 public class DiaryResponseCategoryDto {
 
+    private Long idx;
+
     private String title;
 
     private LocalDate date;
