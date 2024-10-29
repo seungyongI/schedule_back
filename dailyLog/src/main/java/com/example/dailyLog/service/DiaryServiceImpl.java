@@ -8,8 +8,14 @@ import com.example.dailyLog.dto.response.DiaryResponseDayDto;
 import com.example.dailyLog.dto.response.DiaryResponseDayListDto;
 import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
 import com.example.dailyLog.entity.*;
+import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
+import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
 import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
+import com.example.dailyLog.exception.diaryException.DiaryErrorCode;
+import com.example.dailyLog.exception.diaryException.DiaryNotFoundException;
+import com.example.dailyLog.exception.userException.UserErrorCode;
+import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.DiaryRepository;
@@ -57,9 +63,10 @@ public class DiaryServiceImpl implements DiaryService{
                     .sorted(Comparator.comparing(DiaryResponseMonthDto::getDate))
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find diary in DiaryService.findAllMonthDiary", e);
         }
     }
+
 
     // 개별 날짜 모든 다이어리 조회
     @Transactional
@@ -80,9 +87,10 @@ public class DiaryServiceImpl implements DiaryService{
                     .sorted(Comparator.comparing(DiaryResponseDayListDto::getDate))
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find diary in DiaryService.findDiaryByDayList", e);
         }
     }
+
 
     // 전체 및 카테고리별 전체 일기 조회
     @Transactional
@@ -114,29 +122,35 @@ public class DiaryServiceImpl implements DiaryService{
                         .collect(Collectors.toList());
             }
         } catch (Exception e) {
-            throw new ServiceException("Error fetching diaries", e);
+            throw new ServiceException("Failed to find diary in DiaryService.findDiaryCategory", e);
         }
     }
+
 
     //개별 다이어리 조회
     @Transactional
     @Override
     public DiaryResponseDayDto findDiaryByDay(Long idx){
-        Diary diary = diaryRepository.findById(idx)
-                .orElseThrow(() ->  new EntityNotFoundException("Diary not found"));
 
-        List<String> imageUrls = diaryImageRepository.findByDiaryIdx(idx)
-                .stream()
-                .map(diaryImage -> diaryImage.getImage().getImgUrl())
-                .collect(Collectors.toList());
+            Diary diary = diaryRepository.findById(idx)
+                    .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
-        return DiaryResponseDayDto.builder()
-                .title(diary.getTitle())
-                .content(diary.getContent())
-                .date(diary.getDate())
-                .category(diary.getCategory())
-                .images(imageUrls) // 이미지 URL 리스트로 설정
-                .build();
+        try {
+            List<String> imageUrls = diaryImageRepository.findByDiaryIdx(idx)
+                    .stream()
+                    .map(diaryImage -> diaryImage.getImage().getImgUrl())
+                    .collect(Collectors.toList());
+
+            return DiaryResponseDayDto.builder()
+                    .title(diary.getTitle())
+                    .content(diary.getContent())
+                    .date(diary.getDate())
+                    .category(diary.getCategory())
+                    .images(imageUrls) // 이미지 URL 리스트로 설정
+                    .build();
+        } catch (Exception e) {
+            throw new ServiceException("Failed to find diary in DiaryService.findDiaryByDay", e);
+        }
     }
 
 
@@ -144,14 +158,16 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto,List<MultipartFile> imageFileList) {
-        try {
+
             Calendars calendar = calendarRepository.findById(diaryRequestInsertDto.getCalendarsIdx())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid calendar ID"));
+                    .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
 
             User user = calendar.getUser();
             if (user == null) {
-                throw new IllegalArgumentException("No user associated with the given calendar ID");
+                throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
             }
+
+        try {
 
             Diary createDiary = Diary.builder()
                     .title(diaryRequestInsertDto.getTitle())
@@ -173,7 +189,7 @@ public class DiaryServiceImpl implements DiaryService{
                 }
             }
         } catch (Exception e) {
-            throw new ServiceException("Failed to save diary with images", e);
+            throw new ServiceException("Failed to save diary in DiaryService.saveDiary", e);
         }
     }
 
@@ -183,17 +199,17 @@ public class DiaryServiceImpl implements DiaryService{
     @Override
     public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto) {
 
-        try {
             Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+                    .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
+        try {
             modelMapper.getConfiguration().setSkipNullEnabled(true);
             modelMapper.map(diaryRequestUpdateDto, updateDiary);
 
             diaryRepository.save(updateDiary);
 
         } catch (Exception e) {
-            throw new ServiceException("", e);
+            throw new ServiceException("Failed to update diary in DiaryService.updateDiary", e);
         }
     }
 
@@ -206,7 +222,7 @@ public class DiaryServiceImpl implements DiaryService{
         try {
             diaryRepository.deleteById(idx);
         }catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to delete diary in DiaryService.deleteDiary", e);
         }
     }
 }

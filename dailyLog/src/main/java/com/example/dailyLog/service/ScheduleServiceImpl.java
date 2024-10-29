@@ -158,7 +158,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
             }
         } catch (Exception e) {
-            throw new ServiceException("Failed to find schedule in ScheduleService.saveSchedule", e);
+            throw new ServiceException("Failed to save schedule in ScheduleService.saveSchedule", e);
         }
     }
 
@@ -178,7 +178,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             scheduleRepository.save(updateSchedule);
 
         } catch (Exception e) {
-            throw new ServiceException("Failed to find schedule in ScheduleService.updateSchedule", e);
+            throw new ServiceException("Failed to update schedule in ScheduleService.updateSchedule", e);
         }
     }
 
@@ -191,7 +191,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         try {
             scheduleRepository.deleteById(idx);
         } catch (Exception e) {
-            throw new ServiceException("Failed to find schedule in ScheduleService.deleteSchedule", e);
+            throw new ServiceException("Failed to delete schedule in ScheduleService.deleteSchedule", e);
         }
     }
 }
