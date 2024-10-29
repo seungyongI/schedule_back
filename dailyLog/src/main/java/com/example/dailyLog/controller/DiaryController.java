@@ -4,10 +4,7 @@ import com.example.dailyLog.dto.request.DiaryRequestInsertDto;
 import com.example.dailyLog.dto.request.DiaryRequestUpdateDto;
 import com.example.dailyLog.dto.request.ScheduleRequestInsertDto;
 import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
-import com.example.dailyLog.dto.response.DiaryResponseCategoryDto;
-import com.example.dailyLog.dto.response.DiaryResponseDayDto;
-import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
-import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
+import com.example.dailyLog.dto.response.*;
 import com.example.dailyLog.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,26 +33,32 @@ public class DiaryController {
         return ResponseEntity.ok(diaryResponseMonthDto);
     }
 
-
-    //받은 날짜 값의 모든 다이어리 조회
-    @GetMapping("/{idx}/{year}/{month}/{day}")
-    public ResponseEntity<List<DiaryResponseDayDto>> getAllDayDiary(
-            @PathVariable(name = "idx") Long idx,
-            @PathVariable(name = "year") int year,
-            @PathVariable(name = "month") int month,
-            @PathVariable(name = "day") int day) {
-        List<DiaryResponseDayDto> diaryResponseDayDto = diaryService.findDiaryByDay(idx, year, month, day);
-        return ResponseEntity.ok(diaryResponseDayDto);
-    }
-
-
-    //해당 유저의 카테고리에 대한하는 다이어리만 조회
+    //해당 유저의 카테고리별 다이어리 조회
     @GetMapping("/{idx}/{category}")
     public ResponseEntity<List<DiaryResponseCategoryDto>> getCategoryDiary(
             @PathVariable(name = "idx") Long idx,
             @PathVariable(name = "category") String category) {
         List<DiaryResponseCategoryDto> diaryResponseCategoryDto = diaryService.findDiaryCategory(idx, category);
         return ResponseEntity.ok(diaryResponseCategoryDto);
+    }
+
+    //받은 날짜 값의 모든 다이어리(모든카테고리) 조회
+    @GetMapping("/{idx}/{year}/{month}/{day}")
+    public ResponseEntity<List<DiaryResponseDayListDto>> getDayListDiary(
+            @PathVariable(name = "idx") Long idx,
+            @PathVariable(name = "year") int year,
+            @PathVariable(name = "month") int month,
+            @PathVariable(name = "day") int day) {
+        List<DiaryResponseDayListDto> diaryResponseDayListDto = diaryService.findDiaryByDayList(idx, year, month, day);
+        return ResponseEntity.ok(diaryResponseDayListDto);
+    }
+
+    // 특정 일기 전체내용 조회
+    @GetMapping("/{idx}/")
+    public ResponseEntity<DiaryResponseDayDto> getDiary(
+            @PathVariable(name = "idx") Long idx ){
+        DiaryResponseDayDto diaryResponseDayDto = diaryService.findDiaryByDay(idx);
+        return ResponseEntity.ok(diaryResponseDayDto);
     }
 
 

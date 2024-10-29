@@ -9,7 +9,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class DiaryResponseDayDto {
+public class DiaryResponseDayListDto {
 
     private String title;
 
@@ -19,5 +19,4 @@ public class DiaryResponseDayDto {
 
     private Category category;
 
-    private List<String> images;
 }
