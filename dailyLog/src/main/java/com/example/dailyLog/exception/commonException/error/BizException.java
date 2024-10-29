@@ -7,15 +7,15 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class BizException extends RuntimeException {
 
-    private final CommonErrorCode commonErrorCode;
+    private final ErrorCode errorCode;
 
-    public BizException(CommonErrorCode commonErrorCode) {
+    public BizException(ErrorCode errorCode) {
         // 예외 발생 시 메시지를 상위 클래스에 전달
-        super(commonErrorCode.getMessage());
-        this.commonErrorCode = commonErrorCode;
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 
     public HttpStatus getHttpStatus() {
-        return commonErrorCode.getHttpStatus();
+        return errorCode.getHttpStatus();
     }
 }

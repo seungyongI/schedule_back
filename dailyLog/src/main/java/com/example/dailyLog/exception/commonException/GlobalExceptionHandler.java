@@ -1,6 +1,7 @@
 package com.example.dailyLog.exception.commonException;
 
 import com.example.dailyLog.exception.commonException.error.BizException;
+import com.example.dailyLog.exception.commonException.error.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,12 +24,12 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    // CommonErrorCode를 사용하는 에러 응답 생성 메소드
-    private ResponseEntity<ErrorResponse> createErrorResponse(CommonErrorCode commonErrorCode) {
-        return ResponseEntity.status(commonErrorCode.getHttpStatus())
+    // ErrorCode를 사용하는 에러 응답 생성 메소드
+    private ResponseEntity<ErrorResponse> createErrorResponse(ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(ErrorResponse.builder()
-                        .message(commonErrorCode.getMessage())
-                        .httpStatus(commonErrorCode.getHttpStatus())
+                        .message(errorCode.getMessage())
+                        .httpStatus(errorCode.getHttpStatus())
                         .localDateTime(LocalDateTime.now())
                         .build());
     }
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
     // 시스템 예외
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
-        return createErrorResponse(CommonErrorCode.INVALID_REQUEST_BODY);
+        return createErrorResponse(CommonErrorCode.JSON_PARSING_ERROR);
     }
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
@@ -49,6 +50,6 @@ public class GlobalExceptionHandler {
     // 비즈니스 로직 예외
     @ExceptionHandler(BizException.class)
     public ResponseEntity<ErrorResponse> handleBizException(BizException e){
-        return createErrorResponse(e.getCommonErrorCode());
+        return createErrorResponse(e.getErrorCode());
     }
 }

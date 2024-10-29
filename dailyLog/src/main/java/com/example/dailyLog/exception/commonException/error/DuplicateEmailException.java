@@ -1,10 +1,11 @@
 package com.example.dailyLog.exception.commonException.error;
 
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
+import com.example.dailyLog.exception.loginException.LoginErrorCode;
 
-public class DuplicateEmailException extends BizException {
+public class DuplicateEmailException {
     public DuplicateEmailException() {
 
-      super(CommonErrorCode.DUPLICATE_EMAIL);
+      super(LoginErrorCode.DUPLICATE_EMAIL);
     }
 }
