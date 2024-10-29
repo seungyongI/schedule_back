@@ -1,4 +1,4 @@
-package com.example.dailyLog.exception.userException;
+package com.example.dailyLog.exception.calendarsException;
 
 import com.example.dailyLog.exception.commonException.ErrorResponse;
 import com.example.dailyLog.exception.commonException.error.ErrorCode;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
-public class UserExceptionHandler {
+public class CalendarsExceptionHandler {
 
     // ErrorCode를 사용하는 에러 응답 생성 메소드
     private ResponseEntity<ErrorResponse> createErrorResponse(ErrorCode errorCode) {
@@ -22,9 +22,9 @@ public class UserExceptionHandler {
     }
 
 
-    // 유저 없을 때
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e){
+    // 캘린더 없을 때
+    @ExceptionHandler(CalendarsNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCalendarsNotFoundException(CalendarsNotFoundException e){
         return createErrorResponse(e.getErrorCode());
     }
 }

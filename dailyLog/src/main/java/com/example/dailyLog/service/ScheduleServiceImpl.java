@@ -6,8 +6,15 @@ import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
 import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.entity.*;
+import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
+import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
 import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
+import com.example.dailyLog.exception.commonException.error.ErrorCode;
+import com.example.dailyLog.exception.scheduleException.ScheduleErrorCode;
+import com.example.dailyLog.exception.scheduleException.ScheduleNotFoundException;
+import com.example.dailyLog.exception.userException.UserErrorCode;
+import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.ScheduleImageRepository;
@@ -56,7 +63,7 @@ public class ScheduleServiceImpl implements ScheduleService{
                     .sorted(Comparator.comparing(ScheduleResponseMonthDto::getStart))
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find schedule in ScheduleService.findAllMonthSchedule", e);
         }
     }
 
@@ -79,7 +86,7 @@ public class ScheduleServiceImpl implements ScheduleService{
                     .sorted(Comparator.comparing(ScheduleResponseYearDto::getStart))
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find schedule in ScheduleService.findAllYearSchedule", e);
         }
     }
 
@@ -109,7 +116,7 @@ public class ScheduleServiceImpl implements ScheduleService{
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find schedule in ScheduleService.findScheduleByDay", e);
         }
     }
 
@@ -120,11 +127,11 @@ public class ScheduleServiceImpl implements ScheduleService{
     public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList){
         try {
             Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid calendar ID"));
+                    .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
 
             User user = calendar.getUser();
             if (user == null) {
-                throw new BizException(CommonErrorCode.USER_NOT_FOUND);
+                throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
             }
 
             Schedule createSchedule = Schedule.builder()
@@ -152,7 +159,7 @@ public class ScheduleServiceImpl implements ScheduleService{
             }
 
         } catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find schedule in ScheduleService.saveSchedule", e);
         }
     }
 
@@ -164,7 +171,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 
         try {
             Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+                    .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
             modelMapper.getConfiguration().setSkipNullEnabled(true);
             modelMapper.map(scheduleRequestUpdateDto, updateSchedule);
@@ -172,7 +179,7 @@ public class ScheduleServiceImpl implements ScheduleService{
             scheduleRepository.save(updateSchedule);
 
         } catch (Exception e) {
-            throw new ServiceException("", e);
+            throw new ServiceException("Failed to find schedule in ScheduleService.updateSchedule", e);
         }
     }
 
@@ -185,7 +192,7 @@ public class ScheduleServiceImpl implements ScheduleService{
         try {
             scheduleRepository.deleteById(idx);
         }catch (Exception e) {
-            throw new ServiceException("",e);
+            throw new ServiceException("Failed to find schedule in ScheduleService.deleteSchedule", e);
         }
     }
 }
