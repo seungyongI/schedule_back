@@ -16,4 +16,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "(s.start <= :endOfDay AND s.end >= :startOfDay)")
     List<Schedule> findSchedulesInDay(@Param("startOfDay") LocalDateTime startOfDay,
                                       @Param("endOfDay") LocalDateTime endOfDay);
+
+    // 캘린더 일정 검색
+    List<Schedule> findByTitleContainingIgnoreCase(String title);
+    List<Schedule> findByDescriptionContainingIgnoreCase(String description);
 }

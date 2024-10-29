@@ -8,15 +8,11 @@ import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.entity.*;
 import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
 import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
-import com.example.dailyLog.exception.commonException.error.BizException;
-import com.example.dailyLog.exception.commonException.CommonErrorCode;
-import com.example.dailyLog.exception.commonException.error.ErrorCode;
 import com.example.dailyLog.exception.scheduleException.ScheduleErrorCode;
 import com.example.dailyLog.exception.scheduleException.ScheduleNotFoundException;
 import com.example.dailyLog.exception.userException.UserErrorCode;
 import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
-import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.ScheduleImageRepository;
 import com.example.dailyLog.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +45,19 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx, int year, int month) {
 
+        // 유효성 검사
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+        if (year < 1 || year > 9999) {
+            throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
+        }
+
+        // 캘린더 존재 여부 검사
+        if (!calendarRepository.existsById(idx)) {
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
+
         try {
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
             LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
@@ -72,6 +81,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year) {
+
+        // 유효성 검사
+        if (year < 1 || year > 9999) {
+            throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
+        }
 
         try {
             LocalDate startOfYear = LocalDate.of(year, 1, 1);
