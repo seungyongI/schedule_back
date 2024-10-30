@@ -75,23 +75,31 @@ public class DiaryServiceImpl implements DiaryService{
         try {
             LocalDate date = LocalDate.of(year, month, day);
 
-            return diaryRepository.findByCalendarsUserIdxAndDate(idx,date)
+            return diaryRepository.findByCalendarsUserIdxAndDate(idx, date)
                     .stream()
-                    .map(diary ->
-                            DiaryResponseDayListDto.builder()
-                                    .title(diary.getTitle())
-                                    .content(diary.getContent())
-                                    .date(diary.getDate())
-                                    .category(diary.getCategory())
-                                    .build())
+                    .map(diary -> {
+                        // 이미지 URL 리스트 생성
+                        List<String> imageUrls = diaryImageRepository.findByDiaryIdx(diary.getIdx())
+                                .stream()
+                                .map(diaryImage -> diaryImage.getImage().getImgUrl())
+                                .collect(Collectors.toList());
+
+                        // DiaryResponseDayListDto 빌드
+                        return DiaryResponseDayListDto.builder()
+                                .idx(diary.getIdx())
+                                .title(diary.getTitle())
+                                .content(diary.getContent())
+                                .date(diary.getDate())
+                                .category(diary.getCategory())
+                                .images(imageUrls) // 이미지 URL 리스트 추가
+                                .build();
+                    })
                     .sorted(Comparator.comparing(DiaryResponseDayListDto::getDate))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new ServiceException("Failed to find diary in DiaryService.findDiaryByDayList", e);
         }
     }
-
-
     // 전체 및 카테고리별 전체 일기 조회
     @Transactional
     @Override
