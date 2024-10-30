@@ -41,9 +41,11 @@ spring:
 my:
   value: "welcome to my value"
 
-ImgLocation: "D:/Images"
-ProfileImgLocation: "D:/profileImages"
-uploadPath: "file:///D:/files/"
+ImgLocation: "/app/images"
+ProfileImgLocation: "/app/profileImages"
+uploadPath: "file:///D:/images/"
+profileUploadPath: "file:///D:/profileImages/"
+
 
 
 

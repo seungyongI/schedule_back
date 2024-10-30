@@ -13,8 +13,12 @@ WORKDIR /app
 COPY --from=builder /build/build/libs/*-SNAPSHOT.jar ./app.jar
 
 # 외부 포트 10000 열기...
-EXPOSE 8080
+EXPOSE 20010
 
 # root 대신 nobody 권한으로 실행
 # USER nobody
 ENTRYPOINT ["java","-jar","-Djava.security.egd=file:/dev/./urandom","-Dsun.net.inetaddr.ttl=0","app.jar"]
+
+#저장 폴더 지정
+cd app
+mkdir images profileImages
