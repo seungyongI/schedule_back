@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,5 +30,7 @@ public class DiaryRequestUpdateDto {
     private LocalDate date;
 
     private Category category;
+
+    private List<String> images;
 
 }
