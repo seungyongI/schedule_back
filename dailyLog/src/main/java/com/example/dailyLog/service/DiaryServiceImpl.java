@@ -206,13 +206,38 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto) {
-
-            Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
+        Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
+                .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
         try {
-            modelMapper.getConfiguration().setSkipNullEnabled(true);
-            modelMapper.map(diaryRequestUpdateDto, updateDiary);
+            // 기본 필드 업데이트
+            if (diaryRequestUpdateDto.getTitle() != null) {
+                updateDiary.setTitle(diaryRequestUpdateDto.getTitle());
+            }
+            if (diaryRequestUpdateDto.getContent() != null) {
+                updateDiary.setContent(diaryRequestUpdateDto.getContent());
+            }
+            if (diaryRequestUpdateDto.getDate() != null) {
+                updateDiary.setDate(diaryRequestUpdateDto.getDate());
+            }
+            if (diaryRequestUpdateDto.getCategory() != null) {
+                updateDiary.setCategory(diaryRequestUpdateDto.getCategory());
+            }
+
+            // 이미지 연관 설정
+            if (diaryRequestUpdateDto.getImages() != null) {
+                // 이미지 URL을 통해 Image 엔티티 조회
+                List<Image> images = imageRepository.findByImgUrlIn(diaryRequestUpdateDto.getImages());
+                if (!images.isEmpty()) {
+                    // 다이어리와 이미지 간 연관관계를 설정하는 코드
+                    images.forEach(image -> {
+                        DiaryImage diaryImage = new DiaryImage();
+                        diaryImage.setDiary(updateDiary);
+                        diaryImage.setImage(image);
+                        diaryImageRepository.save(diaryImage);
+                    });
+                }
+            }
 
             diaryRepository.save(updateDiary);
 
