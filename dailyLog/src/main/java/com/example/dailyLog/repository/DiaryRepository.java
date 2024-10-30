@@ -16,6 +16,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     List<Diary> findByCalendarsUserIdxAndDateBetween(Long idx, LocalDate start, LocalDate end);
 
     // 캘린더 일기 검색
-    List<Diary> findByTitleContainingIgnoreCase(String title);
-    List<Diary> findByContentContainingIgnoreCase(String content);
+//    List<Diary> findByTitleContainingIgnoreCase(String title);
+//    List<Diary> findByContentContainingIgnoreCase(String content);
 }
