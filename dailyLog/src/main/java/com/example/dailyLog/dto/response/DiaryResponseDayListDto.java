@@ -21,4 +21,6 @@ public class DiaryResponseDayListDto {
 
     private Category category;
 
+    private List<String> images;
+
 }
