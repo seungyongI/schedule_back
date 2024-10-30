@@ -20,5 +20,5 @@ EXPOSE 20010
 ENTRYPOINT ["java","-jar","-Djava.security.egd=file:/dev/./urandom","-Dsun.net.inetaddr.ttl=0","app.jar"]
 
 #저장 폴더 지정
-cd app
-mkdir images profileImages
+# cd app
+# mkdir images profileImages
