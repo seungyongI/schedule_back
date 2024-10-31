@@ -20,4 +20,6 @@ public class DiaryResponseDayDto {
     private Category category;
 
     private List<String> images;
+
+    private List<Long> ids;
 }

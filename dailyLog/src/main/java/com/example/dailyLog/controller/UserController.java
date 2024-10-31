@@ -36,7 +36,7 @@ public class UserController {
                 try {
                     profileImage = imageService.saveProfileImage(multipartFile);
                 } catch (Exception e) {
-                    imageService.deleteProfileImage(profileImage);
+//                    imageService.deleteProfileImage(profileImage);
                     throw new RuntimeException("Failed to save profile image", e);
                 }
             }

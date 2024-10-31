@@ -1,7 +1,10 @@
 package com.example.dailyLog.service;
 
+import com.example.dailyLog.dto.request.DiaryRequestDeleteDto;
+import com.example.dailyLog.entity.DiaryImage;
 import com.example.dailyLog.entity.Image;
 import com.example.dailyLog.entity.ProfileImage;
+import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.ImageRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +31,10 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final ProfileImageRepository profileImageRepository;
     private final FileService fileService;
+    private final DiaryImageRepository diaryImageRepository;
 
-
+    @Transactional
+    @Override
     public Image saveImage(MultipartFile imageFile) throws Exception {
         if (!imageFile.isEmpty()) {
 
@@ -45,6 +52,8 @@ public class ImageServiceImpl implements ImageService {
         }
         return null;
     }
+    @Transactional
+    @Override
     public ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception {
         if (!imageFile.isEmpty()) {
 
@@ -62,15 +71,17 @@ public class ImageServiceImpl implements ImageService {
         }
         return null;
     }
-    public void deleteProfileImage(ProfileImage profileImage) {
-        if (profileImage != null) {
-            try {
-                String filePath = profileImageLocation + "/" + profileImage.getImgName();
-                fileService.deleteFile(filePath);
-                profileImageRepository.delete(profileImage);
-            } catch (Exception e) {
-                log.error("Failed to delete profile image file: " + e.getMessage(), e);
+    @Transactional
+    @Override
+    public void deleteImages(DiaryRequestDeleteDto diaryRequestDeleteDto) {
+        for (Long imageId : diaryRequestDeleteDto.getImageIds()) {
+            DiaryImage diaryImage = diaryImageRepository.findByImage_Idx(imageId);
+            if (diaryImage.getIdx() != null) {
+                diaryImageRepository.delete(diaryImage); // DiaryImage에서 삭제
+            } else {
+                System.out.println("No DiaryImage found for imageId: " + imageId);
             }
+            imageRepository.deleteById(imageId); // Image 엔티티에서 삭제
         }
     }
 }

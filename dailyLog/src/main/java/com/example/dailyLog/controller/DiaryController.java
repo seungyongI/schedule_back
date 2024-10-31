@@ -75,8 +75,9 @@ public class DiaryController {
 
     // 일기 수정
     @PostMapping(value = "/update")
-    public ResponseEntity<String> updateDiary(@RequestBody DiaryRequestUpdateDto diaryRequestUpdateDto) {
-            diaryService.updateDiary(diaryRequestUpdateDto);
+    public ResponseEntity<String> updateDiary(@RequestPart(name = "diaryRequest") DiaryRequestUpdateDto diaryRequestUpdateDto,
+                                              @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
+            diaryService.updateDiary(diaryRequestUpdateDto, imageFileList);
             return ResponseEntity.status(HttpStatus.OK).body("Diary updated successfully");
     }
 

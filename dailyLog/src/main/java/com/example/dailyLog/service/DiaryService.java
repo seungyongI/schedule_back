@@ -17,6 +17,6 @@ public interface DiaryService {
     List<DiaryResponseDayListDto> findDiaryByDayList(Long idx, int year,int month, int day);
     DiaryResponseDayDto findDiaryByDay(Long idx);
     void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto,List<MultipartFile> imageFileList);
-    void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto);
+    void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto, List<MultipartFile> imageFileList);
     void deleteDiary(Long idx);
 }
