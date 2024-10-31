@@ -19,8 +19,10 @@ public class SearchController {
     private final SearchService searchService;
 
     @GetMapping
-    public ResponseEntity<List<SearchResponseDto>> search(@RequestParam(name = "query") String query){
-        List<SearchResponseDto> results = searchService.search(query);
+    public ResponseEntity<List<SearchResponseDto>> search(
+            @RequestParam(name = "query") String query,
+            @RequestParam(name = "filterType", defaultValue = "ALL") String filterType){
+        List<SearchResponseDto> results = searchService.search(query, filterType);
         return ResponseEntity.ok(results);
     }
 }
