@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -41,5 +40,8 @@ public class Diary {
     @ManyToOne
     @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
+
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DiaryImage> diaryImages = new ArrayList<>();
 
 }

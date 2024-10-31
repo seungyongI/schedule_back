@@ -10,7 +10,6 @@ import com.example.dailyLog.dto.response.DiaryResponseMonthDto;
 import com.example.dailyLog.entity.*;
 import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
 import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
-import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.exception.commonException.error.InvalidDay;
 import com.example.dailyLog.exception.commonException.error.InvalidMonth;
@@ -21,14 +20,10 @@ import com.example.dailyLog.exception.diaryException.InvalidCategory;
 import com.example.dailyLog.exception.userException.UserErrorCode;
 import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
-import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.DiaryRepository;
-import com.example.dailyLog.repository.ImageRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.dailyLog.repository.DiaryImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,10 +39,8 @@ public class DiaryServiceImpl implements DiaryService{
 
     private final DiaryRepository diaryRepository;
     private final CalendarRepository calendarRepository;
-    private final ModelMapper modelMapper;
-    private final ImageService imageService;
     private final DiaryImageRepository diaryImageRepository;
-    private final ImageRepository imageRepository;
+    private final ImageService imageService;
 
 
     // 월달력 전체 일기 조회(마커)
@@ -110,20 +103,15 @@ public class DiaryServiceImpl implements DiaryService{
             return diaryRepository.findByCalendarsUserIdxAndDate(idx, date)
                     .stream()
                     .map(diary -> {
-                        // 이미지 URL 리스트 생성
-                        List<String> imageUrls = diaryImageRepository.findByDiaryIdx(diary.getIdx())
-                                .stream()
-                                .map(diaryImage -> diaryImage.getImage().getImgUrl())
-                                .collect(Collectors.toList());
-
-                        // DiaryResponseDayListDto 빌드
                         return DiaryResponseDayListDto.builder()
                                 .idx(diary.getIdx())
                                 .title(diary.getTitle())
                                 .content(diary.getContent())
                                 .date(diary.getDate())
                                 .category(diary.getCategory())
-                                .images(imageUrls) // 이미지 URL 리스트 추가
+                                .images(diary.getDiaryImages().stream()
+                                    .map(DiaryImage::getImgUrl)
+                                    .collect(Collectors.toList()))
                                 .build();
                     })
                     .sorted(Comparator.comparing(DiaryResponseDayListDto::getDate))
@@ -188,9 +176,9 @@ public class DiaryServiceImpl implements DiaryService{
                     .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
         try {
-            List<String> imageUrls = diaryImageRepository.findByDiaryIdx(idx)
+            List<String> imageUrls = diary.getDiaryImages()
                     .stream()
-                    .map(diaryImage -> diaryImage.getImage().getImgUrl())
+                    .map(DiaryImage::getImgUrl)
                     .collect(Collectors.toList());
 
             return DiaryResponseDayDto.builder()
@@ -210,7 +198,6 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto,List<MultipartFile> imageFileList) {
-
             Calendars calendar = calendarRepository.findById(diaryRequestInsertDto.getCalendarsIdx())
                     .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
 
@@ -232,11 +219,8 @@ public class DiaryServiceImpl implements DiaryService{
 
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
-                    Image image = imageService.saveImage(file);
-
-                    DiaryImage diaryImage = new DiaryImage();
+                    DiaryImage diaryImage = imageService.saveDiaryImage(file,createDiary);
                     diaryImage.setDiary(createDiary);
-                    diaryImage.setImage(image);
                     diaryImageRepository.save(diaryImage);
                 }
             }
@@ -273,10 +257,8 @@ public class DiaryServiceImpl implements DiaryService{
     //다이어리 이미지 추가
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
-                    Image image = imageService.saveImage(file);
-                    DiaryImage diaryImage = new DiaryImage();
+                    DiaryImage diaryImage = imageService.saveDiaryImage(file,updateDiary);
                     diaryImage.setDiary(updateDiary);
-                    diaryImage.setImage(image);
                     diaryImageRepository.save(diaryImage);
                 }
             }
@@ -297,10 +279,12 @@ public class DiaryServiceImpl implements DiaryService{
 
         try {
 
-            List<DiaryImage> diaryImages = diaryImageRepository.findByDiaryIdx(idx);
-            diaryImageRepository.deleteAll(diaryImages);
+            List<DiaryImage> diaryImages = diaryImageRepository.findByDiary(diary);
+                for (DiaryImage diaryImage : diaryImages) {
+                    diaryImageRepository.delete(diaryImage);
+                }
 
-            diaryRepository.deleteById(idx);
+            diaryRepository.delete(diary);
         }catch (Exception e) {
             throw new ServiceException("Failed to delete diary in DiaryService.deleteDiary", e);
         }

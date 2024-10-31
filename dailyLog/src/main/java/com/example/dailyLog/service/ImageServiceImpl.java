@@ -1,12 +1,10 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.dto.request.DiaryRequestDeleteDto;
-import com.example.dailyLog.entity.DiaryImage;
-import com.example.dailyLog.entity.Image;
-import com.example.dailyLog.entity.ProfileImage;
+import com.example.dailyLog.dto.request.RequestDeleteDto;
+import com.example.dailyLog.entity.*;
 import com.example.dailyLog.repository.DiaryImageRepository;
-import com.example.dailyLog.repository.ImageRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
+import com.example.dailyLog.repository.ScheduleImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +26,14 @@ public class ImageServiceImpl implements ImageService {
     @Value("${ProfileImgLocation}")
     private String profileImageLocation;
 
-    private final ImageRepository imageRepository;
+    private final DiaryImageRepository diaryImageRepository;
+    private final ScheduleImageRepository scheduleImageRepository;
     private final ProfileImageRepository profileImageRepository;
     private final FileService fileService;
-    private final DiaryImageRepository diaryImageRepository;
 
     @Transactional
     @Override
-    public Image saveImage(MultipartFile imageFile) throws Exception {
+    public DiaryImage saveDiaryImage(MultipartFile imageFile, Diary diary) throws Exception {
         if (!imageFile.isEmpty()) {
 
             String oriImgName = imageFile.getOriginalFilename();
@@ -43,15 +41,39 @@ public class ImageServiceImpl implements ImageService {
             String imageUrl = "/images/" + savedFileName;
 
             // Image 엔티티 생성 및 설정
-            Image image = new Image();
-            image.setImgName(savedFileName);
-            image.setOriImgName(oriImgName);
-            image.setImgUrl(imageUrl);
-            return imageRepository.save(image);
+            DiaryImage diaryImage = new DiaryImage();
+            diaryImage.setImgName(savedFileName);
+            diaryImage.setOriImgName(oriImgName);
+            diaryImage.setImgUrl(imageUrl);
+            diaryImage.setDiary(diary);
+            return diaryImageRepository.save(diaryImage);
 
         }
         return null;
     }
+    @Transactional
+    @Override
+    public ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule) throws Exception {
+        if (!imageFile.isEmpty()) {
+
+            String oriImgName = imageFile.getOriginalFilename();
+            String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
+            String imageUrl = "/images/" + savedFileName;
+
+            // Image 엔티티 생성 및 설정
+            ScheduleImage scheduleImage = new ScheduleImage();
+            scheduleImage.setImgName(savedFileName);
+            scheduleImage.setOriImgName(oriImgName);
+            scheduleImage.setImgUrl(imageUrl);
+            scheduleImage.setSchedule(schedule);
+            return scheduleImageRepository.save(scheduleImage);
+
+        }
+        return null;
+    }
+
+
+
     @Transactional
     @Override
     public ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception {
@@ -73,15 +95,14 @@ public class ImageServiceImpl implements ImageService {
     }
     @Transactional
     @Override
-    public void deleteImages(DiaryRequestDeleteDto diaryRequestDeleteDto) {
+    public void deleteImages(RequestDeleteDto diaryRequestDeleteDto) {
         for (Long imageId : diaryRequestDeleteDto.getImageIds()) {
-            DiaryImage diaryImage = diaryImageRepository.findByImage_Idx(imageId);
-            if (diaryImage.getIdx() != null) {
-                diaryImageRepository.delete(diaryImage); // DiaryImage에서 삭제
-            } else {
-                System.out.println("No DiaryImage found for imageId: " + imageId);
-            }
-            imageRepository.deleteById(imageId); // Image 엔티티에서 삭제
+                Optional<DiaryImage> imageOptional = diaryImageRepository.findById(imageId);
+                if (imageOptional.isPresent()) {
+                    diaryImageRepository.delete(imageOptional.get());
+                } else {
+                    System.out.println("No Image found for imageId: " + imageId);
+                }
         }
     }
 }

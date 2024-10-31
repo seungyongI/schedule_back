@@ -42,9 +42,11 @@ public class Schedule {
     @Enumerated(EnumType.STRING)
     private Color color = Color.ORANGE;
 
-
     @ManyToOne
     @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleImage> scheduleImages = new ArrayList<>();
 
 }
