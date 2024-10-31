@@ -1,7 +1,6 @@
 package com.example.dailyLog.exception.commonException;
 
-import com.example.dailyLog.exception.commonException.error.BizException;
-import com.example.dailyLog.exception.commonException.error.ErrorCode;
+import com.example.dailyLog.exception.commonException.error.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -50,6 +49,21 @@ public class GlobalExceptionHandler {
     // 비즈니스 로직 예외
     @ExceptionHandler(BizException.class)
     public ResponseEntity<ErrorResponse> handleBizException(BizException e){
+        return createErrorResponse(e.getErrorCode());
+    }
+
+    @ExceptionHandler(InvalidYear.class)
+    public ResponseEntity<ErrorResponse> handleInvalidYear(InvalidYear e){
+        return createErrorResponse(e.getErrorCode());
+    }
+
+    @ExceptionHandler(InvalidMonth.class)
+    public ResponseEntity<ErrorResponse> handleInvalidMonth(InvalidMonth e){
+        return createErrorResponse(e.getErrorCode());
+    }
+
+    @ExceptionHandler(InvalidDay.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDay(InvalidDay e){
         return createErrorResponse(e.getErrorCode());
     }
 }

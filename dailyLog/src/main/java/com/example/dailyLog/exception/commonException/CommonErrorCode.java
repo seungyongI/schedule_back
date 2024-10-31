@@ -18,7 +18,9 @@ public enum CommonErrorCode implements ErrorCode {
     NOT_FOUND(HttpStatus.BAD_REQUEST, "해당하는 글이 없습니다."),
 
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
-    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "잘못된 날짜 범위입니다."),
+    INVALID_YEAR(HttpStatus.BAD_REQUEST, "잘못된 연도의 범위입니다."),
+    INVALID_MONTH(HttpStatus.BAD_REQUEST, "잘못된 달(월)의 범위입니다. 1 ~ 12 사이여야 합니다."),
+    INVALID_DAY(HttpStatus.BAD_REQUEST, "해당 월의 잘못된 일(day) 범위입니다."),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리소스를 찾을 수 없습니다."),
     INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 시간 형식입니다."),
 

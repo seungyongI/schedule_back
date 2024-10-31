@@ -12,8 +12,12 @@ import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
 import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
 import com.example.dailyLog.exception.commonException.error.BizException;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
+import com.example.dailyLog.exception.commonException.error.InvalidDay;
+import com.example.dailyLog.exception.commonException.error.InvalidMonth;
+import com.example.dailyLog.exception.commonException.error.InvalidYear;
 import com.example.dailyLog.exception.diaryException.DiaryErrorCode;
 import com.example.dailyLog.exception.diaryException.DiaryNotFoundException;
+import com.example.dailyLog.exception.diaryException.InvalidCategory;
 import com.example.dailyLog.exception.userException.UserErrorCode;
 import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
@@ -30,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +54,17 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public List<DiaryResponseMonthDto> findAllMonthDiary(Long idx, int year, int month){
+
+        // 유효성 검사
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+        if (year < 1 || year > 9999) {
+            throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
+        }
+        if (!calendarRepository.existsById(idx)) {
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
 
         try {
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
@@ -72,6 +88,22 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public List<DiaryResponseDayListDto> findDiaryByDayList(Long idx, int year, int month, int day){
+
+        // 유효성 검사
+        if (!calendarRepository.existsById(idx)) {
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
+        if (month < 1 || month > 12) {
+            throw new InvalidMonth(CommonErrorCode.INVALID_MONTH);
+        }
+        if (year < 1 || year > 9999) {
+            throw new InvalidYear(CommonErrorCode.INVALID_YEAR);
+        }
+        int lastDayOfMonth = YearMonth.of(year, month).lengthOfMonth();
+        if (day < 1 || day > lastDayOfMonth) {
+            throw new InvalidDay(CommonErrorCode.INVALID_DAY);
+        }
+
         try {
             LocalDate date = LocalDate.of(year, month, day);
 
@@ -104,6 +136,17 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public List<DiaryResponseCategoryDto> findDiaryCategory(Long idx, String category) {
+
+        if(idx == null){
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
+
+        try {
+            Category.valueOf(category);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidCategory(DiaryErrorCode.INVALID_CATEGORY);
+        }
+
         try {
             if (category.equals("ALL")) {
                 return diaryRepository.findByCalendarsUserIdx(idx)
@@ -206,6 +249,7 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto) {
+
         Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
                 .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
@@ -251,6 +295,10 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void deleteDiary(Long idx){
+
+        if (idx == null){
+            throw new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND);
+        }
 
         try {
             diaryRepository.deleteById(idx);

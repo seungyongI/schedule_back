@@ -8,6 +8,10 @@ import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
 import com.example.dailyLog.entity.*;
 import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
 import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
+import com.example.dailyLog.exception.commonException.CommonErrorCode;
+import com.example.dailyLog.exception.commonException.error.InvalidDay;
+import com.example.dailyLog.exception.commonException.error.InvalidMonth;
+import com.example.dailyLog.exception.commonException.error.InvalidYear;
 import com.example.dailyLog.exception.scheduleException.ScheduleErrorCode;
 import com.example.dailyLog.exception.scheduleException.ScheduleNotFoundException;
 import com.example.dailyLog.exception.userException.UserErrorCode;
@@ -24,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,8 +57,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (year < 1 || year > 9999) {
             throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
         }
-
-        // 캘린더 존재 여부 검사
         if (!calendarRepository.existsById(idx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
@@ -83,8 +86,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year) {
 
         // 유효성 검사
+        if (!calendarRepository.existsById(idx)) {
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
         if (year < 1 || year > 9999) {
-            throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
+            throw new InvalidYear(CommonErrorCode.INVALID_YEAR);
         }
 
         try {
@@ -109,6 +115,21 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day) {
+
+        // 유효성 검사
+        if (!calendarRepository.existsById(idx)) {
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
+        if (month < 1 || month > 12) {
+            throw new InvalidMonth(CommonErrorCode.INVALID_MONTH);
+        }
+        if (year < 1 || year > 9999) {
+            throw new InvalidYear(CommonErrorCode.INVALID_YEAR);
+        }
+        int lastDayOfMonth = YearMonth.of(year, month).lengthOfMonth();
+        if (day < 1 || day > lastDayOfMonth) {
+            throw new InvalidDay(CommonErrorCode.INVALID_DAY);
+        }
 
         try {
             LocalDate date = LocalDate.of(year, month, day);
@@ -202,6 +223,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void deleteSchedule(Long idx) {
 
+        if (idx == null){
+            throw new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND);
+        }
         try {
             scheduleRepository.deleteById(idx);
         } catch (Exception e) {

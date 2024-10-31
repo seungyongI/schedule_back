@@ -41,4 +41,14 @@ public class LoginExceptionHandler {
     public ResponseEntity<ErrorResponse> handleEmailNotFoundException(EmailNotFoundException e){
         return createErrorResponse(e.getErrorCode());
     }
+
+    @ExceptionHandler(UserPKException.class)
+    public ResponseEntity<ErrorResponse> handleUserPKException(UserPKException e){
+        return createErrorResponse(e.getErrorCode());
+    }
+
+    @ExceptionHandler(HttpRequestException.class)
+    public ResponseEntity<ErrorResponse> handleHttpRequestException(HttpRequestException e){
+        return createErrorResponse(e.getErrorCode());
+    }
 }
