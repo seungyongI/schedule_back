@@ -137,14 +137,15 @@ public class DiaryServiceImpl implements DiaryService{
     @Override
     public List<DiaryResponseCategoryDto> findDiaryCategory(Long idx, String category) {
 
-        if(idx == null){
-            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
-        }
+        Calendars calendar = calendarRepository.findById(idx)
+                .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
 
-        try {
-            Category.valueOf(category);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidCategory(DiaryErrorCode.INVALID_CATEGORY);
+        if (!"ALL".equalsIgnoreCase(category)) {
+            try {
+                Category.valueOf(category.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new InvalidCategory(DiaryErrorCode.INVALID_CATEGORY);
+            }
         }
 
         try {
@@ -296,11 +297,14 @@ public class DiaryServiceImpl implements DiaryService{
     @Override
     public void deleteDiary(Long idx){
 
-        if (idx == null){
-            throw new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND);
-        }
+        Diary diary = diaryRepository.findById(idx)
+                .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
         try {
+
+            List<DiaryImage> diaryImages = diaryImageRepository.findByDiaryIdx(idx);
+            diaryImageRepository.deleteAll(diaryImages);
+
             diaryRepository.deleteById(idx);
         }catch (Exception e) {
             throw new ServiceException("Failed to delete diary in DiaryService.deleteDiary", e);

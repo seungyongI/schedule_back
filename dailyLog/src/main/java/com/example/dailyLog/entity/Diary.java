@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "diary")
@@ -39,4 +41,5 @@ public class Diary {
     @ManyToOne
     @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
+
 }
