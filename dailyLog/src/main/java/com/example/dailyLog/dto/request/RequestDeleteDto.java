@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DiaryRequestDeleteDto {
+public class RequestDeleteDto {
 
     private List<Long> imageIds;
 }

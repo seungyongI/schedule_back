@@ -21,4 +21,4 @@ ENTRYPOINT ["java","-jar","-Djava.security.egd=file:/dev/./urandom","-Dsun.net.i
 
 #저장 폴더 지정
 # cd app
-# mkdir images profileImages
+# mkdir diaryImages profileImages

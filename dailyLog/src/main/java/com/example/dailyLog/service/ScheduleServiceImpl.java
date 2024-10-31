@@ -40,9 +40,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final CalendarRepository calendarRepository;
+    private final ScheduleImageRepository scheduleImageRepository;
     private final ModelMapper modelMapper;
     private final ImageService imageService;
-    private final ScheduleImageRepository scheduleImageRepository;
 
 
     // 월달력 전체 일정 조회
@@ -182,14 +182,8 @@ public class ScheduleServiceImpl implements ScheduleService {
 
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
-                    // 이미지 파일 저장
-                    Image image = imageService.saveImage(file);
-
-                    // 다이어리와 이미지를 연결하는 DiaryImage 생성 및 저장
-                    ScheduleImage scheduleImage = new ScheduleImage();
-                    scheduleImage.setSchedule(createSchedule);
-                    scheduleImage.setImage(image);
-                    scheduleImageRepository.save(scheduleImage); // 새로 추가된 DiaryImageRepository를 사용
+                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file,createSchedule);
+                    createSchedule.getScheduleImages().add(scheduleImage);
                 }
             }
         } catch (Exception e) {
@@ -228,8 +222,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         try {
 
-            List<ScheduleImage> scheduleImages = scheduleImageRepository.findByScheduleIdx(idx);
-            scheduleImageRepository.deleteAll(scheduleImages);
+            List<ScheduleImage> scheduleImages = scheduleImageRepository.findBySchedule(schedule);
+            if (scheduleImages != null && !scheduleImages.isEmpty()) {
+                for (ScheduleImage scheduleImage : scheduleImages) {
+                    scheduleImageRepository.deleteById(scheduleImage.getIdx());
+                }
+            }
 
             scheduleRepository.deleteById(idx);
         } catch (Exception e) {
