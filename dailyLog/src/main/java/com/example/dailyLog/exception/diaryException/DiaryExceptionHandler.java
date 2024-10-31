@@ -27,4 +27,9 @@ public class DiaryExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDiaryNotFoundException(DiaryNotFoundException e){
         return createErrorResponse(e.getErrorCode());
     }
+
+    @ExceptionHandler(InvalidCategory.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCategory(InvalidCategory e){
+        return createErrorResponse(e.getErrorCode());
+    }
 }

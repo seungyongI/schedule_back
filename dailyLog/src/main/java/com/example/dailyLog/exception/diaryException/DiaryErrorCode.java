@@ -9,6 +9,7 @@ public enum DiaryErrorCode implements ErrorCode {
     INVALID_DIARY_DATE(HttpStatus.BAD_REQUEST, "잘못된 날짜 형식입니다."),
     DIARY_PERMISSION_DENIED(HttpStatus.FORBIDDEN, "다이어리에 대한 접근 권한이 없습니다."),
     DUPLICATE_Diary(HttpStatus.CONFLICT, "해당 시간에 중복 일기가 있습니다."),
+    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 카테고리 값입니다."),
     ;
 
 
