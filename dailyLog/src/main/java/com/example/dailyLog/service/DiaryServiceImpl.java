@@ -248,13 +248,13 @@ public class DiaryServiceImpl implements DiaryService{
     // 일기 수정
     @Transactional
     @Override
-    public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto) {
+    public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto, List<MultipartFile> imageFileList) {
 
         Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
                 .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
+    //다이어리 기본 내용 수정
         try {
-            // 기본 필드 업데이트
             if (diaryRequestUpdateDto.getTitle() != null) {
                 updateDiary.setTitle(diaryRequestUpdateDto.getTitle());
             }
@@ -267,23 +267,18 @@ public class DiaryServiceImpl implements DiaryService{
             if (diaryRequestUpdateDto.getCategory() != null) {
                 updateDiary.setCategory(diaryRequestUpdateDto.getCategory());
             }
+            diaryRepository.save(updateDiary);
 
-            // 이미지 연관 설정
-            if (diaryRequestUpdateDto.getImages() != null) {
-                // 이미지 URL을 통해 Image 엔티티 조회
-                List<Image> images = imageRepository.findByImgUrlIn(diaryRequestUpdateDto.getImages());
-                if (!images.isEmpty()) {
-                    // 다이어리와 이미지 간 연관관계를 설정하는 코드
-                    images.forEach(image -> {
-                        DiaryImage diaryImage = new DiaryImage();
-                        diaryImage.setDiary(updateDiary);
-                        diaryImage.setImage(image);
-                        diaryImageRepository.save(diaryImage);
-                    });
+    //다이어리 이미지 추가
+            for (MultipartFile file : imageFileList) {
+                if (!file.isEmpty()) {
+                    Image image = imageService.saveImage(file);
+                    DiaryImage diaryImage = new DiaryImage();
+                    diaryImage.setDiary(updateDiary);
+                    diaryImage.setImage(image);
+                    diaryImageRepository.save(diaryImage);
                 }
             }
-
-            diaryRepository.save(updateDiary);
 
         } catch (Exception e) {
             throw new ServiceException("Failed to update diary in DiaryService.updateDiary", e);
