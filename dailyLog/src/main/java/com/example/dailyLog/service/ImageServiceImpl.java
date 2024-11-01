@@ -1,6 +1,5 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.dto.request.RequestDeleteDto;
 import com.example.dailyLog.entity.*;
 import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
@@ -93,16 +92,5 @@ public class ImageServiceImpl implements ImageService {
         }
         return null;
     }
-    @Transactional
-    @Override
-    public void deleteImages(RequestDeleteDto diaryRequestDeleteDto) {
-        for (Long imageId : diaryRequestDeleteDto.getImageIds()) {
-                Optional<DiaryImage> imageOptional = diaryImageRepository.findById(imageId);
-                if (imageOptional.isPresent()) {
-                    diaryImageRepository.delete(imageOptional.get());
-                } else {
-                    System.out.println("No Image found for imageId: " + imageId);
-                }
-        }
-    }
+
 }

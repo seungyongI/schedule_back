@@ -216,20 +216,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public void deleteSchedule(Long idx) {
-
         Schedule schedule = scheduleRepository.findById(idx)
                 .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
-
         try {
-
-            List<ScheduleImage> scheduleImages = scheduleImageRepository.findBySchedule(schedule);
-            if (scheduleImages != null && !scheduleImages.isEmpty()) {
-                for (ScheduleImage scheduleImage : scheduleImages) {
-                    scheduleImageRepository.deleteById(scheduleImage.getIdx());
-                }
-            }
-
-            scheduleRepository.deleteById(idx);
+            scheduleRepository.delete(schedule);
         } catch (Exception e) {
             throw new ServiceException("Failed to delete schedule in ScheduleService.deleteSchedule", e);
         }

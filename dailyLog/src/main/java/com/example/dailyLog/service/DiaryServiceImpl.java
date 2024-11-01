@@ -254,6 +254,14 @@ public class DiaryServiceImpl implements DiaryService{
             }
             diaryRepository.save(updateDiary);
 
+    // 이미지 삭제
+            List<Long> deleteImageList = diaryRequestUpdateDto.getDeletedImageList();
+            if (deleteImageList != null && !deleteImageList.isEmpty()) {
+                for (Long imageId : deleteImageList) {
+                    diaryImageRepository.findById(imageId).ifPresent(diaryImageRepository::delete);
+                }
+            }
+
     //다이어리 이미지 추가
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
@@ -273,17 +281,9 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void deleteDiary(Long idx){
-
         Diary diary = diaryRepository.findById(idx)
                 .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
-
         try {
-
-            List<DiaryImage> diaryImages = diaryImageRepository.findByDiary(diary);
-                for (DiaryImage diaryImage : diaryImages) {
-                    diaryImageRepository.delete(diaryImage);
-                }
-
             diaryRepository.delete(diary);
         }catch (Exception e) {
             throw new ServiceException("Failed to delete diary in DiaryService.deleteDiary", e);
