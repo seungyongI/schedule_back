@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -183,7 +184,8 @@ public class ScheduleServiceImpl implements ScheduleService {
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
                     ScheduleImage scheduleImage = imageService.saveScheduleImage(file,createSchedule);
-                    createSchedule.getScheduleImages().add(scheduleImage);
+                    scheduleImage.setSchedule(createSchedule);
+                    scheduleImageRepository.save(scheduleImage);
                 }
             }
         } catch (Exception e) {
@@ -196,7 +198,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto,List<MultipartFile> imageFileList) {
-
+        if (imageFileList == null) {
+            imageFileList = Collections.emptyList();
+        }
             Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
                     .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
