@@ -5,18 +5,17 @@ import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
 import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
 import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
-import com.example.dailyLog.entity.Schedule;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ScheduleService {
 
-    public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year);
-    public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx , int year, int month);
-    public List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day);
+    List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year);
+    List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx , int year, int month);
+    List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day);
 
-    public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList);
-    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto);
-    public void deleteSchedule(Long idx);
+    void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList);
+    void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto,List<MultipartFile> imageFileList);
+    void deleteSchedule(Long idx);
 }

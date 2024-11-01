@@ -76,8 +76,7 @@ public class DiaryController {
     // 일기 수정
     @PostMapping(value = "/update",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateDiary(@RequestPart(name = "diaryRequest") DiaryRequestUpdateDto diaryRequestUpdateDto,
-                                              @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList
-    ) {
+                                              @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
             diaryService.updateDiary(diaryRequestUpdateDto, imageFileList);
             return ResponseEntity.status(HttpStatus.OK).body("Diary updated successfully");
     }

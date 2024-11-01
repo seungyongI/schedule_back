@@ -3,6 +3,7 @@ package com.example.dailyLog.entity;
 import com.example.dailyLog.constant.Color;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "schedule")
-@Getter
+@Getter @Setter
 @ToString
 @NoArgsConstructor
 @Builder

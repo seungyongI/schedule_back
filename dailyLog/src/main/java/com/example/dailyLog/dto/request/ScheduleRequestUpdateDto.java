@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,5 +29,7 @@ public class ScheduleRequestUpdateDto {
         private String location;
 
         private Color color;
+
+        private List<Long> deletedImageList;
 
 }
