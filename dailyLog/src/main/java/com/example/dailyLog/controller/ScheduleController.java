@@ -71,8 +71,9 @@ public class ScheduleController {
 
     // 일정 수정
     @PostMapping(value = "/update")
-    public ResponseEntity<String> updateSchedule(@RequestBody ScheduleRequestUpdateDto scheduleRequestUpdateDto){
-            scheduleService.updateSchedule(scheduleRequestUpdateDto);
+    public ResponseEntity<String> updateSchedule(@RequestPart(name = "scheduleRequest") ScheduleRequestUpdateDto scheduleRequestUpdateDto,
+                                                 @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
+            scheduleService.updateSchedule(scheduleRequestUpdateDto, imageFileList);
             return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
     }
 

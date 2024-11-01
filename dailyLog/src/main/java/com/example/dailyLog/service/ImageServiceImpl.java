@@ -1,6 +1,5 @@
 package com.example.dailyLog.service;
 
-import com.example.dailyLog.dto.request.RequestDeleteDto;
 import com.example.dailyLog.entity.*;
 import com.example.dailyLog.exception.imageException.EmptyFileData;
 import com.example.dailyLog.exception.imageException.FileUploadError;
@@ -122,7 +121,6 @@ public class ImageServiceImpl implements ImageService {
             throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }
     }
-
 
     // 오류처리X
     @Transactional

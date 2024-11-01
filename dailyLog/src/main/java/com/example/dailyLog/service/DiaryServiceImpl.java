@@ -237,8 +237,12 @@ public class DiaryServiceImpl implements DiaryService{
     @Override
     public void updateDiary(DiaryRequestUpdateDto diaryRequestUpdateDto, List<MultipartFile> imageFileList) {
 
+        if (imageFileList == null) {
+            imageFileList = Collections.emptyList();
+        }
         Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
                 .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
+
 
     //다이어리 기본 내용 수정
         try {
@@ -248,13 +252,21 @@ public class DiaryServiceImpl implements DiaryService{
             if (diaryRequestUpdateDto.getContent() != null) {
                 updateDiary.setContent(diaryRequestUpdateDto.getContent());
             }
-            if (diaryRequestUpdateDto.getDate() != null) {
-                updateDiary.setDate(diaryRequestUpdateDto.getDate());
-            }
+//            if (diaryRequestUpdateDto.getDate() != null) {
+//                updateDiary.setDate(diaryRequestUpdateDto.getDate());
+//            }
             if (diaryRequestUpdateDto.getCategory() != null) {
                 updateDiary.setCategory(diaryRequestUpdateDto.getCategory());
             }
             diaryRepository.save(updateDiary);
+
+    // 이미지 삭제
+            List<Long> deleteImageList = diaryRequestUpdateDto.getDeletedImageList();
+            if (deleteImageList != null && !deleteImageList.isEmpty()) {
+                for (Long imageId : deleteImageList) {
+                    diaryImageRepository.findById(imageId).ifPresent(diaryImageRepository::delete);
+                }
+            }
 
     //다이어리 이미지 추가
             for (MultipartFile file : imageFileList) {
@@ -275,17 +287,9 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void deleteDiary(Long idx){
-
         Diary diary = diaryRepository.findById(idx)
                 .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
-
         try {
-
-            List<DiaryImage> diaryImages = diaryImageRepository.findByDiary(diary);
-                for (DiaryImage diaryImage : diaryImages) {
-                    diaryImageRepository.delete(diaryImage);
-                }
-
             diaryRepository.delete(diary);
         }catch (Exception e) {
             throw new ServiceException("Failed to delete diary in DiaryService.deleteDiary", e);
