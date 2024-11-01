@@ -27,7 +27,7 @@ public class DiaryRequestUpdateDto {
     @Length(max = 3000)
     private String content;
 
-    private LocalDate date;
+//    private LocalDate date;
 
     private Category category;
 

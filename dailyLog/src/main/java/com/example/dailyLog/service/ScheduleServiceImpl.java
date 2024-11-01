@@ -195,16 +195,44 @@ public class ScheduleServiceImpl implements ScheduleService {
     // 일정 수정
     @Transactional
     @Override
-    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto) {
+    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto,List<MultipartFile> imageFileList) {
 
             Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
                     .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
         try {
-            modelMapper.getConfiguration().setSkipNullEnabled(true);
-            modelMapper.map(scheduleRequestUpdateDto, updateSchedule);
-
+            if (scheduleRequestUpdateDto.getTitle() != null) {
+                updateSchedule.setTitle(scheduleRequestUpdateDto.getTitle());
+            }
+            if (scheduleRequestUpdateDto.getContent() != null) {
+                updateSchedule.setContent(scheduleRequestUpdateDto.getContent());
+            }
+            if (scheduleRequestUpdateDto.getStart() != null) {
+                updateSchedule.setStart(scheduleRequestUpdateDto.getStart());
+            }
+            if (scheduleRequestUpdateDto.getEnd() != null) {
+                updateSchedule.setLocation(scheduleRequestUpdateDto.getLocation());
+            }
+            if (scheduleRequestUpdateDto.getColor() != null) {
+                updateSchedule.setColor(scheduleRequestUpdateDto.getColor());
+            }
             scheduleRepository.save(updateSchedule);
+
+            List<Long> deleteImageList = scheduleRequestUpdateDto.getDeletedImageList();
+            if (deleteImageList != null && !deleteImageList.isEmpty()) {
+                for (Long imageId : deleteImageList) {
+                    scheduleRepository.findById(imageId).ifPresent(scheduleRepository::delete);
+                }
+            }
+
+            //다이어리 이미지 추가
+            for (MultipartFile file : imageFileList) {
+                if (!file.isEmpty()) {
+                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file,updateSchedule);
+                    scheduleImage.setSchedule(updateSchedule);
+                    scheduleImageRepository.save(scheduleImage);
+                }
+            }
 
         } catch (Exception e) {
             throw new ServiceException("Failed to update schedule in ScheduleService.updateSchedule", e);
