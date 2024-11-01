@@ -120,6 +120,8 @@ public class DiaryServiceImpl implements DiaryService{
             throw new ServiceException("Failed to find diary in DiaryService.findDiaryByDayList", e);
         }
     }
+
+
     // 전체 및 카테고리별 전체 일기 조회
     @Transactional
     @Override

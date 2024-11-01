@@ -21,8 +21,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
 
     @Override
     @Transactional
@@ -49,10 +51,12 @@ public class UserServiceImpl implements UserService{
         }
     }
 
+
     @Override
     public User findUserById(Long id) {
         return null;
     }
+
 
     @Override
     @Transactional
@@ -80,6 +84,7 @@ public class UserServiceImpl implements UserService{
             throw new ServiceException("Failed to update user", e);
         }
     }
+
 
     @Override
     public void deleteUser(Long id) {

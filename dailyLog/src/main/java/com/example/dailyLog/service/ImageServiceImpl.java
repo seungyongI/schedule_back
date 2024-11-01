@@ -2,6 +2,10 @@ package com.example.dailyLog.service;
 
 import com.example.dailyLog.dto.request.RequestDeleteDto;
 import com.example.dailyLog.entity.*;
+import com.example.dailyLog.exception.imageException.EmptyFileData;
+import com.example.dailyLog.exception.imageException.FileUploadError;
+import com.example.dailyLog.exception.imageException.ImageErrorCode;
+import com.example.dailyLog.exception.imageException.InvalidFileName;
 import com.example.dailyLog.repository.DiaryImageRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.ScheduleImageRepository;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -31,11 +36,27 @@ public class ImageServiceImpl implements ImageService {
     private final ProfileImageRepository profileImageRepository;
     private final FileService fileService;
 
+
+    // 유효성 검사 메소드
+    public void validateImageFile(MultipartFile imageFile) {
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new EmptyFileData(ImageErrorCode.EMPTY_FILE_DATA);
+        }
+
+        String oriImgName = imageFile.getOriginalFilename();
+        if (oriImgName == null || !oriImgName.contains(".")) {
+            throw new InvalidFileName(ImageErrorCode.INVALID_FILE_NAME);
+        }
+    }
+
+
     @Transactional
     @Override
-    public DiaryImage saveDiaryImage(MultipartFile imageFile, Diary diary) throws Exception {
-        if (!imageFile.isEmpty()) {
+    public DiaryImage saveDiaryImage(MultipartFile imageFile, Diary diary){
 
+        validateImageFile(imageFile);
+
+        try {
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
             String imageUrl = "/images/" + savedFileName;
@@ -46,16 +67,21 @@ public class ImageServiceImpl implements ImageService {
             diaryImage.setOriImgName(oriImgName);
             diaryImage.setImgUrl(imageUrl);
             diaryImage.setDiary(diary);
-            return diaryImageRepository.save(diaryImage);
 
+            return diaryImageRepository.save(diaryImage);
+        } catch (Exception e) {
+            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }
-        return null;
     }
+
+
     @Transactional
     @Override
-    public ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule) throws Exception {
-        if (!imageFile.isEmpty()) {
+    public ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule){
 
+        validateImageFile(imageFile);
+
+        try {
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
             String imageUrl = "/images/" + savedFileName;
@@ -66,19 +92,21 @@ public class ImageServiceImpl implements ImageService {
             scheduleImage.setOriImgName(oriImgName);
             scheduleImage.setImgUrl(imageUrl);
             scheduleImage.setSchedule(schedule);
+
             return scheduleImageRepository.save(scheduleImage);
-
+        } catch (Exception e) {
+            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }
-        return null;
     }
-
 
 
     @Transactional
     @Override
-    public ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception {
-        if (!imageFile.isEmpty()) {
+    public ProfileImage saveProfileImage(MultipartFile imageFile){
 
+        validateImageFile(imageFile);
+
+        try{
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(profileImageLocation, oriImgName, imageFile.getBytes());
             String imageUrl = "/profileImages/" + savedFileName;
@@ -88,11 +116,15 @@ public class ImageServiceImpl implements ImageService {
             profileImage.setImgName(savedFileName);
             profileImage.setOriImgName(oriImgName);
             profileImage.setImgUrl(imageUrl);
-            return profileImageRepository.save(profileImage);
 
+            return profileImageRepository.save(profileImage);
+            } catch (Exception e) {
+            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }
-        return null;
     }
+
+
+    // 오류처리X
     @Transactional
     @Override
     public void deleteImages(RequestDeleteDto diaryRequestDeleteDto) {
