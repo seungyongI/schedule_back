@@ -102,37 +102,22 @@ public class ImageServiceImpl implements ImageService {
     @Transactional
     @Override
     public ProfileImage saveProfileImage(MultipartFile imageFile, User user) throws Exception {
-        if (!imageFile.isEmpty()) {
+            try {
+                String oriImgName = imageFile.getOriginalFilename();
+                String savedFileName = fileService.uploadFile(profileImageLocation, oriImgName, imageFile.getBytes());
+                String imageUrl = "/profileImages/" + savedFileName;
 
-
-        try{
-            String oriImgName = imageFile.getOriginalFilename();
-            String savedFileName = fileService.uploadFile(profileImageLocation, oriImgName, imageFile.getBytes());
-            String imageUrl = "/profileImages/" + savedFileName;
-
-            // ProfileImage 엔티티 생성 및 설정
-            ProfileImage profileImage = new ProfileImage();
-            profileImage.setImgName(savedFileName);
-            profileImage.setOriImgName(oriImgName);
-            profileImage.setImgUrl(imageUrl);
-            profileImage.setUser(user);
-            return profileImageRepository.save(profileImage);
+                // ProfileImage 엔티티 생성 및 설정
+                ProfileImage profileImage = new ProfileImage();
+                profileImage.setImgName(savedFileName);
+                profileImage.setOriImgName(oriImgName);
+                profileImage.setImgUrl(imageUrl);
+                profileImage.setUser(user);
+                return profileImageRepository.save(profileImage);
             } catch (Exception e) {
-            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
-        }
-    }
+                throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
+            }
 
-    // 오류처리X
-    @Transactional
-    @Override
-    public void deleteImages(RequestDeleteDto diaryRequestDeleteDto) {
-        for (Long imageId : diaryRequestDeleteDto.getImageIds()) {
-                Optional<DiaryImage> imageOptional = diaryImageRepository.findById(imageId);
-                if (imageOptional.isPresent()) {
-                    diaryImageRepository.delete(imageOptional.get());
-                } else {
-                    System.out.println("No Image found for imageId: " + imageId);
-                }
-        }
     }
 }
+
