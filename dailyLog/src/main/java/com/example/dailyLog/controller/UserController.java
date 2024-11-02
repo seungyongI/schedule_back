@@ -1,8 +1,6 @@
 package com.example.dailyLog.controller;
 
 import com.example.dailyLog.dto.request.UserRequestUpdateDto;
-import com.example.dailyLog.entity.ProfileImage;
-import com.example.dailyLog.service.ImageService;
 import com.example.dailyLog.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final ImageService imageService;
     private final UserService userService;
 
     //유저 프로필 수정

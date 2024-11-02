@@ -243,7 +243,6 @@ public class DiaryServiceImpl implements DiaryService{
         Diary updateDiary = diaryRepository.findById(diaryRequestUpdateDto.getIdx())
                 .orElseThrow(() -> new DiaryNotFoundException(DiaryErrorCode.DIARY_NOT_FOUND));
 
-
     //다이어리 기본 내용 수정
         try {
             if (diaryRequestUpdateDto.getTitle() != null) {

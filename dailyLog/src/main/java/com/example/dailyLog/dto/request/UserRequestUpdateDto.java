@@ -9,6 +9,6 @@ public class UserRequestUpdateDto {
 
     private String userName;
 
-    private Long deletedProfileImageIdx;
+    private Long updatedProfileImageIdx;
 
 }

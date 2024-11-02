@@ -5,9 +5,12 @@ import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.constant.Provider;
 import com.example.dailyLog.dto.request.UserRequestUpdateDto;
 import com.example.dailyLog.entity.Calendars;
+import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.exception.commonException.error.BizException;
+import com.example.dailyLog.exception.imageException.FileUploadError;
+import com.example.dailyLog.exception.imageException.ImageErrorCode;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -20,17 +23,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ProfileImageRepository profileImageRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
 
 
     @Override
     @Transactional
     public User createUser(UserRequestInsertDto userRequestInsertDto) {
-        try{
+        try {
             Calendars calendars = Calendars.builder()
                     .theme(Theme.LIGHT)
                     .build();
@@ -58,21 +62,26 @@ public class UserServiceImpl implements UserService{
         return null;
     }
 
-
+    // 유저 프로필 수정
     @Override
     @Transactional
     public void updateUser(UserRequestUpdateDto userRequestUpdateDto, MultipartFile imageFile) {
+        try {
+            User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
+                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
 
-        User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
-                .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
-        if (userRequestUpdateDto.getUserName() != null) {
-            updateUser.setUserName(userRequestUpdateDto.getUserName());
+
+            if (userRequestUpdateDto.getUserName() != null) {
+                updateUser.setUserName(userRequestUpdateDto.getUserName());
+            }
+            userRepository.save(updateUser);
+
+            ProfileImage profileImage = imageService.saveProfileImage(imageFile, updateUser);
+            profileImage.setUser(updateUser);
+            profileImageRepository.save(profileImage);
+        } catch (Exception e) {
+            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }
-        Long deleteImage = userRequestUpdateDto.getDeletedProfileImageIdx();
-        if (deleteImage != null) {
-            profileImageRepository.deleteById(deleteImage);
-        }
-        userRepository.save(updateUser);
     }
 }
 
