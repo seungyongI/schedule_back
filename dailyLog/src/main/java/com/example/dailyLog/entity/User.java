@@ -46,6 +46,6 @@ public class User {
     @Column(nullable = false)
     private Provider provider;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProfileImage profileImage;
 }

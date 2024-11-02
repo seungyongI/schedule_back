@@ -7,10 +7,8 @@ public class UserRequestUpdateDto {
 
     private Long idx;
 
-    private String email;
-
-    private String password;
-
     private String userName;
+
+    private Long deletedProfileImageIdx;
 
 }

@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DiaryRequestUpdateDto {
 
-    @Schema(hidden = true)
     private Long idx;
 
     @Length(min = 1, max = 50)
