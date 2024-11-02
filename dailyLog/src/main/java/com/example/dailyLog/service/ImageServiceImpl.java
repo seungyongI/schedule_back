@@ -37,7 +37,7 @@ public class ImageServiceImpl implements ImageService {
 
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
-            String imageUrl = "/images/" + savedFileName;
+            String imageUrl = "/diaryImages/" + savedFileName;
 
             // Image 엔티티 생성 및 설정
             DiaryImage diaryImage = new DiaryImage();
@@ -57,7 +57,7 @@ public class ImageServiceImpl implements ImageService {
 
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
-            String imageUrl = "/images/" + savedFileName;
+            String imageUrl = "/scheduleImages/" + savedFileName;
 
             // Image 엔티티 생성 및 설정
             ScheduleImage scheduleImage = new ScheduleImage();
@@ -75,7 +75,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional
     @Override
-    public ProfileImage saveProfileImage(MultipartFile imageFile) throws Exception {
+    public ProfileImage saveProfileImage(MultipartFile imageFile, User user) throws Exception {
         if (!imageFile.isEmpty()) {
 
             String oriImgName = imageFile.getOriginalFilename();
@@ -87,6 +87,7 @@ public class ImageServiceImpl implements ImageService {
             profileImage.setImgName(savedFileName);
             profileImage.setOriImgName(oriImgName);
             profileImage.setImgUrl(imageUrl);
+            profileImage.setUser(user);
             return profileImageRepository.save(profileImage);
 
         }

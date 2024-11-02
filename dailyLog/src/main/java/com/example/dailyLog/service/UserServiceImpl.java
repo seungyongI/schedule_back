@@ -5,24 +5,26 @@ import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.constant.Provider;
 import com.example.dailyLog.dto.request.UserRequestUpdateDto;
 import com.example.dailyLog.entity.Calendars;
-import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.exception.commonException.error.BizException;
+import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
+    private final ProfileImageRepository profileImageRepository;
     private final PasswordEncoder passwordEncoder;
+
 
     @Override
     @Transactional
@@ -56,33 +58,20 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public void updateUser(UserRequestUpdateDto userRequestUpdateDto, ProfileImage profileImage) {
-        try {
-            User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+    public void updateUser(UserRequestUpdateDto userRequestUpdateDto, MultipartFile imageFile) {
 
-            if (userRequestUpdateDto.getEmail() != null) {
-                updateUser.setEmail(userRequestUpdateDto.getEmail());
-            }
-            if (userRequestUpdateDto.getUserName() != null) {
-                updateUser.setUserName(userRequestUpdateDto.getUserName());
-            }
-            if (userRequestUpdateDto.getPassword() != null) {
-                updateUser.setPassword(passwordEncoder.encode(userRequestUpdateDto.getPassword()));
-            }
-
-            if (profileImage != null) {
-                updateUser.setProfileImage(profileImage);
-            }
-            userRepository.save(updateUser);
-
-        } catch (Exception e) {
-            throw new ServiceException("Failed to update user", e);
+        User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
+                .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+        if (userRequestUpdateDto.getUserName() != null) {
+            updateUser.setUserName(userRequestUpdateDto.getUserName());
         }
+        Long deleteImage = userRequestUpdateDto.getDeletedProfileImageIdx();
+        if (deleteImage != null) {
+            profileImageRepository.deleteById(deleteImage);
+        }
+        userRepository.save(updateUser);
     }
 
-    @Override
-    public void deleteUser(Long id) {
-
-    }
 }
+
+
