@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
+
     private final UserRepository userRepository;
     private final ProfileImageRepository profileImageRepository;
     private final PasswordEncoder passwordEncoder;
@@ -51,10 +52,12 @@ public class UserServiceImpl implements UserService{
         }
     }
 
+
     @Override
     public User findUserById(Long id) {
         return null;
     }
+
 
     @Override
     @Transactional
@@ -71,7 +74,6 @@ public class UserServiceImpl implements UserService{
         }
         userRepository.save(updateUser);
     }
-
 }
 
 
