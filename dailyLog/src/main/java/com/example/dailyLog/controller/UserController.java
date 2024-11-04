@@ -16,7 +16,7 @@ public class UserController {
 
     private final UserService userService;
 
-    //유저 프로필 수정
+    //유저 닉네임 수정
     @PutMapping(value = "/updateUserName/{idx}")
     public ResponseEntity<String> updateUserName(@PathVariable(name = "idx")Long idx,
                                                  @RequestBody UserRequestUpdateDto userRequestUpdateDto){
@@ -24,10 +24,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("UserNickname updated successfully");
     }
 
-    //유저 프로필 수정
-    @PutMapping(value = "/updateProfileImage/{idx}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    //유저 프로필 이미지 수정
+    @PostMapping(value = "/updateProfileImage/{idx}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProfileImage(@PathVariable(name = "idx") Long idx,
-                                                     @RequestPart(name = "imageFiles", required = false) MultipartFile imageFile) {
+                                                     @RequestPart(name = "imageFiles") MultipartFile imageFile) {
         userService.updateProfileImage(idx, imageFile);
         return ResponseEntity.status(HttpStatus.OK).body("Profile updated successfully");
     }

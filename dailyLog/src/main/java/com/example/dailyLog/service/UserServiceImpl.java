@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUserName(Long idx, UserRequestUpdateDto userRequestUpdateDto) {
         try {
-            User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
+            User updateUser = userRepository.findById(idx)
                     .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
 
             if (userRequestUpdateDto.getUserName() != null) {
