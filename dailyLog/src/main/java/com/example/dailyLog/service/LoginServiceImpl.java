@@ -5,15 +5,10 @@ import com.example.dailyLog.exception.loginException.EmailNotFoundException;
 import com.example.dailyLog.exception.loginException.LoginErrorCode;
 import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
-import com.example.dailyLog.security.providers.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor

@@ -18,10 +18,10 @@ import com.example.dailyLog.exception.userException.UserErrorCode;
 import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ScheduleImageRepository;
+import com.example.dailyLog.repository.ScheduleRepeatRepository;
 import com.example.dailyLog.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
@@ -42,16 +41,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final CalendarRepository calendarRepository;
     private final ScheduleImageRepository scheduleImageRepository;
-    private final ModelMapper modelMapper;
+    private final ScheduleRepeatRepository scheduleRepeatRepository;
     private final ImageService imageService;
-
 
     // 월달력 전체 일정 조회
     @Transactional
     @Override
     public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx, int year, int month) {
-
-        // 유효성 검사
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("Month must be between 1 and 12");
         }
@@ -66,13 +62,55 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
             LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-            return scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59))
-                    .stream().map(schedule ->
-                            ScheduleResponseMonthDto.builder()
-                                    .title(schedule.getTitle())
-                                    .start(schedule.getStart())
-                                    .color(schedule.getColor())
-                                    .build())
+            List<Schedule> schedules = scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59));
+            List<ScheduleRepeat> repeatingSchedules = scheduleRepeatRepository.findByEndDateAfter(startOfMonth);
+
+            for (ScheduleRepeat repeat : repeatingSchedules) {
+                Schedule schedule = repeat.getSchedule();
+                LocalDate current = schedule.getStart().toLocalDate();
+
+                while (!current.isAfter(endOfMonth) && !current.isAfter(repeat.getEndDate())) {
+                    if (!current.isBefore(startOfMonth)) {
+                        schedules.add(
+                                Schedule.builder()
+                                        .title(schedule.getTitle())
+                                        .content(schedule.getContent())
+                                        .start(current.atTime(schedule.getStart().toLocalTime()))
+                                        .end(current.atTime(schedule.getEnd().toLocalTime()))
+                                        .location(schedule.getLocation())
+                                        .color(schedule.getColor())
+                                        .calendars(schedule.getCalendars())
+                                        .build()
+                        );
+                    }
+
+                    switch (repeat.getRepeatType()) {
+                        case DAILY:
+                            current = current.plusDays(1);
+                            break;
+                        case WEEKLY:
+                            current = current.plusWeeks(1);
+                            break;
+                        case MONTHLY:
+                            current = current.plusMonths(1);
+                            break;
+                        case YEARLY:
+                            current = current.plusYears(1);
+                            break;
+                    }
+                }
+            }
+
+            return schedules.stream()
+                    .map(schedule -> {
+                        boolean isRepeat = scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx()) != null;
+                        return ScheduleResponseMonthDto.builder()
+                                .title(schedule.getTitle())
+                                .start(schedule.getStart())
+                                .color(schedule.getColor())
+                                .isRepeat(isRepeat)
+                                .build();
+                    })
                     .sorted(Comparator.comparing(ScheduleResponseMonthDto::getStart))
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -80,13 +118,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-
     // 연달력 전체 일정 조회
     @Transactional
     @Override
     public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year) {
-
-        // 유효성 검사
         if (!calendarRepository.existsById(idx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
@@ -98,12 +133,54 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDate startOfYear = LocalDate.of(year, 1, 1);
             LocalDate endOfYear = LocalDate.of(year, 12, 31);
 
-            return scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59))
-                    .stream().map(schedule ->
-                            ScheduleResponseYearDto.builder()
-                                    .start(schedule.getStart())
-                                    .color(schedule.getColor())
-                                    .build())
+            List<Schedule> schedules = scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59));
+            List<ScheduleRepeat> repeatingSchedules = scheduleRepeatRepository.findByEndDateAfter(startOfYear);
+
+            for (ScheduleRepeat repeat : repeatingSchedules) {
+                Schedule schedule = repeat.getSchedule();
+                LocalDate current = schedule.getStart().toLocalDate();
+
+                while (!current.isAfter(endOfYear) && !current.isAfter(repeat.getEndDate())) {
+                    if (!current.isBefore(startOfYear)) {
+                        schedules.add(
+                                Schedule.builder()
+                                        .title(schedule.getTitle())
+                                        .content(schedule.getContent())
+                                        .start(current.atTime(schedule.getStart().toLocalTime()))
+                                        .end(current.atTime(schedule.getEnd().toLocalTime()))
+                                        .location(schedule.getLocation())
+                                        .color(schedule.getColor())
+                                        .calendars(schedule.getCalendars())
+                                        .build()
+                        );
+                    }
+
+                    switch (repeat.getRepeatType()) {
+                        case DAILY:
+                            current = current.plusDays(1);
+                            break;
+                        case WEEKLY:
+                            current = current.plusWeeks(1);
+                            break;
+                        case MONTHLY:
+                            current = current.plusMonths(1);
+                            break;
+                        case YEARLY:
+                            current = current.plusYears(1);
+                            break;
+                    }
+                }
+            }
+
+            return schedules.stream()
+                    .map(schedule -> {
+                        boolean isRepeat = scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx()) != null;
+                        return ScheduleResponseYearDto.builder()
+                                .start(schedule.getStart())
+                                .color(schedule.getColor())
+                                .isRepeat(isRepeat)
+                                .build();
+                    })
                     .sorted(Comparator.comparing(ScheduleResponseYearDto::getStart))
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -111,13 +188,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-
     // 개별 날짜 일정 조회
     @Transactional
     @Override
     public List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day) {
-
-        // 유효성 검사
         if (!calendarRepository.existsById(idx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
@@ -137,17 +211,58 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDateTime startOfDay = date.atStartOfDay();
             LocalDateTime endOfDay = date.atTime(23, 59, 59);
 
-            return scheduleRepository.findSchedulesInDay(startOfDay, endOfDay)
-                    .stream()
-                    .map(schedule ->
-                            ScheduleResponseDayDto.builder()
-                                    .title(schedule.getTitle())
-                                    .content(schedule.getContent())
-                                    .start(schedule.getStart())
-                                    .end(schedule.getEnd())
-                                    .location(schedule.getLocation())
-                                    .color(schedule.getColor())
-                                    .build())
+            List<Schedule> schedules = scheduleRepository.findSchedulesInDay(startOfDay, endOfDay);
+            List<ScheduleRepeat> repeatingSchedules = scheduleRepeatRepository.findByEndDateAfter(date);
+
+            for (ScheduleRepeat repeat : repeatingSchedules) {
+                Schedule schedule = repeat.getSchedule();
+                LocalDate current = schedule.getStart().toLocalDate();
+
+                while (!current.isAfter(date) && !current.isAfter(repeat.getEndDate())) {
+                    if (current.isEqual(date)) {
+                        schedules.add(
+                                Schedule.builder()
+                                        .title(schedule.getTitle())
+                                        .content(schedule.getContent())
+                                        .start(current.atTime(schedule.getStart().toLocalTime()))
+                                        .end(current.atTime(schedule.getEnd().toLocalTime()))
+                                        .location(schedule.getLocation())
+                                        .color(schedule.getColor())
+                                        .calendars(schedule.getCalendars())
+                                        .build()
+                        );
+                    }
+
+                    switch (repeat.getRepeatType()) {
+                        case DAILY:
+                            current = current.plusDays(1);
+                            break;
+                        case WEEKLY:
+                            current = current.plusWeeks(1);
+                            break;
+                        case MONTHLY:
+                            current = current.plusMonths(1);
+                            break;
+                        case YEARLY:
+                            current = current.plusYears(1);
+                            break;
+                    }
+                }
+            }
+
+            return schedules.stream()
+                    .map(schedule -> {
+                        boolean isRepeat = scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx()) != null;
+                        return ScheduleResponseDayDto.builder()
+                                .title(schedule.getTitle())
+                                .content(schedule.getContent())
+                                .start(schedule.getStart())
+                                .end(schedule.getEnd())
+                                .location(schedule.getLocation())
+                                .color(schedule.getColor())
+                                .isRepeat(isRepeat)
+                                .build();
+                    })
                     .sorted(Comparator.comparing(ScheduleResponseDayDto::getStart))
                     .collect(Collectors.toList());
 
@@ -156,12 +271,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-
     // 일정 입력
     @Transactional
     @Override
     public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList) {
-
         Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
                 .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
 
@@ -169,6 +282,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (user == null) {
             throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
         }
+
         try {
             Schedule createSchedule = Schedule.builder()
                     .title(scheduleRequestInsertDto.getTitle())
@@ -181,9 +295,19 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .build();
             scheduleRepository.save(createSchedule);
 
+            // 반복 일정이 설정된 경우 ScheduleRepeat 생성
+            if (scheduleRequestInsertDto.getRepeatType() != null) {
+                ScheduleRepeat scheduleRepeat = new ScheduleRepeat();
+                scheduleRepeat.setSchedule(createSchedule);
+                scheduleRepeat.setRepeatType(scheduleRequestInsertDto.getRepeatType());
+                scheduleRepeat.setEndDate(scheduleRequestInsertDto.getRepeatEndDate());
+                scheduleRepeatRepository.save(scheduleRepeat);
+            }
+
+            // 이미지 저장 로직
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
-                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file,createSchedule);
+                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file, createSchedule);
                     scheduleImage.setSchedule(createSchedule);
                     scheduleImageRepository.save(scheduleImage);
                 }
@@ -193,18 +317,19 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-
     // 일정 수정
     @Transactional
     @Override
-    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto,List<MultipartFile> imageFileList) {
+    public void updateSchedule(ScheduleRequestUpdateDto scheduleRequestUpdateDto, List<MultipartFile> imageFileList) {
         if (imageFileList == null) {
             imageFileList = Collections.emptyList();
         }
-            Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
-                    .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
+
+        Schedule updateSchedule = scheduleRepository.findById(scheduleRequestUpdateDto.getIdx())
+                .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
         try {
+            // 일정 정보 업데이트
             if (scheduleRequestUpdateDto.getTitle() != null) {
                 updateSchedule.setTitle(scheduleRequestUpdateDto.getTitle());
             }
@@ -215,24 +340,36 @@ public class ScheduleServiceImpl implements ScheduleService {
                 updateSchedule.setStart(scheduleRequestUpdateDto.getStart());
             }
             if (scheduleRequestUpdateDto.getEnd() != null) {
+                updateSchedule.setEnd(scheduleRequestUpdateDto.getEnd());
+            }
+            if (scheduleRequestUpdateDto.getLocation() != null) {
                 updateSchedule.setLocation(scheduleRequestUpdateDto.getLocation());
             }
             if (scheduleRequestUpdateDto.getColor() != null) {
                 updateSchedule.setColor(scheduleRequestUpdateDto.getColor());
             }
-            scheduleRepository.save(updateSchedule);
 
-            List<Long> deleteImageList = scheduleRequestUpdateDto.getDeletedImageList();
-            if (deleteImageList != null && !deleteImageList.isEmpty()) {
-                for (Long imageId : deleteImageList) {
-                    scheduleRepository.findById(imageId).ifPresent(scheduleRepository::delete);
+            // 반복 정보 업데이트
+            ScheduleRepeat scheduleRepeat = scheduleRepeatRepository.findByScheduleIdx(updateSchedule.getIdx());
+            if (scheduleRequestUpdateDto.getRepeatType() != null) {
+                if (scheduleRepeat == null) {
+                    scheduleRepeat = new ScheduleRepeat();
+                    scheduleRepeat.setSchedule(updateSchedule);
                 }
+                scheduleRepeat.setRepeatType(scheduleRequestUpdateDto.getRepeatType());
+                scheduleRepeat.setEndDate(scheduleRequestUpdateDto.getRepeatEndDate());
+                scheduleRepeatRepository.save(scheduleRepeat);
+            } else if (scheduleRepeat != null) {
+                // 반복 일정 해제 처리
+                scheduleRepeatRepository.delete(scheduleRepeat);
             }
 
-            //다이어리 이미지 추가
+            scheduleRepository.save(updateSchedule);
+
+            // 이미지 업데이트 로직
             for (MultipartFile file : imageFileList) {
                 if (!file.isEmpty()) {
-                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file,updateSchedule);
+                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file, updateSchedule);
                     scheduleImage.setSchedule(updateSchedule);
                     scheduleImageRepository.save(scheduleImage);
                 }
@@ -243,7 +380,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-
     // 일정 삭제
     @Transactional
     @Override
@@ -251,6 +387,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule schedule = scheduleRepository.findById(idx)
                 .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
         try {
+            // 관련된 반복 일정 삭제
+            ScheduleRepeat scheduleRepeat = scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx());
+            if (scheduleRepeat != null) {
+                scheduleRepeatRepository.delete(scheduleRepeat);
+            }
+
             scheduleRepository.delete(schedule);
         } catch (Exception e) {
             throw new ServiceException("Failed to delete schedule in ScheduleService.deleteSchedule", e);

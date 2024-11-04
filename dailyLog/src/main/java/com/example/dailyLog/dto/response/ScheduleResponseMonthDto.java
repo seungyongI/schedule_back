@@ -16,4 +16,6 @@ public class ScheduleResponseMonthDto {
     private LocalDateTime start;
 
     private Color color;
+
+    private boolean isRepeat;  // 반복 일정 여부 추가
 }

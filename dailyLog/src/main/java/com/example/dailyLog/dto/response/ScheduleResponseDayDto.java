@@ -21,4 +21,6 @@ public class ScheduleResponseDayDto {
     private String location;
 
     private Color color;
+
+    private boolean isRepeat;  // 반복 일정 여부 추가
 }

@@ -22,7 +22,8 @@ public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    private static final long TOKEN_VALID_TIME = 30 * 60 * 1000L; // 30분
+    private static final long TOKEN_VALID_TIME = 24 * 60 * 60 * 1000L; // 1일
+    private static final long REFRESH_TOKEN_VALID_TIME = 7 * 24 * 60 * 60 * 1000L; // 7일
 
     private final UserDetailsService userDetailsService;
 
@@ -35,14 +36,22 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String userPk, HttpServletRequest request) {
-        Claims claims = Jwts.claims().setSubject(userPk);
-        // 사용자의 권한 정보를 담는 claim. role 정보는 현재 사용하지 않으므로 제거
+    public String createToken(String userPk) {
         Date now = new Date();
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(userPk)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
+    public String createRefreshToken(String userPk) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(userPk)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
@@ -67,10 +76,14 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String jwtToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
     }
 }
+

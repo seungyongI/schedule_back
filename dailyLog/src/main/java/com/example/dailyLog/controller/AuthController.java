@@ -1,10 +1,15 @@
 package com.example.dailyLog.controller;
 
+import com.example.dailyLog.dto.request.KakaoUserRequestDto;
 import com.example.dailyLog.dto.request.LoginRequestDto;
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
+import com.example.dailyLog.dto.response.KakaoUserResponseDto;
 import com.example.dailyLog.dto.response.LoginResponseDto;
+import com.example.dailyLog.entity.ProfileImage;
+import com.example.dailyLog.entity.User;
 import com.example.dailyLog.security.CustomUserDetails;
 import com.example.dailyLog.security.providers.JwtTokenProvider;
+import com.example.dailyLog.service.KakaoLoginService;
 import com.example.dailyLog.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -28,26 +33,29 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserService userService; // UserService 주입
+    private final KakaoLoginService kakaoLoginService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto, HttpServletRequest request) {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            String token = jwtTokenProvider.createToken(userDetails.getUserName(), request); // HttpServletRequest 제거
+        String token = jwtTokenProvider.createToken(userDetails.getUserName());
+        String refreshToken = jwtTokenProvider.createRefreshToken(userDetails.getUserName());
 
-            LoginResponseDto responseDto = LoginResponseDto.builder()
-                    .accessToken(token)
-                    .email(userDetails.getEmail())
-                    .userName(userDetails.getUserName())
-                    .profileImage(userDetails.getProfileImage())
-                    .build();
+        LoginResponseDto responseDto = LoginResponseDto.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken)
+                .email(userDetails.getEmail())
+                .userName(userDetails.getUserName())
+                .profileImage(userDetails.getProfileImage())
+                .build();
 
-            return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/join")
@@ -65,4 +73,33 @@ public class AuthController {
         userService.createUser(userRequestInsertDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
+
+    @GetMapping("/kakao/login")
+    public ResponseEntity<LoginResponseDto> kakaoLogin(@RequestParam("code") String code) {
+        String accessToken = kakaoLoginService.getKakaoAccessToken(code);
+        KakaoUserResponseDto kakaoUserInfo = kakaoLoginService.getKakaoUserInfo(accessToken);
+        User user = kakaoLoginService.createKakaoUser(kakaoUserInfo);
+
+        // JWT 생성
+        String token = jwtTokenProvider.createToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
+
+        ProfileImage profileImage = user.getProfileImage();
+        if (profileImage == null) {
+            profileImage = new ProfileImage();
+            profileImage.setImgUrl(null);
+        }
+
+        // LoginResponseDto 생성
+        LoginResponseDto responseDto = LoginResponseDto.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken)
+                .email(user.getEmail())
+                .userName(user.getUserName())
+                .profileImage(profileImage)
+                .build();
+
+        return ResponseEntity.ok(responseDto);
+    }
 }
+

@@ -47,6 +47,9 @@ public class Schedule {
     @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
 
+    @OneToOne(mappedBy = "schedule")
+    private ScheduleRepeat scheduleRepeat;
+
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleImage> scheduleImages = new ArrayList<>();
 

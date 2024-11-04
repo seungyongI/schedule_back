@@ -2,9 +2,7 @@ package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Provider;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -48,4 +46,13 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProfileImage profileImage;
+
+    @Column(name = "access_token")
+    private String accessToken;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "token_expiry")
+    private LocalDateTime tokenExpiry;
 }

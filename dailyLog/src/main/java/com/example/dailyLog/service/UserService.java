@@ -4,6 +4,7 @@ import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.dto.request.UserRequestUpdateDto;
 import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
+import com.example.dailyLog.security.CustomUserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -59,15 +60,17 @@ public class ScheduleController {
 
 
     // 일정 입력
-    @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> saveSchedule(@RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
-                                               @RequestPart(name = "imageFiles",required = false)List<MultipartFile> imageFileList) {
-            scheduleService.saveSchedule(scheduleRequestInsertDto,imageFileList);
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> saveSchedule(
+            @ModelAttribute ScheduleRequestInsertDto scheduleRequestInsertDto,
+            @RequestPart(name = "imageFiles", required = false) List<MultipartFile> imageFileList) {
+        if (imageFileList == null) {
+            imageFileList = Collections.emptyList();
+        }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
-
+        scheduleService.saveSchedule(scheduleRequestInsertDto, imageFileList);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
     }
-
 
     // 일정 수정
     @PostMapping(value = "/update")
