@@ -1,8 +1,10 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.constant.Provider;
+import com.example.dailyLog.constant.Theme;
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.dto.request.UserRequestUpdateDto;
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
@@ -32,12 +34,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User createUser(UserRequestInsertDto userRequestInsertDto) {
         try {
+            Calendars calendars = Calendars.builder().theme(Theme.LIGHT).build();
             // 기존 회원가입 로직
             User user = User.builder()
                     .email(userRequestInsertDto.getEmail())
                     .password(passwordEncoder.encode(userRequestInsertDto.getPassword()))
                     .userName(userRequestInsertDto.getUserName())
                     .provider(Provider.LOCAL)
+                    .calendars(calendars)
                     .build();
 
             return userRepository.save(user);
