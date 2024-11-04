@@ -62,7 +62,7 @@ public class ScheduleController {
     // 일정 입력
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveSchedule(
-            @ModelAttribute ScheduleRequestInsertDto scheduleRequestInsertDto,
+            @RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
             @RequestPart(name = "imageFiles", required = false) List<MultipartFile> imageFileList) {
         if (imageFileList == null) {
             imageFileList = Collections.emptyList();

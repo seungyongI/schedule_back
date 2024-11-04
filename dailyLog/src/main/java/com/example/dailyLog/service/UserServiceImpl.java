@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(UserRequestUpdateDto userRequestUpdateDto, MultipartFile imageFile) {
+    public void updateUserName(Long idx, UserRequestUpdateDto userRequestUpdateDto) {
         try {
             User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
                     .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
@@ -67,13 +67,25 @@ public class UserServiceImpl implements UserService {
 
             userRepository.save(updateUser);
 
+        } catch (Exception e) {
+            throw new RuntimeException("닉네임 업데이트 중 오류 발생", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateProfileImage(Long idx, MultipartFile imageFile) {
+        try {
+            User updateUser = userRepository.findById(idx)
+                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+
             if (imageFile != null) {
                 ProfileImage profileImage = imageService.saveProfileImage(imageFile, updateUser);
                 profileImage.setUser(updateUser);
                 profileImageRepository.save(profileImage);
             }
         } catch (Exception e) {
-            throw new RuntimeException("프로필 업데이트 중 오류 발생", e);
+            throw new RuntimeException("프로필 이미지 업데이트 중 오류 발생", e);
         }
     }
 }
