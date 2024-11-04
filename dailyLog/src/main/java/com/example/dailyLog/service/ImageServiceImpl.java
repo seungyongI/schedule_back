@@ -58,7 +58,7 @@ public class ImageServiceImpl implements ImageService {
         try {
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
-            String imageUrl = "/diaryImages/" + savedFileName;
+            String imageUrl = "/images/" + savedFileName;
 
             // Image 엔티티 생성 및 설정
             DiaryImage diaryImage = new DiaryImage();
@@ -83,7 +83,7 @@ public class ImageServiceImpl implements ImageService {
         try {
             String oriImgName = imageFile.getOriginalFilename();
             String savedFileName = fileService.uploadFile(imageLocation, oriImgName, imageFile.getBytes());
-            String imageUrl = "/scheduleImages/" + savedFileName;
+            String imageUrl = "/images/" + savedFileName;
 
             // Image 엔티티 생성 및 설정
             ScheduleImage scheduleImage = new ScheduleImage();
