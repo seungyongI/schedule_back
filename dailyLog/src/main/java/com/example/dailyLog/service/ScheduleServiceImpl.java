@@ -63,43 +63,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
             List<Schedule> schedules = scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59));
-            List<ScheduleRepeat> repeatingSchedules = scheduleRepeatRepository.findByEndDateAfter(startOfMonth);
-
-            for (ScheduleRepeat repeat : repeatingSchedules) {
-                Schedule schedule = repeat.getSchedule();
-                LocalDate current = schedule.getStart().toLocalDate();
-
-                while (!current.isAfter(endOfMonth) && !current.isAfter(repeat.getEndDate())) {
-                    if (!current.isBefore(startOfMonth)) {
-                        schedules.add(
-                                Schedule.builder()
-                                        .title(schedule.getTitle())
-                                        .content(schedule.getContent())
-                                        .start(current.atTime(schedule.getStart().toLocalTime()))
-                                        .end(current.atTime(schedule.getEnd().toLocalTime()))
-                                        .location(schedule.getLocation())
-                                        .color(schedule.getColor())
-                                        .calendars(schedule.getCalendars())
-                                        .build()
-                        );
-                    }
-
-                    switch (repeat.getRepeatType()) {
-                        case DAILY:
-                            current = current.plusDays(1);
-                            break;
-                        case WEEKLY:
-                            current = current.plusWeeks(1);
-                            break;
-                        case MONTHLY:
-                            current = current.plusMonths(1);
-                            break;
-                        case YEARLY:
-                            current = current.plusYears(1);
-                            break;
-                    }
-                }
-            }
 
             return schedules.stream()
                     .map(schedule -> {
@@ -134,43 +97,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDate endOfYear = LocalDate.of(year, 12, 31);
 
             List<Schedule> schedules = scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59));
-            List<ScheduleRepeat> repeatingSchedules = scheduleRepeatRepository.findByEndDateAfter(startOfYear);
-
-            for (ScheduleRepeat repeat : repeatingSchedules) {
-                Schedule schedule = repeat.getSchedule();
-                LocalDate current = schedule.getStart().toLocalDate();
-
-                while (!current.isAfter(endOfYear) && !current.isAfter(repeat.getEndDate())) {
-                    if (!current.isBefore(startOfYear)) {
-                        schedules.add(
-                                Schedule.builder()
-                                        .title(schedule.getTitle())
-                                        .content(schedule.getContent())
-                                        .start(current.atTime(schedule.getStart().toLocalTime()))
-                                        .end(current.atTime(schedule.getEnd().toLocalTime()))
-                                        .location(schedule.getLocation())
-                                        .color(schedule.getColor())
-                                        .calendars(schedule.getCalendars())
-                                        .build()
-                        );
-                    }
-
-                    switch (repeat.getRepeatType()) {
-                        case DAILY:
-                            current = current.plusDays(1);
-                            break;
-                        case WEEKLY:
-                            current = current.plusWeeks(1);
-                            break;
-                        case MONTHLY:
-                            current = current.plusMonths(1);
-                            break;
-                        case YEARLY:
-                            current = current.plusYears(1);
-                            break;
-                    }
-                }
-            }
 
             return schedules.stream()
                     .map(schedule -> {
@@ -211,44 +137,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDateTime startOfDay = date.atStartOfDay();
             LocalDateTime endOfDay = date.atTime(23, 59, 59);
 
-            List<Schedule> schedules = scheduleRepository.findSchedulesInDay(startOfDay, endOfDay);
-            List<ScheduleRepeat> repeatingSchedules = scheduleRepeatRepository.findByEndDateAfter(date);
-
-            for (ScheduleRepeat repeat : repeatingSchedules) {
-                Schedule schedule = repeat.getSchedule();
-                LocalDate current = schedule.getStart().toLocalDate();
-
-                while (!current.isAfter(date) && !current.isAfter(repeat.getEndDate())) {
-                    if (current.isEqual(date)) {
-                        schedules.add(
-                                Schedule.builder()
-                                        .title(schedule.getTitle())
-                                        .content(schedule.getContent())
-                                        .start(current.atTime(schedule.getStart().toLocalTime()))
-                                        .end(current.atTime(schedule.getEnd().toLocalTime()))
-                                        .location(schedule.getLocation())
-                                        .color(schedule.getColor())
-                                        .calendars(schedule.getCalendars())
-                                        .build()
-                        );
-                    }
-
-                    switch (repeat.getRepeatType()) {
-                        case DAILY:
-                            current = current.plusDays(1);
-                            break;
-                        case WEEKLY:
-                            current = current.plusWeeks(1);
-                            break;
-                        case MONTHLY:
-                            current = current.plusMonths(1);
-                            break;
-                        case YEARLY:
-                            current = current.plusYears(1);
-                            break;
-                    }
-                }
-            }
+            List<Schedule> schedules = scheduleRepository.findSchedulesInDay(startOfDay, endOfDay, idx);
 
             return schedules.stream()
                     .map(schedule -> {
@@ -284,38 +173,62 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         try {
-            Schedule createSchedule = Schedule.builder()
-                    .title(scheduleRequestInsertDto.getTitle())
-                    .content(scheduleRequestInsertDto.getContent())
-                    .start(scheduleRequestInsertDto.getStart())
-                    .end(scheduleRequestInsertDto.getEnd())
-                    .location(scheduleRequestInsertDto.getLocation())
-                    .color(scheduleRequestInsertDto.getColor())
-                    .calendars(calendar)
-                    .build();
-            scheduleRepository.save(createSchedule);
+            LocalDateTime currentStart = scheduleRequestInsertDto.getStart();
+            LocalDateTime currentEnd = scheduleRequestInsertDto.getEnd();
 
-            // 반복 일정이 설정된 경우 ScheduleRepeat 생성
-            if (scheduleRequestInsertDto.getRepeatType() != null) {
-                ScheduleRepeat scheduleRepeat = new ScheduleRepeat();
-                scheduleRepeat.setSchedule(createSchedule);
-                scheduleRepeat.setRepeatType(scheduleRequestInsertDto.getRepeatType());
-                scheduleRepeat.setEndDate(scheduleRequestInsertDto.getRepeatEndDate());
-                scheduleRepeatRepository.save(scheduleRepeat);
-            }
+            do {
+                Schedule createSchedule = Schedule.builder()
+                        .title(scheduleRequestInsertDto.getTitle())
+                        .content(scheduleRequestInsertDto.getContent())
+                        .start(currentStart)
+                        .end(currentEnd)
+                        .location(scheduleRequestInsertDto.getLocation())
+                        .color(scheduleRequestInsertDto.getColor())
+                        .calendars(calendar)
+                        .build();
+                scheduleRepository.save(createSchedule);
 
-            // 이미지 저장 로직
-            for (MultipartFile file : imageFileList) {
-                if (!file.isEmpty()) {
-                    ScheduleImage scheduleImage = imageService.saveScheduleImage(file, createSchedule);
-                    scheduleImage.setSchedule(createSchedule);
-                    scheduleImageRepository.save(scheduleImage);
+                // 이미지 저장 로직
+                for (MultipartFile file : imageFileList) {
+                    if (!file.isEmpty()) {
+                        ScheduleImage scheduleImage = imageService.saveScheduleImage(file, createSchedule);
+                        scheduleImage.setSchedule(createSchedule);
+                        scheduleImageRepository.save(scheduleImage);
+                    }
                 }
-            }
+
+                // 반복 설정이 있는 경우에만 switch 구문 실행
+                if (scheduleRequestInsertDto.getRepeatType() != null) {
+                    switch (scheduleRequestInsertDto.getRepeatType()) {
+                        case DAILY:
+                            currentStart = currentStart.plusDays(1);
+                            currentEnd = currentEnd.plusDays(1);
+                            break;
+                        case WEEKLY:
+                            currentStart = currentStart.plusDays(7);
+                            currentEnd = currentEnd.plusDays(7);
+                            break;
+                        case MONTHLY:
+                            currentStart = currentStart.plusMonths(1);
+                            currentEnd = currentEnd.plusMonths(1);
+                            break;
+                        case YEARLY:
+                            currentStart = currentStart.plusYears(1);
+                            currentEnd = currentEnd.plusYears(1);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid repeat type");
+                    }
+                }
+            } while (scheduleRequestInsertDto.getRepeatType() != null &&
+                    !currentStart.toLocalDate().isAfter(scheduleRequestInsertDto.getRepeatEndDate()));
+
+
         } catch (Exception e) {
             throw new ServiceException("Failed to save schedule in ScheduleService.saveSchedule", e);
         }
     }
+
 
     // 일정 수정
     @Transactional
@@ -349,20 +262,43 @@ public class ScheduleServiceImpl implements ScheduleService {
                 updateSchedule.setColor(scheduleRequestUpdateDto.getColor());
             }
 
-            // 반복 정보 업데이트
-            ScheduleRepeat scheduleRepeat = scheduleRepeatRepository.findByScheduleIdx(updateSchedule.getIdx());
-            if (scheduleRequestUpdateDto.getRepeatType() != null) {
-                if (scheduleRepeat == null) {
-                    scheduleRepeat = new ScheduleRepeat();
-                    scheduleRepeat.setSchedule(updateSchedule);
+            // 기존의 반복 일정 삭제 후 새로 생성 (반복 일정 변경 시)
+            scheduleRepository.deleteByCalendarsIdxAndStartAfter(updateSchedule.getCalendars().getIdx(), updateSchedule.getStart());
+            LocalDateTime currentStart = scheduleRequestUpdateDto.getStart();
+            LocalDateTime currentEnd = scheduleRequestUpdateDto.getEnd();
+            do {
+                Schedule newSchedule = Schedule.builder()
+                        .title(scheduleRequestUpdateDto.getTitle())
+                        .content(scheduleRequestUpdateDto.getContent())
+                        .start(currentStart)
+                        .end(currentEnd)
+                        .location(scheduleRequestUpdateDto.getLocation())
+                        .color(scheduleRequestUpdateDto.getColor())
+                        .calendars(updateSchedule.getCalendars())
+                        .build();
+                scheduleRepository.save(newSchedule);
+
+                switch (scheduleRequestUpdateDto.getRepeatType()) {
+                    case DAILY:
+                        currentStart = currentStart.plusDays(1);
+                        currentEnd = currentEnd.plusDays(1);
+                        break;
+                    case WEEKLY:
+                        currentStart = currentStart.plusDays(7);
+                        currentEnd = currentEnd.plusDays(7);
+                        break;
+                    case MONTHLY:
+                        currentStart = currentStart.plusMonths(1);
+                        currentEnd = currentEnd.plusMonths(1);
+                        break;
+                    case YEARLY:
+                        currentStart = currentStart.plusYears(1);
+                        currentEnd = currentEnd.plusYears(1);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid repeat type");
                 }
-                scheduleRepeat.setRepeatType(scheduleRequestUpdateDto.getRepeatType());
-                scheduleRepeat.setEndDate(scheduleRequestUpdateDto.getRepeatEndDate());
-                scheduleRepeatRepository.save(scheduleRepeat);
-            } else if (scheduleRepeat != null) {
-                // 반복 일정 해제 처리
-                scheduleRepeatRepository.delete(scheduleRepeat);
-            }
+            } while (!currentStart.toLocalDate().isAfter(scheduleRequestUpdateDto.getRepeatEndDate()));
 
             scheduleRepository.save(updateSchedule);
 
@@ -388,7 +324,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
         try {
             // 관련된 반복 일정 삭제
-            ScheduleRepeat scheduleRepeat = scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx());
+            ScheduleRepeat scheduleRepeat = (ScheduleRepeat) scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx());
             if (scheduleRepeat != null) {
                 scheduleRepeatRepository.delete(scheduleRepeat);
             }
@@ -398,4 +334,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ServiceException("Failed to delete schedule in ScheduleService.deleteSchedule", e);
         }
     }
+
+
 }

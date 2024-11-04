@@ -9,15 +9,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
+    List<Schedule> findByCalendarsUserIdxAndStartBetween(Long userIdx, LocalDateTime start, LocalDateTime end);
 
     List<Schedule> findByStartBetween(LocalDateTime start, LocalDateTime end);
-    List<Schedule> findByCalendarsUserIdxAndStartBetween(Long idx, LocalDateTime start, LocalDateTime end);
-    @Query("SELECT s FROM Schedule s WHERE " +
-            "(s.start <= :endOfDay AND s.end >= :startOfDay)")
-    List<Schedule> findSchedulesInDay(@Param("startOfDay") LocalDateTime startOfDay,
-                                      @Param("endOfDay") LocalDateTime endOfDay);
 
-    // 캘린더 일정 검색
-//    List<Schedule> findByTitleContainingIgnoreCase(String title);
-//    List<Schedule> findByDescriptionContainingIgnoreCase(String description);
+    @Query("SELECT s FROM Schedule s WHERE s.start BETWEEN :start AND :end AND s.calendars.idx = :calendarIdx")
+    List<Schedule> findSchedulesInDay(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("calendarIdx") Long calendarIdx);
+
+    void deleteByCalendarsIdxAndStartAfter(Long calendarsIdx, LocalDateTime start);
+
+    Schedule findFirstByOrderByIdxDesc();
 }
