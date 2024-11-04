@@ -1,17 +1,21 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.constant.Provider;
+import com.example.dailyLog.constant.Theme;
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.dto.request.UserRequestUpdateDto;
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.exception.commonException.error.BizException;
+import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,9 +25,11 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CalendarRepository calendarRepository;
     private final ProfileImageRepository profileImageRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
@@ -32,12 +38,16 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User createUser(UserRequestInsertDto userRequestInsertDto) {
         try {
+            Calendars calendars = Calendars.builder().theme(Theme.LIGHT).build();
+            log.info("calendar = {}", calendarRepository.save(calendars));
+
             // 기존 회원가입 로직
             User user = User.builder()
                     .email(userRequestInsertDto.getEmail())
                     .password(passwordEncoder.encode(userRequestInsertDto.getPassword()))
                     .userName(userRequestInsertDto.getUserName())
                     .provider(Provider.LOCAL)
+                    .calendars(calendars)
                     .build();
 
             return userRepository.save(user);

@@ -14,7 +14,6 @@ import lombok.*;
 @AllArgsConstructor
 public class Calendars {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cal_idx")
@@ -23,14 +22,11 @@ public class Calendars {
     @Column(name = "c_holiday")
     private String holiday;
 
-
-
     @Column(name = "c_theme", nullable = false)
     @Enumerated(EnumType.STRING)
     private Theme theme;
 
     @OneToOne(mappedBy = "calendars")
-    @JoinColumn(name = "u_idx", nullable = false)
     private User user;
 
 }

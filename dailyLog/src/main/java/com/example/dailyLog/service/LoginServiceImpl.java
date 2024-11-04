@@ -23,6 +23,7 @@ public class LoginServiceImpl implements LoginService {
 
         // CustomUserDetails 객체 직접 생성
         return new CustomUserDetails(
+                user.getIdx(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getUserName(),
