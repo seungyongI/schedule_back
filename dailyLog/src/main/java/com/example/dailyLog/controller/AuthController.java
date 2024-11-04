@@ -48,6 +48,7 @@ public class AuthController {
         String refreshToken = jwtTokenProvider.createRefreshToken(userDetails.getUserName());
 
         LoginResponseDto responseDto = LoginResponseDto.builder()
+                .idx(userDetails.getIdx())
                 .accessToken(token)
                 .refreshToken(refreshToken)
                 .email(userDetails.getEmail())

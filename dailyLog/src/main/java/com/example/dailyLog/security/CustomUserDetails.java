@@ -13,7 +13,7 @@ import java.util.Collections;
 @Getter
 @Builder
 public class CustomUserDetails implements UserDetails {
-
+    private Long idx;
     private String email;
     private String password;
     private String userName;
