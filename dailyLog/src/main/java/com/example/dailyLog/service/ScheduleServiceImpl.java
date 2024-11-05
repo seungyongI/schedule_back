@@ -143,6 +143,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .map(schedule -> {
                         boolean isRepeat = scheduleRepeatRepository.findByScheduleIdx(schedule.getIdx()) != null;
                         return ScheduleResponseDayDto.builder()
+                                .idx(schedule.getIdx())
                                 .title(schedule.getTitle())
                                 .content(schedule.getContent())
                                 .start(schedule.getStart())
