@@ -1,5 +1,5 @@
 package com.example.dailyLog.constant;
 
 public enum RepeatType {
-    DAILY, WEEKLY, MONTHLY, YEARLY
+    NONE, DAILY, WEEKLY, MONTHLY, YEARLY
 }
