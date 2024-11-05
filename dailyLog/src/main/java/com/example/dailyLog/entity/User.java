@@ -47,8 +47,7 @@ public class User {
     @Column(nullable = false)
     private Provider provider;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-    @JoinColumn(name = "p_idx")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true ,fetch = FetchType.EAGER)
     @JsonManagedReference
     private ProfileImage profileImage;
 

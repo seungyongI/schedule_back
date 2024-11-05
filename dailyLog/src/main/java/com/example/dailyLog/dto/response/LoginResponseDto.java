@@ -11,6 +11,6 @@ public class LoginResponseDto {
     private final String accessToken;
     private final String email;
     private final String userName;
-    private final ProfileImage profileImage;
+    private final String profileImageUrl;
     private final String refreshToken;
 }

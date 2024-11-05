@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
+    void deleteByImgUrl(String imgUrl);
     // 월간 일정 조회
     List<Schedule> findByCalendarsUserIdxAndStartBetween(Long idx, LocalDateTime start, LocalDateTime end);
 
