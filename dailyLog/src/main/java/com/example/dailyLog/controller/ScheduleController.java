@@ -1,5 +1,6 @@
 package com.example.dailyLog.controller;
 
+import com.example.dailyLog.dto.request.ScheduleRequestDeleteDto;
 import com.example.dailyLog.dto.request.ScheduleRequestInsertDto;
 import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
 import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
@@ -64,6 +65,7 @@ public class ScheduleController {
     public ResponseEntity<String> saveSchedule(
             @RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
             @RequestPart(name = "imageFiles", required = false) List<MultipartFile> imageFileList) {
+
         if (imageFileList == null) {
             imageFileList = Collections.emptyList();
         }
@@ -81,15 +83,15 @@ public class ScheduleController {
     }
 
 
-    // 일정 삭제
     @DeleteMapping(value = "/delete/{idx}")
     public ResponseEntity<String> deleteSchedule(
             @PathVariable(name = "idx") Long idx,
-            @RequestParam(name = "deleteAllRepeats", defaultValue = "false") boolean deleteAllRepeats,
-            @RequestParam(name = "deleteOnlyThis", defaultValue = "false") boolean deleteOnlyThis,
-            @RequestParam(name = "deleteAfter", defaultValue = "false") boolean deleteAfter) {
+            @RequestParam(name = "deleteAllRepeats", required = false, defaultValue = "false") boolean deleteAllRepeats,
+            @RequestParam(name = "deleteOnlyThis", required = false, defaultValue = "false") boolean deleteOnlyThis,
+            @RequestParam(name = "deleteAfter", required = false, defaultValue = "false") boolean deleteAfter) {
         scheduleService.deleteSchedule(idx, deleteAllRepeats, deleteOnlyThis, deleteAfter);
         return ResponseEntity.status(HttpStatus.OK).body("Schedule deleted successfully");
     }
+
 
 }
