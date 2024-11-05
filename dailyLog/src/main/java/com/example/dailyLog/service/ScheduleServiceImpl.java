@@ -343,14 +343,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                 LocalDateTime scheduleStart = schedule.getStart();
 
                 // 반복 설정된 모든 일정을 가져와 반복 일정의 기준 이후 일정을 삭제
-                List<Schedule> futureSchedules = scheduleRepository.findByCalendarsIdxAndStartAfter(schedule.getCalendars().getIdx(), scheduleStart);
+//                List<Schedule> futureSchedules = scheduleRepository.findByCalendarsIdxAndStartAfter(schedule.getCalendars().getIdx(), scheduleStart);
 
-                for (Schedule futureSchedule : futureSchedules) {
-                    // 기준 날짜 이후의 일정만 삭제
-                    if (futureSchedule.getStart().isAfter(scheduleStart)) {
-                        scheduleRepository.delete(futureSchedule);
-                    }
-                }
+//                for (Schedule futureSchedule : futureSchedules) {
+//                    // 기준 날짜 이후의 일정만 삭제
+//                    if (futureSchedule.getStart().isAfter(scheduleStart)) {
+//                        scheduleRepository.delete(futureSchedule);
+//                    }
+//                }
                 // ScheduleRepeat는 최초 반복 설정만 남겨두기 위해 유지
             }
 

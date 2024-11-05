@@ -19,6 +19,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("SELECT s FROM Schedule s WHERE s.start >= :start AND s.end <= :end AND s.calendars.idx = :calendarIdx")
     List<Schedule> findSchedulesInDay(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("calendarIdx") Long calendarIdx);
 
+    List<Schedule> findByStartBetween(LocalDateTime start, LocalDateTime end);
+
     // 반복 일정 삭제 (특정 날짜 이후)
     @Modifying
     @Transactional
