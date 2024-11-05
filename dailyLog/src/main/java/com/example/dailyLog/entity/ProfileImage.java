@@ -1,5 +1,6 @@
 package com.example.dailyLog.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class ProfileImage {
 
     @OneToOne
     @JoinColumn(name = "u_idx",unique = true)
+    @JsonBackReference
     private User user;
 
 }

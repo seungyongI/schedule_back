@@ -30,6 +30,6 @@ public class DiaryRequestUpdateDto {
 
     private Category category;
 
-    private List<Long> deletedImageList;
+    private List<String> deletedImageList;
 
 }

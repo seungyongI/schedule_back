@@ -260,10 +260,10 @@ public class DiaryServiceImpl implements DiaryService{
             diaryRepository.save(updateDiary);
 
     // 이미지 삭제
-            List<Long> deleteImageList = diaryRequestUpdateDto.getDeletedImageList();
+            List<String> deleteImageList = diaryRequestUpdateDto.getDeletedImageList();
             if (deleteImageList != null && !deleteImageList.isEmpty()) {
-                for (Long imageId : deleteImageList) {
-                    diaryImageRepository.findById(imageId).ifPresent(diaryImageRepository::delete);
+                for (String imageId : deleteImageList) {
+                    diaryImageRepository.deleteByImgUrl(imageId);
                 }
             }
 

@@ -1,11 +1,14 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Provider;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,8 +47,9 @@ public class User {
     @Column(nullable = false)
     private Provider provider;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     @JoinColumn(name = "p_idx")
+    @JsonManagedReference
     private ProfileImage profileImage;
 
     @Column(name = "access_token")
