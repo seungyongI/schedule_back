@@ -27,13 +27,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("DELETE FROM Schedule s WHERE s.calendars.idx = :calendarIdx AND s.start > :start")
     void deleteByCalendarsIdxAndStartAfter(@Param("calendarIdx") Long calendarIdx, @Param("start") LocalDateTime start);
 
-    // 특정 반복 그룹의 모든 일정 조회
-    @Query("SELECT s FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId")
-    List<Schedule> findByRepeatGroupId(@Param("repeatGroupId") Long repeatGroupId);
-
-    // 특정 반복 그룹의 특정 날짜 이후 일정 삭제
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId AND s.start >= :start")
-    void deleteAfterDate(@Param("repeatGroupId") Long repeatGroupId, @Param("start") LocalDateTime start);
+//    // 특정 반복 그룹의 모든 일정 조회
+//    @Query("SELECT s FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId")
+//    List<Schedule> findByRepeatGroupId(@Param("repeatGroupId") Long repeatGroupId);
+//
+//    // 특정 반복 그룹의 특정 날짜 이후 일정 삭제
+//    @Modifying
+//    @Transactional
+//    @Query("DELETE FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId AND s.start >= :start")
+//    void deleteAfterDate(@Param("repeatGroupId") Long repeatGroupId, @Param("start") LocalDateTime start);
 }
