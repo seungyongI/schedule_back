@@ -286,6 +286,13 @@ public class ScheduleServiceImpl implements ScheduleService {
                     }
                 } while (!currentStart.toLocalDate().isAfter(scheduleRequestUpdateDto.getRepeatEndDate()));
             }
+            // 이미지 삭제
+            List<String> deleteImageList = scheduleRequestUpdateDto.getDeletedImageList();
+            if (deleteImageList != null && !deleteImageList.isEmpty()) {
+                for (String imageId : deleteImageList) {
+                    scheduleRepository.deleteByImgUrl(imageId);
+                }
+            }
 
             // 이미지 업데이트 로직
             for (MultipartFile file : imageFileList) {

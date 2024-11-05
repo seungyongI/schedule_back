@@ -32,7 +32,7 @@ public class ScheduleRequestUpdateDto {
 
         private Color color;
 
-        private List<Long> deletedImageList;
+        private List<String> deletedImageList;
 
         // 반복 일정 관련 필드 추가
         private RepeatType repeatType;  // 반복 유형: DAILY, WEEKLY, MONTHLY, YEARLY

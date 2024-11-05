@@ -53,7 +53,7 @@ public class AuthController {
                 .refreshToken(refreshToken)
                 .email(userDetails.getEmail())
                 .userName(userDetails.getUserName())
-                .profileImage(userDetails.getProfileImage())
+                .profileImageUrl(userDetails.getProfileImage() != null ? userDetails.getProfileImage().getImgUrl() : "")
                 .build();
 
         return ResponseEntity.ok(responseDto);
@@ -97,7 +97,7 @@ public class AuthController {
                 .refreshToken(refreshToken)
                 .email(user.getEmail())
                 .userName(user.getUserName())
-                .profileImage(profileImage)
+                .profileImageUrl(user.getProfileImage().getImgUrl())
                 .build();
 
         return ResponseEntity.ok(responseDto);

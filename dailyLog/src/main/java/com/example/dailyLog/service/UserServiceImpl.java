@@ -13,6 +13,7 @@ import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final ProfileImageRepository profileImageRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -88,11 +90,18 @@ public class UserServiceImpl implements UserService {
         try {
             User updateUser = userRepository.findById(idx)
                     .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+            // 기존 이미지 삭제 로직 추가
+            ProfileImage oldProfileImage = updateUser.getProfileImage();
+            if (oldProfileImage != null) {
+                updateUser.setProfileImage(null);
+                entityManager.flush();
+                profileImageRepository.delete(oldProfileImage);
+            }
 
             if (imageFile != null) {
                 ProfileImage profileImage = imageService.saveProfileImage(imageFile, updateUser);
                 profileImage.setUser(updateUser);
-                profileImageRepository.save(profileImage);
+                updateUser.setProfileImage(profileImage);
             }
         } catch (Exception e) {
             throw new RuntimeException("프로필 이미지 업데이트 중 오류 발생", e);

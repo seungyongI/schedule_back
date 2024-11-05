@@ -27,7 +27,7 @@ public class ProfileImage {
     private String imgUrl;
 
     @OneToOne
-    @JoinColumn(name = "u_idx",unique = true)
+    @JoinColumn(name = "u_idx")
     @JsonBackReference
     private User user;
 
