@@ -1,6 +1,5 @@
 package com.example.dailyLog.controller;
 
-import com.example.dailyLog.dto.request.ScheduleRequestDeleteDto;
 import com.example.dailyLog.dto.request.ScheduleRequestInsertDto;
 import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
 import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
