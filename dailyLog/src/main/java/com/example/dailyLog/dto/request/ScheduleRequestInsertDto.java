@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 @Data
 public class ScheduleRequestInsertDto {
 
-        private Long idx;
-
         @Length(min = 1, max = 50)
         private String title;
 
@@ -34,6 +32,8 @@ public class ScheduleRequestInsertDto {
         private Long calendarsIdx;
 
         // 반복 일정 관련 필드 추가
-        private RepeatType repeatType;  // 반복 유형: DAILY, WEEKLY, MONTHLY, YEARLY
+        private RepeatType repeatType;  // 반복 유형: NONE, DAILY, WEEKLY, MONTHLY, YEARLY
+
         private LocalDate repeatEndDate;  // 반복 종료 일자 (반복이 언제까지 지속되는지)
+
 }

@@ -1,10 +1,12 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Color;
+import com.example.dailyLog.constant.RepeatType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,17 +40,23 @@ public class Schedule {
     @Column(name = "s_location")
     private String location;
 
-
     @Column(name = "s_color", nullable = false)
     @Enumerated(EnumType.STRING)
     private Color color = Color.ORANGE;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "repeat_type", nullable = false)
+    private RepeatType repeatType = RepeatType.NONE;
+
+    @Column(name = "repeat_end_date")
+    private LocalDate repeatEndDate;
+
+    @Column(name = "repeat_group_id")
+    private Long repeatGroupId;
+
     @ManyToOne
     @JoinColumn(name = "cal_idx", nullable = false)
     private Calendars calendars;
-
-    @OneToOne(mappedBy = "schedule")
-    private ScheduleRepeat scheduleRepeat;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleImage> scheduleImages = new ArrayList<>();

@@ -83,8 +83,13 @@ public class ScheduleController {
 
     // 일정 삭제
     @DeleteMapping(value = "/delete/{idx}")
-    public ResponseEntity<String> deleteSchedule(@PathVariable(name = "idx") Long idx){
-            scheduleService.deleteSchedule(idx);
-            return ResponseEntity.status(HttpStatus.OK).body("Schedule deleted successfully");
+    public ResponseEntity<String> deleteSchedule(
+            @PathVariable(name = "idx") Long idx,
+            @RequestParam(name = "deleteAllRepeats", defaultValue = "false") boolean deleteAllRepeats,
+            @RequestParam(name = "deleteOnlyThis", defaultValue = "false") boolean deleteOnlyThis,
+            @RequestParam(name = "deleteAfter", defaultValue = "false") boolean deleteAfter) {
+        scheduleService.deleteSchedule(idx, deleteAllRepeats, deleteOnlyThis, deleteAfter);
+        return ResponseEntity.status(HttpStatus.OK).body("Schedule deleted successfully");
     }
+
 }
