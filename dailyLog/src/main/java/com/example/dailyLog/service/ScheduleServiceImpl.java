@@ -150,6 +150,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                                 .end(schedule.getEnd())
                                 .location(schedule.getLocation())
                                 .color(schedule.getColor())
+                                .images(schedule.getScheduleImages().stream()
+                                        .map(ScheduleImage::getImgUrl)
+                                        .collect(Collectors.toList()))
                                 .isRepeat(isRepeat)
                                 .build();
                     })
