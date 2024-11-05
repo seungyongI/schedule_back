@@ -45,6 +45,7 @@ public class User {
     private Provider provider;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "p_idx")
     private ProfileImage profileImage;
 
     @Column(name = "access_token")

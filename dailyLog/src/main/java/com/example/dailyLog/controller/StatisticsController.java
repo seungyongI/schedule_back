@@ -28,10 +28,10 @@ public class StatisticsController {
     }
 
 
-    @GetMapping("/month/{idx}")
-    public ResponseEntity<List<StatisticsMonthDto>> getMonthStatistics(@PathVariable(name = "idx") Long idx){
-
-        List<StatisticsMonthDto> list = statisticsService.getMonthStatistics(idx);
-        return ResponseEntity.ok(list);
-    }
+//    @GetMapping("/month/{idx}")
+//    public ResponseEntity<List<StatisticsMonthDto>> getMonthStatistics(@PathVariable(name = "idx") Long idx){
+//
+//        List<StatisticsMonthDto> list = statisticsService.getMonthStatistics(idx);
+//        return ResponseEntity.ok(list);
+//    }
 }

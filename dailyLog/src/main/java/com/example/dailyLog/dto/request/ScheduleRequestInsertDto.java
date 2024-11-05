@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Data
 public class ScheduleRequestInsertDto {
 
+        private Long idx;
+
         @Length(min = 1, max = 50)
         private String title;
 

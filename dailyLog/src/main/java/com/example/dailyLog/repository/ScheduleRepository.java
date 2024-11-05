@@ -1,7 +1,9 @@
 package com.example.dailyLog.repository;
 
 import com.example.dailyLog.entity.Schedule;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -9,14 +11,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    List<Schedule> findByCalendarsUserIdxAndStartBetween(Long userIdx, LocalDateTime start, LocalDateTime end);
 
-    List<Schedule> findByStartBetween(LocalDateTime start, LocalDateTime end);
+    // 월간 일정 조회
+    List<Schedule> findByCalendarsUserIdxAndStartBetween(Long idx, LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT s FROM Schedule s WHERE s.start BETWEEN :start AND :end AND s.calendars.idx = :calendarIdx")
+    // 일간 일정 조회
+    @Query("SELECT s FROM Schedule s WHERE s.start >= :start AND s.end <= :end AND s.calendars.idx = :calendarIdx")
     List<Schedule> findSchedulesInDay(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("calendarIdx") Long calendarIdx);
 
-    void deleteByCalendarsIdxAndStartAfter(Long calendarsIdx, LocalDateTime start);
+    // 반복 일정 삭제 (특정 날짜 이후)
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Schedule s WHERE s.calendars.idx = :calendarIdx AND s.start > :start")
+    void deleteByCalendarsIdxAndStartAfter(@Param("calendarIdx") Long calendarIdx, @Param("start") LocalDateTime start);
 
-    Schedule findFirstByOrderByIdxDesc();
+    // 특정 반복 그룹의 모든 일정 조회
+    @Query("SELECT s FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId")
+    List<Schedule> findByRepeatGroupId(@Param("repeatGroupId") Long repeatGroupId);
+
+    // 특정 반복 그룹의 특정 날짜 이후 일정 삭제
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId AND s.start >= :start")
+    void deleteAfterDate(@Param("repeatGroupId") Long repeatGroupId, @Param("start") LocalDateTime start);
 }
