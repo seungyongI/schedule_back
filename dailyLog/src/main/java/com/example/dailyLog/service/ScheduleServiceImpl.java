@@ -20,8 +20,11 @@ import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ScheduleImageRepository;
 import com.example.dailyLog.repository.ScheduleRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,8 +35,10 @@ import java.time.YearMonth;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@EnableAsync
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
@@ -42,6 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final CalendarRepository calendarRepository;
     private final ScheduleImageRepository scheduleImageRepository;
     private final ImageService imageService;
+    private final EntityManager entityManager;
 
     // 월달력 전체 일정 조회
     @Transactional
@@ -225,6 +231,14 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
+    // 일정 삭제 메서드 (별도의 비동기 트랜잭션으로 삭제 처리)
+    @Async
+    @Transactional
+    public CompletableFuture<Void> deleteExistingSchedules(Long repeatGroupId, LocalDateTime startDate) {
+        scheduleRepository.deleteAfterDate(repeatGroupId, startDate);
+        return CompletableFuture.completedFuture(null);
+    }
+
     // 일정 수정
     @Transactional
     @Override
@@ -243,57 +257,69 @@ public class ScheduleServiceImpl implements ScheduleService {
                     (updateSchedule.getRepeatEndDate() != null && !updateSchedule.getRepeatEndDate().equals(repeatEndDate));
 
             if (isRepeatTypeChanged || isRepeatEndDateChanged) {
-                // 기존 반복 일정 삭제 후 새로운 반복 일정 생성
-                scheduleRepository.deleteAfterDate(updateSchedule.getRepeatGroupId(), updateSchedule.getStart());
+                // 기존 반복 일정 삭제 (비동기로 처리)
+                deleteExistingSchedules(updateSchedule.getRepeatGroupId(), updateSchedule.getStart())
+                        .thenRun(() -> {
+                            // 새로운 반복 일정 생성 로직
+                            if (scheduleRequestUpdateDto.getRepeatType() == RepeatType.NONE) {
+                                // 반복 없음으로 변경하는 경우: 현재 일정만 생성
+                                Schedule newSchedule = Schedule.builder()
+                                        .title(scheduleRequestUpdateDto.getTitle())
+                                        .content(scheduleRequestUpdateDto.getContent())
+                                        .start(scheduleRequestUpdateDto.getStart())
+                                        .end(scheduleRequestUpdateDto.getEnd())
+                                        .location(scheduleRequestUpdateDto.getLocation())
+                                        .color(scheduleRequestUpdateDto.getColor())
+                                        .calendars(updateSchedule.getCalendars())
+                                        .repeatType(RepeatType.NONE)
+                                        .repeatEndDate(null)
+                                        .repeatGroupId(null)
+                                        .build();
+                                scheduleRepository.save(newSchedule);
+                            } else {
+                                // 반복 타입 변경 또는 종료 날짜 변경: 새로운 반복 일정 생성
+                                LocalDateTime currentStart = scheduleRequestUpdateDto.getStart();
+                                LocalDateTime currentEnd = scheduleRequestUpdateDto.getEnd();
+                                Long newRepeatGroupId = System.currentTimeMillis();
+                                do {
+                                    Schedule newSchedule = Schedule.builder()
+                                            .title(scheduleRequestUpdateDto.getTitle())
+                                            .content(scheduleRequestUpdateDto.getContent())
+                                            .start(currentStart)
+                                            .end(currentEnd)
+                                            .location(scheduleRequestUpdateDto.getLocation())
+                                            .color(scheduleRequestUpdateDto.getColor())
+                                            .calendars(updateSchedule.getCalendars())
+                                            .repeatType(scheduleRequestUpdateDto.getRepeatType())
+                                            .repeatEndDate(scheduleRequestUpdateDto.getRepeatEndDate())
+                                            .repeatGroupId(newRepeatGroupId)
+                                            .build();
+                                    scheduleRepository.save(newSchedule);
 
-                if (scheduleRequestUpdateDto.getRepeatType() == RepeatType.NONE) {
-                    // 반복 없음으로 변경하는 경우: 현재 일정 이후의 반복 일정 삭제 후 현재 일정만 수정
-                    updateSchedule.setRepeatType(RepeatType.NONE);
-                    updateSchedule.setRepeatEndDate(null);
-                    updateSchedule.setRepeatGroupId(null);
-                } else {
-                    // 반복 타입 변경 또는 종료 날짜 변경: 새로운 반복 일정 생성
-                    LocalDateTime currentStart = scheduleRequestUpdateDto.getStart();
-                    LocalDateTime currentEnd = scheduleRequestUpdateDto.getEnd();
-                    Long newRepeatGroupId = System.currentTimeMillis();
-                    do {
-                        Schedule newSchedule = Schedule.builder()
-                                .title(scheduleRequestUpdateDto.getTitle())
-                                .content(scheduleRequestUpdateDto.getContent())
-                                .start(currentStart)
-                                .end(currentEnd)
-                                .location(scheduleRequestUpdateDto.getLocation())
-                                .color(scheduleRequestUpdateDto.getColor())
-                                .calendars(updateSchedule.getCalendars())
-                                .repeatType(scheduleRequestUpdateDto.getRepeatType())
-                                .repeatEndDate(scheduleRequestUpdateDto.getRepeatEndDate())
-                                .repeatGroupId(newRepeatGroupId)
-                                .build();
-                        scheduleRepository.save(newSchedule);
-
-                        // 반복 설정에 따른 날짜 계산
-                        switch (scheduleRequestUpdateDto.getRepeatType()) {
-                            case DAILY:
-                                currentStart = currentStart.plusDays(1);
-                                currentEnd = currentEnd.plusDays(1);
-                                break;
-                            case WEEKLY:
-                                currentStart = currentStart.plusDays(7);
-                                currentEnd = currentEnd.plusDays(7);
-                                break;
-                            case MONTHLY:
-                                currentStart = currentStart.plusMonths(1);
-                                currentEnd = currentEnd.plusMonths(1);
-                                break;
-                            case YEARLY:
-                                currentStart = currentStart.plusYears(1);
-                                currentEnd = currentEnd.plusYears(1);
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Invalid repeat type");
-                        }
-                    } while (!currentStart.toLocalDate().isAfter(scheduleRequestUpdateDto.getRepeatEndDate()));
-                }
+                                    // 반복 설정에 따른 날짜 계산
+                                    switch (scheduleRequestUpdateDto.getRepeatType()) {
+                                        case DAILY:
+                                            currentStart = currentStart.plusDays(1);
+                                            currentEnd = currentEnd.plusDays(1);
+                                            break;
+                                        case WEEKLY:
+                                            currentStart = currentStart.plusDays(7);
+                                            currentEnd = currentEnd.plusDays(7);
+                                            break;
+                                        case MONTHLY:
+                                            currentStart = currentStart.plusMonths(1);
+                                            currentEnd = currentEnd.plusMonths(1);
+                                            break;
+                                        case YEARLY:
+                                            currentStart = currentStart.plusYears(1);
+                                            currentEnd = currentEnd.plusYears(1);
+                                            break;
+                                        default:
+                                            throw new IllegalArgumentException("Invalid repeat type");
+                                    }
+                                } while (!currentStart.toLocalDate().isAfter(scheduleRequestUpdateDto.getRepeatEndDate()));
+                            }
+                        });
             } else {
                 // 반복 설정이 변경되지 않은 경우: 현재 일정만 수정
                 updateSchedule.setTitle(scheduleRequestUpdateDto.getTitle());
