@@ -26,6 +26,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByRepeatGroupId(@Param("repeatGroupId") Long repeatGroupId);
 
     // 특정 반복 그룹의 특정 날짜 이후 일정 삭제
+    @Modifying
     @Transactional
     @Query("DELETE FROM Schedule s WHERE s.repeatGroupId = :repeatGroupId AND s.start >= :start")
     void deleteAfterDate(@Param("repeatGroupId") Long repeatGroupId, @Param("start") LocalDateTime start);
