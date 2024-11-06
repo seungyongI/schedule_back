@@ -35,7 +35,8 @@ public class ScheduleRequestUpdateDto {
         private List<String> deletedImageList;
 
         // 반복 일정 관련 필드 추가
-        private RepeatType repeatType;  // 반복 유형: DAILY, WEEKLY, MONTHLY, YEARLY
+        private RepeatType repeatType;  // 반복 유형: NONE, DAILY, WEEKLY, MONTHLY, YEARLY
+
         private LocalDate repeatEndDate;  // 반복 종료 일자 (반복이 언제까지 지속되는지)
 
 }

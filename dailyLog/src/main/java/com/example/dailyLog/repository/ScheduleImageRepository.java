@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface ScheduleImageRepository extends JpaRepository<ScheduleImage, Long> {
     List<ScheduleImage> findBySchedule(Schedule schedule);
+    void deleteByImgUrl(String imgUrl);
 
 }

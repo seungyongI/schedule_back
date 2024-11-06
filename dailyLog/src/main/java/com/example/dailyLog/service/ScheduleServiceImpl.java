@@ -237,14 +237,20 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
         try {
+            boolean isRepeatTypeChanged = !updateSchedule.getRepeatType().equals(scheduleRequestUpdateDto.getRepeatType());
+            LocalDate repeatEndDate = scheduleRequestUpdateDto.getRepeatEndDate();
+            boolean isRepeatEndDateChanged = (updateSchedule.getRepeatEndDate() == null && repeatEndDate != null) ||
+                    (updateSchedule.getRepeatEndDate() != null && !updateSchedule.getRepeatEndDate().equals(repeatEndDate));
+
             if (scheduleRequestUpdateDto.getRepeatType() == RepeatType.NONE) {
-                scheduleRepository.deleteAfterDate(updateSchedule.getCalendars().getIdx(), updateSchedule.getStart());
+                // 반복 없음으로 변경하는 경우: 현재 날짜 이후의 반복 일정 삭제 후 현재 일정만 수정
+                scheduleRepository.deleteAfterDate(updateSchedule.getRepeatGroupId(), updateSchedule.getStart());
                 updateSchedule.setRepeatType(RepeatType.NONE);
                 updateSchedule.setRepeatEndDate(null);
                 updateSchedule.setRepeatGroupId(null);
-            } else {
-                // 기존 반복 일정 삭제 로직 수행 후 새로운 반복 일정 생성
-                scheduleRepository.deleteAfterDate(updateSchedule.getCalendars().getIdx(), updateSchedule.getStart());
+            } else if (isRepeatTypeChanged || isRepeatEndDateChanged) {
+                // 반복 설정이 변경된 경우: 기존 반복 일정 삭제 후 새로운 반복 일정 생성
+                scheduleRepository.deleteAfterDate(updateSchedule.getRepeatGroupId(), updateSchedule.getStart());
 
                 LocalDateTime currentStart = scheduleRequestUpdateDto.getStart();
                 LocalDateTime currentEnd = scheduleRequestUpdateDto.getEnd();
@@ -259,6 +265,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                             .color(scheduleRequestUpdateDto.getColor())
                             .calendars(updateSchedule.getCalendars())
                             .repeatType(scheduleRequestUpdateDto.getRepeatType())
+                            .repeatEndDate(scheduleRequestUpdateDto.getRepeatEndDate())
                             .repeatGroupId(newRepeatGroupId)
                             .build();
                     scheduleRepository.save(newSchedule);
@@ -270,8 +277,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                             currentEnd = currentEnd.plusDays(1);
                             break;
                         case WEEKLY:
-                            currentStart = currentStart.plusWeeks(1);
-                            currentEnd = currentEnd.plusWeeks(1);
+                            currentStart = currentStart.plusDays(7);
+                            currentEnd = currentEnd.plusDays(7);
                             break;
                         case MONTHLY:
                             currentStart = currentStart.plusMonths(1);
@@ -285,12 +292,21 @@ public class ScheduleServiceImpl implements ScheduleService {
                             throw new IllegalArgumentException("Invalid repeat type");
                     }
                 } while (!currentStart.toLocalDate().isAfter(scheduleRequestUpdateDto.getRepeatEndDate()));
+            } else {
+                // 반복 설정이 변경되지 않은 경우: 현재 일정만 수정
+                updateSchedule.setTitle(scheduleRequestUpdateDto.getTitle());
+                updateSchedule.setContent(scheduleRequestUpdateDto.getContent());
+                updateSchedule.setStart(scheduleRequestUpdateDto.getStart());
+                updateSchedule.setEnd(scheduleRequestUpdateDto.getEnd());
+                updateSchedule.setLocation(scheduleRequestUpdateDto.getLocation());
+                updateSchedule.setColor(scheduleRequestUpdateDto.getColor());
             }
+
             // 이미지 삭제
             List<String> deleteImageList = scheduleRequestUpdateDto.getDeletedImageList();
             if (deleteImageList != null && !deleteImageList.isEmpty()) {
                 for (String imageId : deleteImageList) {
-                    scheduleRepository.deleteByImgUrl(imageId);
+                    scheduleImageRepository.deleteByImgUrl(imageId);
                 }
             }
 
@@ -307,6 +323,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ServiceException("Failed to update schedule in ScheduleService.updateSchedule", e);
         }
     }
+
 
     // 일정 삭제
     @Transactional
