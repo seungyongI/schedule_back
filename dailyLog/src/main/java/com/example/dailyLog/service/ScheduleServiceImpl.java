@@ -47,19 +47,18 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final CalendarRepository calendarRepository;
     private final ScheduleImageRepository scheduleImageRepository;
     private final ImageService imageService;
-    private final EntityManager entityManager;
 
     // 월달력 전체 일정 조회
     @Transactional
     @Override
-    public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long idx, int year, int month) {
+    public List<ScheduleResponseMonthDto> findAllMonthSchedule(Long calendarIdx, int year, int month) {
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("Month must be between 1 and 12");
         }
         if (year < 1 || year > 9999) {
             throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
         }
-        if (!calendarRepository.existsById(idx)) {
+        if (!calendarRepository.existsById(calendarIdx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
 
@@ -67,7 +66,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
             LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-            List<Schedule> schedules = scheduleRepository.findByCalendarsUserIdxAndStartBetween(idx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59));
+            List<Schedule> schedules = scheduleRepository.findByCalendarsIdxAndStartBetween(calendarIdx, startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59));
 
             return schedules.stream()
                     .map(schedule -> ScheduleResponseMonthDto.builder()
@@ -85,8 +84,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     // 연달력 전체 일정 조회
     @Transactional
     @Override
-    public List<ScheduleResponseYearDto> findAllYearSchedule(Long idx, int year) {
-        if (!calendarRepository.existsById(idx)) {
+    public List<ScheduleResponseYearDto> findAllYearSchedule(Long calendarIdx, int year) {
+        if (!calendarRepository.existsById(calendarIdx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
         if (year < 1 || year > 9999) {
@@ -114,8 +113,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     // 개별 날짜 일정 조회
     @Transactional
     @Override
-    public List<ScheduleResponseDayDto> findScheduleByDay(Long idx, int year, int month, int day) {
-        if (!calendarRepository.existsById(idx)) {
+    public List<ScheduleResponseDayDto> findScheduleByDay(Long calendarIdx, int year, int month, int day) {
+        if (!calendarRepository.existsById(calendarIdx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
         if (month < 1 || month > 12) {
@@ -134,7 +133,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDateTime startOfDay = date.atStartOfDay();
             LocalDateTime endOfDay = date.atTime(23, 59, 59);
 
-            List<Schedule> schedules = scheduleRepository.findSchedulesInDay(startOfDay, endOfDay, idx);
+            List<Schedule> schedules = scheduleRepository.findSchedulesInDay(startOfDay, endOfDay, calendarIdx);
 
             return schedules.stream()
                     .map(schedule -> ScheduleResponseDayDto.builder()
@@ -163,13 +162,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public void saveSchedule(ScheduleRequestInsertDto scheduleRequestInsertDto, List<MultipartFile> imageFileList) {
-        Calendars calendar = calendarRepository.findById(scheduleRequestInsertDto.getCalendarsIdx())
+        Calendars calendarIdx = calendarRepository.findById(scheduleRequestInsertDto.getCalendarIdx())
                 .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
-
-        User user = calendar.getUser();
-        if (user == null) {
-            throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
-        }
 
         try {
             LocalDateTime currentStart = scheduleRequestInsertDto.getStart();
@@ -184,7 +178,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .end(currentEnd)
                         .location(scheduleRequestInsertDto.getLocation())
                         .color(scheduleRequestInsertDto.getColor())
-                        .calendars(calendar)
+                        .calendars(calendarIdx)
                         .repeatType(scheduleRequestInsertDto.getRepeatType())
                         .repeatEndDate(scheduleRequestInsertDto.getRepeatEndDate())
                         .repeatGroupId(repeatGroupId)
@@ -201,6 +195,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
 
                 if (scheduleRequestInsertDto.getRepeatType() == RepeatType.NONE) {
+
                     break; // 반복 없음 처리
                 }
 

@@ -46,7 +46,7 @@ public class DiaryServiceImpl implements DiaryService{
     // 월달력 전체 일기 조회(마커)
     @Transactional
     @Override
-    public List<DiaryResponseMonthDto> findAllMonthDiary(Long idx, int year, int month){
+    public List<DiaryResponseMonthDto> findAllMonthDiary(Long calendarIdx, int year, int month){
 
         // 유효성 검사
         if (month < 1 || month > 12) {
@@ -55,7 +55,7 @@ public class DiaryServiceImpl implements DiaryService{
         if (year < 1 || year > 9999) {
             throw new IllegalArgumentException("Year must be a positive number and within the range of valid years");
         }
-        if (!calendarRepository.existsById(idx)) {
+        if (!calendarRepository.existsById(calendarIdx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
 
@@ -63,7 +63,7 @@ public class DiaryServiceImpl implements DiaryService{
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
             LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-            return diaryRepository.findByCalendarsUserIdxAndDateBetween(idx, startOfMonth, endOfMonth)
+            return diaryRepository.findByCalendarsUserIdxAndDateBetween(calendarIdx, startOfMonth, endOfMonth)
                     .stream().map(diary ->
                             DiaryResponseMonthDto.builder()
                                     .title(diary.getTitle())
@@ -80,10 +80,10 @@ public class DiaryServiceImpl implements DiaryService{
     // 개별 날짜 모든 다이어리 조회
     @Transactional
     @Override
-    public List<DiaryResponseDayListDto> findDiaryByDayList(Long idx, int year, int month, int day){
+    public List<DiaryResponseDayListDto> findDiaryByDayList(Long calendarIdx, int year, int month, int day){
 
         // 유효성 검사
-        if (!calendarRepository.existsById(idx)) {
+        if (!calendarRepository.existsById(calendarIdx)) {
             throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
         }
         if (month < 1 || month > 12) {
@@ -100,7 +100,7 @@ public class DiaryServiceImpl implements DiaryService{
         try {
             LocalDate date = LocalDate.of(year, month, day);
 
-            return diaryRepository.findByCalendarsUserIdxAndDate(idx, date)
+            return diaryRepository.findByCalendarsUserIdxAndDate(calendarIdx, date)
                     .stream()
                     .map(diary -> {
                         return DiaryResponseDayListDto.builder()
@@ -125,10 +125,11 @@ public class DiaryServiceImpl implements DiaryService{
     // 전체 및 카테고리별 전체 일기 조회
     @Transactional
     @Override
-    public List<DiaryResponseCategoryDto> findDiaryCategory(Long idx, String category) {
+    public List<DiaryResponseCategoryDto> findDiaryCategory(Long calendarIdx, String category) {
 
-        Calendars calendar = calendarRepository.findById(idx)
-                .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
+        if (!calendarRepository.existsById(calendarIdx)) {
+            throw new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND);
+        }
 
         if (!"ALL".equalsIgnoreCase(category)) {
             try {
@@ -140,7 +141,7 @@ public class DiaryServiceImpl implements DiaryService{
 
         try {
             if (category.equals("ALL")) {
-                return diaryRepository.findByCalendarsUserIdx(idx)
+                return diaryRepository.findByCalendarsUserIdx(calendarIdx)
                         .stream()
                         .map(diary -> DiaryResponseCategoryDto.builder()
                                 .idx(diary.getIdx())
@@ -152,7 +153,7 @@ public class DiaryServiceImpl implements DiaryService{
                         .collect(Collectors.toList());
             } else {
                 Category categoryEnum = Category.valueOf(category.toUpperCase());
-                return diaryRepository.findByCalendarsUserIdxAndCategory(idx, categoryEnum)
+                return diaryRepository.findByCalendarsUserIdxAndCategory(calendarIdx, categoryEnum)
                         .stream()
                         .map(diary -> DiaryResponseCategoryDto.builder()
                                 .idx(diary.getIdx())
@@ -200,13 +201,8 @@ public class DiaryServiceImpl implements DiaryService{
     @Transactional
     @Override
     public void saveDiary(DiaryRequestInsertDto diaryRequestInsertDto,List<MultipartFile> imageFileList) {
-            Calendars calendar = calendarRepository.findById(diaryRequestInsertDto.getCalendarsIdx())
+            Calendars calendarIdx = calendarRepository.findById(diaryRequestInsertDto.getCalendarIdx())
                     .orElseThrow(() -> new CalendarsNotFoundException(CalendarsErrorCode.CALENDARS_NOT_FOUND));
-
-            User user = calendar.getUser();
-            if (user == null) {
-                throw new UserNotFoundException(UserErrorCode.USER_NOT_FOUND);
-            }
 
         try {
 
@@ -215,7 +211,7 @@ public class DiaryServiceImpl implements DiaryService{
                     .content(diaryRequestInsertDto.getContent())
                     .date(diaryRequestInsertDto.getDate())
                     .category(diaryRequestInsertDto.getCategory())
-                    .calendars(calendar)
+                    .calendars(calendarIdx)
                     .build();
             diaryRepository.save(createDiary);
 

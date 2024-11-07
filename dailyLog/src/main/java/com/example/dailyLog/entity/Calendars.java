@@ -19,14 +19,8 @@ public class Calendars {
     @Column(name = "cal_idx")
     private Long idx;
 
-    @Column(name = "c_holiday")
-    private String holiday;
-
     @Column(name = "c_theme", nullable = false)
     @Enumerated(EnumType.STRING)
     private Theme theme;
-
-    @OneToOne(mappedBy = "calendars")
-    private User user;
 
 }

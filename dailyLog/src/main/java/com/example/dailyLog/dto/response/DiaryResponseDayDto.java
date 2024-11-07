@@ -1,6 +1,7 @@
 package com.example.dailyLog.dto.response;
 
 import com.example.dailyLog.constant.Category;
+import com.example.dailyLog.entity.Calendars;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,4 +23,5 @@ public class DiaryResponseDayDto {
     private List<String> images;
 
     private List<Long> ids;
+
 }

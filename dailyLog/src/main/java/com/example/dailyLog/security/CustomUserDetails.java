@@ -1,5 +1,6 @@
 package com.example.dailyLog.security;
 
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.ProfileImage;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +19,7 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private String userName;
     private ProfileImage profileImage;
+    private Calendars calendarIdx;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -37,4 +39,5 @@ public class CustomUserDetails implements UserDetails {
     public String getUserName() {
         return userName;
     }
+
 }

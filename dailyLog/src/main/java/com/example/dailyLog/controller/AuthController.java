@@ -54,6 +54,7 @@ public class AuthController {
                 .email(userDetails.getEmail())
                 .userName(userDetails.getUserName())
                 .profileImageUrl(userDetails.getProfileImage() != null ? userDetails.getProfileImage().getImgUrl() : "")
+                .calendarIdx(userDetails.getCalendarIdx().getIdx())
                 .build();
         return ResponseEntity.ok(responseDto);
     }

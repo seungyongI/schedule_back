@@ -5,7 +5,12 @@ import com.example.dailyLog.dto.request.ScheduleRequestUpdateDto;
 import com.example.dailyLog.dto.response.ScheduleResponseDayDto;
 import com.example.dailyLog.dto.response.ScheduleResponseMonthDto;
 import com.example.dailyLog.dto.response.ScheduleResponseYearDto;
+import com.example.dailyLog.entity.Calendars;
+import com.example.dailyLog.exception.calendarsException.CalendarsErrorCode;
+import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundException;
+import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.service.ScheduleService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,46 +29,44 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
-
     // 홈페이지 첫화면 기본 창(월달력 조회)
-    @GetMapping("/{idx}/{year}/{month}")
+    @GetMapping("/{calendarIdx}/{year}/{month}")
     public ResponseEntity<List<ScheduleResponseMonthDto>> getAllMonthSchedule(
-            @PathVariable(name = "idx") Long idx,
+            @PathVariable(name = "calendarIdx") Long calendarIdx,
             @PathVariable(name = "year") int year,
-            @PathVariable(name = "month") int month){
-        List<ScheduleResponseMonthDto> scheduleResponseMonthDto = scheduleService.findAllMonthSchedule(idx, year, month);
+            @PathVariable(name = "month") int month) {
+
+        List<ScheduleResponseMonthDto> scheduleResponseMonthDto = scheduleService.findAllMonthSchedule(calendarIdx, year, month);
         return ResponseEntity.ok(scheduleResponseMonthDto);
     }
 
-
     // 연달력 전체 일정 조회
-    @GetMapping("/{idx}/{year}")
+    @GetMapping("/{calendarIdx}/{year}")
     public ResponseEntity<List<ScheduleResponseYearDto>> getAllYearSchedule(
-            @PathVariable(name = "idx") Long idx,
-            @PathVariable(name = "year") int year){
+            @PathVariable(name = "calendarIdx") Long calendarIdx,
+            @PathVariable(name = "year") int year) {
 
-        List<ScheduleResponseYearDto> scheduleResponseYearDto = scheduleService.findAllYearSchedule(idx, year);
+        List<ScheduleResponseYearDto> scheduleResponseYearDto = scheduleService.findAllYearSchedule(calendarIdx, year);
         return ResponseEntity.ok(scheduleResponseYearDto);
     }
 
-
     // 일달력 조회
-    @GetMapping("/{idx}/{year}/{month}/{day}")
+    @GetMapping("/{calendarIdx}/{year}/{month}/{day}")
     public ResponseEntity<List<ScheduleResponseDayDto>> getAllDaySchedule(
-            @PathVariable(name = "idx") Long idx,
+            @PathVariable(name = "calendarIdx") Long calendarIdx,
             @PathVariable(name = "year") int year,
             @PathVariable(name = "month") int month,
-            @PathVariable(name = "day") int day){
-        List<ScheduleResponseDayDto> scheduleResponseDayDto = scheduleService.findScheduleByDay(idx, year, month, day);
+            @PathVariable(name = "day") int day) {
+
+        List<ScheduleResponseDayDto> scheduleResponseDayDto = scheduleService.findScheduleByDay(calendarIdx, year, month, day);
         return ResponseEntity.ok(scheduleResponseDayDto);
     }
-
 
     // 일정 입력
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveSchedule(
             @RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
-            @RequestPart(name = "imageFiles", required = false) List<MultipartFile> imageFileList) {
+            @RequestPart(name = "imageFiles", required = false) @Schema(type = "array", format = "binary", description = "이미지 파일들") List<MultipartFile> imageFileList) {
 
         if (imageFileList == null) {
             imageFileList = Collections.emptyList();
@@ -76,9 +79,9 @@ public class ScheduleController {
     // 일정 수정
     @PutMapping(value = "/update")
     public ResponseEntity<String> updateSchedule(@RequestPart(name = "scheduleRequest") ScheduleRequestUpdateDto scheduleRequestUpdateDto,
-                                                 @RequestPart(name = "imageFiles",required = false) List<MultipartFile> imageFileList) {
-            scheduleService.updateSchedule(scheduleRequestUpdateDto, imageFileList);
-            return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
+                                                 @RequestPart(name = "imageFiles", required = false) List<MultipartFile> imageFileList) {
+        scheduleService.updateSchedule(scheduleRequestUpdateDto, imageFileList);
+        return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
     }
 
 

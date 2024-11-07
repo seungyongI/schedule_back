@@ -27,7 +27,8 @@ public class LoginServiceImpl implements LoginService {
                 user.getEmail(),
                 user.getPassword(),
                 user.getUserName(),
-                user.getProfileImage()
+                user.getProfileImage(),
+                user.getCalendars()
         );
     }
 }

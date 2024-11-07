@@ -1,5 +1,6 @@
 package com.example.dailyLog.repository;
 
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Schedule;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,8 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     // 월간 일정 조회
-    List<Schedule> findByCalendarsUserIdxAndStartBetween(Long idx, LocalDateTime start, LocalDateTime end);
+    @Query("SELECT s FROM Schedule s WHERE s.calendars.idx = :calendarIdx AND s.start BETWEEN :start AND :end")
+    List<Schedule> findByCalendarsIdxAndStartBetween(@Param("calendarIdx") Long calendarIdx, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     // 일간 일정 조회
     @Query("SELECT s FROM Schedule s WHERE s.start >= :start AND s.end <= :end AND s.calendars.idx = :calendarIdx")

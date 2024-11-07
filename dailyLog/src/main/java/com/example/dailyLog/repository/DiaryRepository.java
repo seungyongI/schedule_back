@@ -1,6 +1,7 @@
 package com.example.dailyLog.repository;
 
 import com.example.dailyLog.constant.Category;
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.Diary;
 import com.example.dailyLog.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,10 +11,10 @@ import java.util.List;
 
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
-    List<Diary> findByCalendarsUserIdx(Long idx);
-    List<Diary> findByCalendarsUserIdxAndCategory(Long idx, Category category);
-    List<Diary> findByCalendarsUserIdxAndDate(Long idx, LocalDate date);
-    List<Diary> findByCalendarsUserIdxAndDateBetween(Long idx, LocalDate start, LocalDate end);
+    List<Diary> findByCalendarsUserIdx(Long calendarIdx);
+    List<Diary> findByCalendarsUserIdxAndCategory(Long calendarIdx, Category category);
+    List<Diary> findByCalendarsUserIdxAndDate(Long calendarIdx, LocalDate date);
+    List<Diary> findByCalendarsUserIdxAndDateBetween(Long calendarIdx, LocalDate start, LocalDate end);
 
     // 캘린더 일기 검색
 //    List<Diary> findByTitleContainingIgnoreCase(String title);

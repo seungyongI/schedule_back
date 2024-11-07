@@ -2,6 +2,7 @@ package com.example.dailyLog.dto.response;
 
 import com.example.dailyLog.constant.Color;
 import com.example.dailyLog.constant.RepeatType;
+import com.example.dailyLog.entity.Calendars;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -32,4 +33,5 @@ public class ScheduleResponseDayDto {
     private RepeatType repeatType;
 
     private LocalDate repeatEndDate;
+
 }

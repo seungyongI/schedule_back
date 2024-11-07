@@ -1,5 +1,6 @@
 package com.example.dailyLog.dto.response;
 
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.ProfileImage;
 import lombok.*;
 
@@ -13,4 +14,5 @@ public class LoginResponseDto {
     private final String userName;
     private final String profileImageUrl;
     private final String refreshToken;
+    private final Long calendarIdx;
 }

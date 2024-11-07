@@ -1,6 +1,7 @@
 package com.example.dailyLog.dto.response;
 
 import com.example.dailyLog.constant.Color;
+import com.example.dailyLog.entity.Calendars;
 import lombok.Builder;
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -13,5 +14,4 @@ public class ScheduleResponseYearDto {
 
         private Color color;
 
-        private boolean isRepeat;  // 반복 일정 여부 추가
 }

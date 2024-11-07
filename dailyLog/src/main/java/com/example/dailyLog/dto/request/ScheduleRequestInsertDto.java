@@ -29,7 +29,7 @@ public class ScheduleRequestInsertDto {
         private Color color;
 
         @Schema(example = "c_idx", hidden = true)
-        private Long calendarsIdx;
+        private Long calendarIdx;
 
         // 반복 일정 관련 필드 추가
         private RepeatType repeatType;  // 반복 유형: NONE, DAILY, WEEKLY, MONTHLY, YEARLY

@@ -27,5 +27,5 @@ public class DiaryRequestInsertDto {
     private Category category;
 
     @Schema(example = "c_idx", hidden = true)
-    private Long calendarsIdx;
+    private Long calendarIdx;
 }

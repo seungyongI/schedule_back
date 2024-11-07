@@ -1,6 +1,7 @@
 package com.example.dailyLog.dto.response;
 
 import com.example.dailyLog.constant.Category;
+import com.example.dailyLog.entity.Calendars;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,4 +18,5 @@ public class DiaryResponseCategoryDto {
     private LocalDate date;
 
     private Category category;
+
 }
