@@ -32,4 +32,9 @@ public class DiaryExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidCategory(InvalidCategory e){
         return createErrorResponse(e.getErrorCode());
     }
+
+    @ExceptionHandler(DatabaseError.class)
+    public ResponseEntity<ErrorResponse> handleDatabaseError(DatabaseError e){
+        return createErrorResponse(e.getErrorCode());
+    }
 }

@@ -17,6 +17,11 @@ INSERT INTO user (u_idx, u_email, u_password, u_nickname, u_joinday, cal_idx, pr
 -- INSERT INTO 'diary' table
 INSERT INTO diary (d_idx, d_title, d_content, d_date, d_category, cal_idx) VALUES
 (1, 'Day 1', 'Went for a walk', '2024-01-01', 'DAILY', 1),
+(6, 'Day 1', 'Went for a walk', '2024-11-01', 'GROWTH', 1),
+(7, 'Day 1', 'Went for a walk', '2024-11-05', 'GROWTH', 1),
+(8, 'Day 1', 'Went for a walk', '2024-11-05', 'EXERCISE', 1),
+(9, 'Day 1', 'Went for a walk', '2024-11-05', 'TRIP', 1),
+(10, 'Day 1', 'Went for a walk', '2024-11-20', 'ETC', 1),
 (2, 'Day 2', 'Started new project', '2024-01-02', 'GROWTH', 2),
 (3, 'Day 3', 'Workout session', '2024-01-03', 'EXERCISE', 3),
 (4, 'Day 4', 'Visited new city', '2024-01-04', 'TRIP', 4),
