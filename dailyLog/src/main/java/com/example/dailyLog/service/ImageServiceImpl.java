@@ -11,6 +11,7 @@ import com.example.dailyLog.repository.ScheduleImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +52,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional
     @Override
-    public DiaryImage saveDiaryImage(MultipartFile imageFile, Diary diary){
+    public DiaryImage saveDiaryImage(MultipartFile imageFile, Diary diary) {
 
         validateImageFile(imageFile);
 
@@ -76,7 +77,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional
     @Override
-    public ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule){
+    public ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule) {
 
         validateImageFile(imageFile);
 
@@ -102,22 +103,43 @@ public class ImageServiceImpl implements ImageService {
     @Transactional
     @Override
     public ProfileImage saveProfileImage(MultipartFile imageFile, User user) throws Exception {
-            try {
-                String oriImgName = imageFile.getOriginalFilename();
-                String savedFileName = fileService.uploadFile(profileImageLocation, oriImgName, imageFile.getBytes());
-                String imageUrl = "/profileImages/" + savedFileName;
+        try {
 
-                // ProfileImage 엔티티 생성 및 설정
-                ProfileImage profileImage = new ProfileImage();
-                profileImage.setImgName(savedFileName);
-                profileImage.setOriImgName(oriImgName);
-                profileImage.setImgUrl(imageUrl);
-                profileImage.setUser(user);
-                return profileImageRepository.save(profileImage);
-            } catch (Exception e) {
-                throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
+            ProfileImage existingImage = user.getProfileImage();
+            if (existingImage != null) {
+                fileService.deleteFile(existingImage.getImgUrl());
+                profileImageRepository.delete(existingImage);
             }
 
+            String oriImgName = imageFile.getOriginalFilename();
+            String savedFileName = fileService.uploadFile(profileImageLocation, oriImgName, imageFile.getBytes());
+            String imageUrl = "/profileImages/" + savedFileName;
+
+
+            // ProfileImage 엔티티 생성 및 설정
+            ProfileImage profileImage = new ProfileImage();
+            profileImage.setImgName(savedFileName);
+            profileImage.setOriImgName(oriImgName);
+            profileImage.setImgUrl(imageUrl);
+            profileImage.setUser(user);
+
+            user.setProfileImage(profileImage);
+            return profileImageRepository.save(profileImage);
+        } catch (Exception e) {
+            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
+        }
+    }
+
+    //프로필 이미지 반환 메서드
+    @Transactional(readOnly = true)
+    @Override
+    public String getProfileImage(Long userIdx) {
+        ProfileImage profileImage = profileImageRepository.findByUserIdx(userIdx).orElse(null);
+        if (profileImage == null || profileImage.getImgUrl() == null || profileImage.getImgUrl().isEmpty()) {
+            log.info("사용자 {}에 대한 프로필 이미지가 없으므로 기본 이미지를 반환합니다.", userIdx);
+            return "/src/resources/static/images/default.png"; // 기본 이미지 URL 설정
+        }
+        log.info("사용자 {}의 프로필 이미지 URL: {}", userIdx, profileImage.getImgUrl());
+        return profileImage.getImgUrl();
     }
 }
-

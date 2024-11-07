@@ -50,15 +50,13 @@ public class FileServiceImpl implements FileService{
 
     // 이미지 삭제
     @Override
-    public void deleteFile(String filePath) throws Exception{
-        File deleteFile = new File(filePath);
-
-        if(deleteFile.exists()){
+    public void deleteFile(String profileImageLocation) throws Exception {
+        File deleteFile = new File(profileImageLocation); // 절대 경로 설정
+        if (deleteFile.exists()) {
             deleteFile.delete();
-            log.info("파일을 삭제하셨습니다.");
-
-        }else {
-            log.info("파일이 존재하지 않습니다");
+            log.info("파일을 삭제했습니다: " + profileImageLocation);
+        } else {
+            log.info("파일이 존재하지 않습니다: " + profileImageLocation);
         }
     }
 }

@@ -55,7 +55,6 @@ public class AuthController {
                 .userName(userDetails.getUserName())
                 .profileImageUrl(userDetails.getProfileImage() != null ? userDetails.getProfileImage().getImgUrl() : "")
                 .build();
-
         return ResponseEntity.ok(responseDto);
     }
 
