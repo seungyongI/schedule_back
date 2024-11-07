@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -59,4 +60,10 @@ public class User {
 
     @Column(name = "token_expiry")
     private LocalDateTime tokenExpiry;
+
+    @OneToMany(mappedBy = "requester")
+    private List<Friend> sentRequests;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Friend> receivedRequests;
 }
