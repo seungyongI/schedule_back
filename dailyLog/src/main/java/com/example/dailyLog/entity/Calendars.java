@@ -23,4 +23,7 @@ public class Calendars {
     @Enumerated(EnumType.STRING)
     private Theme theme;
 
+    @OneToOne(mappedBy = "calendars")
+    private User user;
+
 }

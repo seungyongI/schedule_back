@@ -63,7 +63,7 @@ public class DiaryServiceImpl implements DiaryService{
             LocalDate startOfMonth = LocalDate.of(year, month, 1);
             LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
 
-            return diaryRepository.findByCalendarsUserIdxAndDateBetween(calendarIdx, startOfMonth, endOfMonth)
+            return diaryRepository.findByCalendarsIdxAndDateBetween(calendarIdx, startOfMonth, endOfMonth)
                     .stream().map(diary ->
                             DiaryResponseMonthDto.builder()
                                     .title(diary.getTitle())
@@ -100,7 +100,7 @@ public class DiaryServiceImpl implements DiaryService{
         try {
             LocalDate date = LocalDate.of(year, month, day);
 
-            return diaryRepository.findByCalendarsUserIdxAndDate(calendarIdx, date)
+            return diaryRepository.findByCalendarsIdxAndDate(calendarIdx, date)
                     .stream()
                     .map(diary -> {
                         return DiaryResponseDayListDto.builder()
@@ -141,7 +141,7 @@ public class DiaryServiceImpl implements DiaryService{
 
         try {
             if (category.equals("ALL")) {
-                return diaryRepository.findByCalendarsUserIdx(calendarIdx)
+                return diaryRepository.findByCalendarsIdx(calendarIdx)
                         .stream()
                         .map(diary -> DiaryResponseCategoryDto.builder()
                                 .idx(diary.getIdx())
@@ -153,7 +153,7 @@ public class DiaryServiceImpl implements DiaryService{
                         .collect(Collectors.toList());
             } else {
                 Category categoryEnum = Category.valueOf(category.toUpperCase());
-                return diaryRepository.findByCalendarsUserIdxAndCategory(calendarIdx, categoryEnum)
+                return diaryRepository.findByCalendarsIdxAndCategory(calendarIdx, categoryEnum)
                         .stream()
                         .map(diary -> DiaryResponseCategoryDto.builder()
                                 .idx(diary.getIdx())

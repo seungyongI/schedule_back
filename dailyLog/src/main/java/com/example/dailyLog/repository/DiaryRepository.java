@@ -11,10 +11,10 @@ import java.util.List;
 
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
-    List<Diary> findByCalendarsUserIdx(Long calendarIdx);
-    List<Diary> findByCalendarsUserIdxAndCategory(Long calendarIdx, Category category);
-    List<Diary> findByCalendarsUserIdxAndDate(Long calendarIdx, LocalDate date);
-    List<Diary> findByCalendarsUserIdxAndDateBetween(Long calendarIdx, LocalDate start, LocalDate end);
+    List<Diary> findByCalendarsIdx(Long calendarIdx);
+    List<Diary> findByCalendarsIdxAndCategory(Long calendarIdx, Category category);
+    List<Diary> findByCalendarsIdxAndDate(Long calendarIdx, LocalDate date);
+    List<Diary> findByCalendarsIdxAndDateBetween(Long calendarIdx, LocalDate start, LocalDate end);
 
     // 캘린더 일기 검색
 //    List<Diary> findByTitleContainingIgnoreCase(String title);
