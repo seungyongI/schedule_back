@@ -25,7 +25,6 @@ import java.util.List;
 public class DiaryController {
 
     private final DiaryService diaryService;
-    private final CalendarRepository calendarRepository;
 
     // 홈페이지 첫화면 기본 창(월달력 조회)
     @GetMapping("/{calendarIdx}/{year}/{month}")
