@@ -1,9 +1,11 @@
 package com.example.dailyLog.dto.response;
 
 import com.example.dailyLog.constant.Color;
+import com.example.dailyLog.constant.RepeatType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,5 +29,7 @@ public class ScheduleResponseDayDto {
 
     private List<String> images;
 
-    private boolean isRepeat;  // 반복 일정 여부 추가
+    private RepeatType repeatType;
+
+    private LocalDate repeatEndDate;
 }
