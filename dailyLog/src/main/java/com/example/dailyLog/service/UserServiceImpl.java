@@ -15,6 +15,7 @@ import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -68,9 +69,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserName(Long idx, UserRequestUpdateDto userRequestUpdateDto) {
+    public void updateUserName(@Valid UserRequestUpdateDto userRequestUpdateDto) {
         try {
-            User updateUser = userRepository.findById(idx)
+            User updateUser = userRepository.findById(userRequestUpdateDto.getIdx())
                     .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
 
             if (userRequestUpdateDto.getUserName() != null) {

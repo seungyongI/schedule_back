@@ -17,10 +17,10 @@ public class UserController {
     private final UserService userService;
 
     //유저 닉네임 수정
-    @PutMapping(value = "/updateUserName/{idx}")
-    public ResponseEntity<String> updateUserName(@PathVariable(name = "idx")Long idx,
+    @PutMapping(value = "/updateUserName")
+    public ResponseEntity<String> updateUserName(
                                                  @RequestBody UserRequestUpdateDto userRequestUpdateDto){
-        userService.updateUserName(idx,userRequestUpdateDto);
+        userService.updateUserName(userRequestUpdateDto);
         return ResponseEntity.status(HttpStatus.OK).body("UserNickname updated successfully");
     }
 
