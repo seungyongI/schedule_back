@@ -16,26 +16,26 @@ public interface StatisticsRepository extends JpaRepository<Diary, Long> {
             "GROUP BY d.category")
     List<Object[]> findCategoryCountsAsObjectArray(@Param("userIdx") Long userIdx);
 
+
     @Query("SELECT COUNT(d) FROM Diary d JOIN d.calendars c JOIN c.user u WHERE u.idx = :userIdx")
     Long findTotalCountByUser(@Param("userIdx") Long userIdx);
 
-    // 월별 전체 일기 작성 비율을 가져오는 쿼리
-    @Query("SELECT FUNCTION('DATE_FORMAT', d.date, '%Y-%m') AS month, COUNT(d) AS diaryCount " +
-            "FROM Diary d " +
-            "JOIN d.calendars c " +
-            "JOIN c.user u " +
-            "WHERE u.idx = :userIdx " +
-            "GROUP BY month " +
-            "ORDER BY month")
-    List<Object[]> findMonthlyDiaryCounts(@Param("userIdx") Long userIdx);
 
-    // 카테고리별 작성 일기 수 조회
-    @Query("SELECT d.category, COUNT(d), 0.0 " +
+    @Query("SELECT FUNCTION('DAY', d.date) AS day, d.category, COUNT(d) " +
             "FROM Diary d " +
-            "JOIN d.calendars c " +
-            "JOIN c.user u " +
-            "WHERE u.idx = :userIdx " +
-            "GROUP BY d.category")
-    List<Object[]> findCategoryCountsByUser(@Param("userIdx") Long userIdx);
+            "WHERE d.calendars.user.idx = :userIdx AND FUNCTION('YEAR', d.date) = :year AND FUNCTION('MONTH', d.date) = :month " +
+            "GROUP BY FUNCTION('DAY', d.date), d.category " +
+            "ORDER BY day")
+    List<Object[]> findDailyCategoryCountsByUserAndMonth(
+            @Param("userIdx") Long userIdx,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
+
+    @Query("SELECT FUNCTION('MONTH', d.date) AS month, d.category, COUNT(d) " +
+            "FROM Diary d WHERE d.calendars.user.idx = :userIdx AND FUNCTION('YEAR', d.date) = :year " +
+            "GROUP BY FUNCTION('MONTH', d.date), d.category ORDER BY month")
+    List<Object[]> findMonthlyCategoryCountsByUserAndYear(@Param("userIdx") Long userIdx, @Param("year") int year);
 
 }

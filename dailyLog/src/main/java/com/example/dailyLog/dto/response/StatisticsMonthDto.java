@@ -12,8 +12,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class StatisticsMonthDto {
 
-    private String month;
+    private String date;
     private Long diaryCount;
+    private Long cumulativeDiaryCount;
     private Double totalPercentage;
-    private Map<Category, Double> categoryPercentageMap;
+    private Map<Category, Double> CategoryPercentageMap;
 }

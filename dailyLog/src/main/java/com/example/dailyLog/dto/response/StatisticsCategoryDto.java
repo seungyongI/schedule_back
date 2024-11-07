@@ -14,5 +14,4 @@ public class StatisticsCategoryDto {
     private Long count;
     private Double percentage;
 
-
 }

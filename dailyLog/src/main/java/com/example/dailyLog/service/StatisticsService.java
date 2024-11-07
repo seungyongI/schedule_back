@@ -10,6 +10,6 @@ import java.util.List;
 public interface StatisticsService {
 
     List<StatisticsCategoryDto> getCategoryStatisticsByUser(Long idx);
-//    List<StatisticsMonthDto> getMonthStatistics(Long idx);
-    List<StatisticsYearDto> getYearStatistics(Long idx);
+    public List<StatisticsMonthDto> getMonthStatistics(Long userIdx, int year, int month);
+    public List<StatisticsYearDto> getYearStatistics(Long userIdx, int year);
 }

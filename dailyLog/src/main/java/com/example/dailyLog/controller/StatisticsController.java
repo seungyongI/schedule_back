@@ -2,13 +2,11 @@ package com.example.dailyLog.controller;
 
 import com.example.dailyLog.dto.response.StatisticsCategoryDto;
 import com.example.dailyLog.dto.response.StatisticsMonthDto;
+import com.example.dailyLog.dto.response.StatisticsYearDto;
 import com.example.dailyLog.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,18 +18,32 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
 
 
-    @GetMapping("/all/{idx}")
-    public ResponseEntity<List<StatisticsCategoryDto>> getCategoryStatistics(@PathVariable(name = "idx") Long idx){
-
-        List<StatisticsCategoryDto> list = statisticsService.getCategoryStatisticsByUser(idx);
-        return ResponseEntity.ok(list);
+    @GetMapping("/category")
+    public ResponseEntity<List<StatisticsCategoryDto>> getCategoryStatistics(@RequestParam(name = "userIdx") Long userIdx) {
+        List<StatisticsCategoryDto> statisticsList = statisticsService.getCategoryStatisticsByUser(userIdx);
+        return ResponseEntity.ok(statisticsList);
     }
 
 
-//    @GetMapping("/month/{idx}")
-//    public ResponseEntity<List<StatisticsMonthDto>> getMonthStatistics(@PathVariable(name = "idx") Long idx){
-//
-//        List<StatisticsMonthDto> list = statisticsService.getMonthStatistics(idx);
-//        return ResponseEntity.ok(list);
-//    }
+    @GetMapping("/month")
+    public ResponseEntity<List<StatisticsMonthDto>> getMonthlyStatistics(
+            @RequestParam(name = "userIdx") Long userIdx,
+            @RequestParam(name = "year") int year,
+            @RequestParam(name = "month") int month) {
+
+        List<StatisticsMonthDto> statistics = statisticsService.getMonthStatistics(userIdx, year, month);
+
+        return ResponseEntity.ok(statistics);
+    }
+
+
+    @GetMapping("/year")
+    public ResponseEntity<List<StatisticsYearDto>> getYearStatistics(
+            @RequestParam(name = "userIdx") Long userIdx,
+            @RequestParam(name = "year") int year) {
+
+        List<StatisticsYearDto> statistics = statisticsService.getYearStatistics(userIdx, year);
+
+        return ResponseEntity.ok(statistics);
+    }
 }
