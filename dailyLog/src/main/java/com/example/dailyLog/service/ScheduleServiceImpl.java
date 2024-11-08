@@ -168,7 +168,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         try {
             LocalDateTime currentStart = scheduleRequestInsertDto.getStart();
             LocalDateTime currentEnd = scheduleRequestInsertDto.getEnd();
-            Long repeatGroupId = scheduleRequestInsertDto.getRepeatType() == RepeatType.NONE ? null : System.currentTimeMillis(); // 반복 그룹 ID 생성
+            Long repeatGroupId = System.currentTimeMillis(); // 반복 그룹 ID 생성
 
             do {
                 Schedule createSchedule = Schedule.builder()
@@ -259,6 +259,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .thenRun(() -> {
                             // 새로운 반복 일정 생성 로직
                             if (scheduleRequestUpdateDto.getRepeatType() == RepeatType.NONE) {
+                                Long newRepeatGroupId = System.currentTimeMillis();
+
                                 // 반복 없음으로 변경하는 경우: 현재 일정만 생성
                                 Schedule newSchedule = Schedule.builder()
                                         .title(scheduleRequestUpdateDto.getTitle())
@@ -270,7 +272,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                                         .calendars(updateSchedule.getCalendars())
                                         .repeatType(RepeatType.NONE)
                                         .repeatEndDate(null)
-                                        .repeatGroupId(null)
+                                        .repeatGroupId(newRepeatGroupId)
                                         .build();
                                 scheduleRepository.save(newSchedule);
                             } else {
