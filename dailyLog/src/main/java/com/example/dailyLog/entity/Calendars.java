@@ -1,6 +1,7 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Theme;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class Calendars {
     private Theme theme;
 
     @OneToOne(mappedBy = "calendars")
+    @JsonBackReference
     private User user;
 
 }

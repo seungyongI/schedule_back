@@ -8,6 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -37,4 +39,7 @@ public class Friend {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL)
+    private List<ShareDiaryGroupFriend> sharedDiaryGroups = new ArrayList<>();
 }
