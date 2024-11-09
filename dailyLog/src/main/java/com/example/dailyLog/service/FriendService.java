@@ -20,5 +20,5 @@ public interface FriendService {
 
     List<FriendListResponseDto> getFriendsList(Long userId);
 
-    List<UserSearchResponseDto> searchUsersByUserName(String userName);
+    List<UserSearchResponseDto> searchUsersByUserName(Long userId, String userName);
 }

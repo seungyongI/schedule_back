@@ -70,4 +70,13 @@ public class User {
     @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Friend> receivedRequests;
+
+    @OneToMany(mappedBy = "user1", fetch = FetchType.LAZY)
+    private List<ExchangeDiary> exchangeDiariesAsUser1;
+
+    @OneToMany(mappedBy = "user2", fetch = FetchType.LAZY)
+    private List<ExchangeDiary> exchangeDiariesAsUser2;
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ExchangeDiaryEntry> diaryEntries;
 }
