@@ -17,11 +17,11 @@ public class ExchangeDiaryController {
 
     // 교환 일기 요청 전송
     @PostMapping("/request")
-    public ResponseEntity<String> sendExchangeDiaryRequest(@RequestParam(name = "requesterId") Long requesterId,
+    public ResponseEntity<Long> sendExchangeDiaryRequest(@RequestParam(name = "requesterId") Long requesterId,
                                                            @RequestParam(name = "receiverId") Long receiverId,
                                                            @RequestParam(name = "groupName") String groupName) {
-        exchangeDiaryService.sendExchangeDiaryRequest(requesterId, receiverId, groupName);
-        return ResponseEntity.ok("Exchange diary request sent successfully.");
+        Long diaryId = exchangeDiaryService.sendExchangeDiaryRequest(requesterId, receiverId, groupName);
+        return ResponseEntity.ok(diaryId);
     }
 
     // 교환 일기 요청 목록 조회

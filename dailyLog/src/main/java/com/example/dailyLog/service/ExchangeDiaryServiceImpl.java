@@ -24,7 +24,7 @@ public class ExchangeDiaryServiceImpl implements ExchangeDiaryService{
     // 교환 일기 요청 보내기
     @Transactional
     @Override
-    public void sendExchangeDiaryRequest(Long requesterId, Long receiverId, String groupName) {
+    public Long sendExchangeDiaryRequest(Long requesterId, Long receiverId, String groupName) {
         if (requesterId.equals(receiverId)) {
             throw new IllegalArgumentException("Cannot send an exchange diary request to oneself.");
         }
@@ -48,6 +48,7 @@ public class ExchangeDiaryServiceImpl implements ExchangeDiaryService{
         exchangeDiary.setCreatedAt(LocalDateTime.now());
 
         exchangeDiaryRepository.save(exchangeDiary);
+        return  exchangeDiary.getIdx();
     }
 
     // 교환 일기 요청 조회
@@ -63,9 +64,10 @@ public class ExchangeDiaryServiceImpl implements ExchangeDiaryService{
                 .map(exchangeDiary -> {
                     User requester = exchangeDiary.getUser1();
                     return new UserSearchResponseDto(
-                            requester.getIdx(),
+                            requester.getIdx(),                       // userId
+                            exchangeDiary.getIdx(),                   // diaryId
                             requester.getUserName(),
-                            requester.getProfileImage() != null ? requester.getProfileImage().getImgUrl() : "/images/default.png", // 기본 이미지 경로 설정
+                            requester.getProfileImage() != null ? requester.getProfileImage().getImgUrl() : "/images/default.png",
                             requester.getEmail()
                     );
                 })
@@ -76,6 +78,7 @@ public class ExchangeDiaryServiceImpl implements ExchangeDiaryService{
     @Transactional
     @Override
     public void acceptExchangeDiaryRequest(Long requesterId, Long receiverId) {
+
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid requester ID"));
         User receiver = userRepository.findById(receiverId)

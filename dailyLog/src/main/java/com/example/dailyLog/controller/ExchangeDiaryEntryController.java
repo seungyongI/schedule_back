@@ -51,7 +51,5 @@ public class ExchangeDiaryEntryController {
     public List<ExchangeDiaryEntryListResponseDto> getExchangeDiaryList(@PathVariable(name = "idx") Long diaryId,
                                                                         @RequestParam(name = "userId") Long userId) {
         return exchangeDiaryEntryService.getEntriesByDiaryId(userId, diaryId);
-
-
     }
 }

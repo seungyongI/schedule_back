@@ -130,7 +130,8 @@ public class ExchangeDiaryEntryServiceImpl implements ExchangeDiaryEntryService 
                         entry.getIdx(),
                         entry.getTitle(),
                         entry.getContent(),
-                        entry.getCreatedAt()
+                        entry.getCreatedAt(),
+                        entry.getCreator().getUserName() // 작성자 이름 추가
                 ))
                 .collect(Collectors.toList());
     }

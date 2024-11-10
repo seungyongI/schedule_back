@@ -9,7 +9,7 @@ import java.util.List;
 public interface ExchangeDiaryService {
 
     // 교환 일기 요청 보내기
-    void sendExchangeDiaryRequest(Long requesterId, Long receiverId, String groupName);
+    Long sendExchangeDiaryRequest(Long requesterId, Long receiverId, String groupName);
 
     // 교환 일기 요청 조회
     List<UserSearchResponseDto> getExchangeDiaryRequests(Long userId);
