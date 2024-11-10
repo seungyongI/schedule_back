@@ -55,8 +55,9 @@ public class FriendController {
 
     // 유저 검색
     @GetMapping("/search")
-    public ResponseEntity<List<UserSearchResponseDto>> searchUsers(@RequestParam(name = "userName") String userName) {
-        List<UserSearchResponseDto> users = friendService.searchUsersByUserName(userName);
+    public ResponseEntity<List<UserSearchResponseDto>> searchUsers(@RequestParam(name = "userId") Long userId,
+                                                                   @RequestParam(name = "userName") String userName) {
+        List<UserSearchResponseDto> users = friendService.searchUsersByUserName(userId, userName);
         return ResponseEntity.ok(users);
     }
 

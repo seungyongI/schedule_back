@@ -25,17 +25,22 @@ public class FriendServiceImpl implements FriendService{
     @Transactional
     @Override
     public void sendFriendRequest(Long requesterId, Long receiverId) {
-        User requester = userRepository.findById(requesterId).orElseThrow(() -> new IllegalArgumentException("Invalid requester ID"));
-        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new IllegalArgumentException("Invalid receiver ID"));
+        if (requesterId.equals(receiverId)) {
+            throw new IllegalArgumentException("Cannot send an friend request to oneself.");
+        }
+        User requester = userRepository.findById(requesterId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid requester ID"));
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid receiver ID"));
 
         // 중복 요청 방지 로직
-        if (friendRepository.findByRequesterAndReceiver(requester, receiver).isPresent()) {
+        if (friendRepository.existsByRequesterAndReceiver(requester, receiver) ||
+            friendRepository.existsByRequesterAndReceiver(receiver, requester)) {
             throw new IllegalStateException("Already sent a friend request to this user.");
         }
 
-        Friend friendRequest = new Friend();
-        friendRequest.setRequester(requester);
-        friendRequest.setReceiver(receiver);
+        // 새로운 Friend 인스턴스 생성
+        Friend friendRequest = new Friend(requester, receiver);
         friendRequest.setStatus(Status.PENDING);
         friendRepository.save(friendRequest);
     }
@@ -77,12 +82,12 @@ public class FriendServiceImpl implements FriendService{
         friendRequest.setStatus(Status.ACCEPTED);
         friendRepository.save(friendRequest);
 
-        // 반대 방향의 관계도 추가 (receiver가 requester의 친구로 추가됨)
-        Friend reverseFriendRequest = new Friend();
-        reverseFriendRequest.setRequester(receiver); // 반대 방향의 요청자
-        reverseFriendRequest.setReceiver(requester); // 반대 방향의 수신자
-        reverseFriendRequest.setStatus(Status.ACCEPTED);
-        friendRepository.save(reverseFriendRequest); // 새로운 관계 저장
+        // 반대 방향의 친구 요청이 이미 있는지 확인
+        if (!friendRepository.existsByRequesterAndReceiver(receiver, requester)) {
+            Friend reverseFriendRequest = new Friend(receiver, requester);
+            reverseFriendRequest.setStatus(Status.ACCEPTED);
+            friendRepository.save(reverseFriendRequest);
+        }
     }
 
     // 친구 요청 거절
@@ -112,14 +117,25 @@ public class FriendServiceImpl implements FriendService{
                 .collect(Collectors.toList());
     }
 
+    //친구 검색 기능
+    @Transactional
     @Override
-    public List<UserSearchResponseDto> searchUsersByUserName(String userName) {
-        return userRepository.findByUserNameContaining(userName).stream()
-                .map(user -> new UserSearchResponseDto(
-                        user.getIdx(),
-                        user.getUserName(),
-                        user.getProfileImage() != null ? user.getProfileImage().getImgUrl() : "/images/default.png", // 기본 이미지 경로
-                        user.getEmail()
+    public List<UserSearchResponseDto> searchUsersByUserName(Long userId, String userName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+
+        // 현재 친구인 사용자 ID 가져오기
+        List<Long> friendIds = friendRepository.findFriendsByUser(user).stream()
+                .map(friend -> friend.getRequester().getIdx().equals(userId) ? friend.getReceiver().getIdx() : friend.getRequester().getIdx())
+                .collect(Collectors.toList());
+        friendIds.add(userId); // 자기 자신도 제외하기 위해 추가
+
+        return userRepository.findByUserNameContainingAndIdxNotIn(userName, friendIds).stream()
+                .map(foundUser -> new UserSearchResponseDto(
+                        foundUser.getIdx(),
+                        foundUser.getUserName(),
+                        foundUser.getProfileImage() != null ? foundUser.getProfileImage().getImgUrl() : "/images/default.png",
+                        foundUser.getEmail()
                 ))
                 .collect(Collectors.toList());
     }

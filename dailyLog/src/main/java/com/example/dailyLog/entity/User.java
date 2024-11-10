@@ -1,6 +1,7 @@
 package com.example.dailyLog.entity;
 
 import com.example.dailyLog.constant.Provider;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -42,6 +43,7 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cal_idx", nullable = false)
+    @JsonManagedReference
     private Calendars calendars;
 
     @Enumerated(EnumType.STRING)
@@ -61,9 +63,20 @@ public class User {
     @Column(name = "token_expiry")
     private LocalDateTime tokenExpiry;
 
-    @OneToMany(mappedBy = "requester")
+    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Friend> sentRequests;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Friend> receivedRequests;
+
+    @OneToMany(mappedBy = "user1", fetch = FetchType.LAZY)
+    private List<ExchangeDiary> exchangeDiariesAsUser1;
+
+    @OneToMany(mappedBy = "user2", fetch = FetchType.LAZY)
+    private List<ExchangeDiary> exchangeDiariesAsUser2;
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ExchangeDiaryEntry> diaryEntries;
 }
