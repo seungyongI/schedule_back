@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,13 +18,17 @@ import java.util.Base64;
 import java.util.Date;
 
 @Component
+@Getter
 public class JwtTokenProvider {
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    private static final long TOKEN_VALID_TIME = 24 * 60 * 60 * 1000L; // 1일
-    private static final long REFRESH_TOKEN_VALID_TIME = 7 * 24 * 60 * 60 * 1000L; // 7일
+    @Value("${spring.jwt.token-valid-time}")
+    private long tokenValidTime; // 1일
+
+    @Value("${spring.jwt.refresh-token-valid-time}")
+    private long refreshTokenValidTime; // 7일
 
     private final UserDetailsService userDetailsService;
 
@@ -36,22 +41,21 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String userPk) {
-        Date now = new Date();
-        return Jwts.builder()
-                .setSubject(userPk)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+    public String createAccessToken(String username) {
+        return createToken(username, tokenValidTime);
     }
 
-    public String createRefreshToken(String userPk) {
+    public String createRefreshToken(String username) {
+        return createToken(username, refreshTokenValidTime);
+    }
+
+    private String createToken(String email, long validTime) {
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(userPk)
+                .setSubject(email)
+                .claim("issued", now)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                .setExpiration(new Date(now.getTime() + validTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
@@ -71,7 +75,11 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("Authorization");
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
     public boolean validateToken(String jwtToken) {
@@ -85,5 +93,12 @@ public class JwtTokenProvider {
             return false;
         }
     }
-}
 
+    public Date getAccessTokenExpiryDate() {
+        return new Date(System.currentTimeMillis() + tokenValidTime);
+    }
+
+    public Date getRefreshTokenExpiryDate() {
+        return new Date(System.currentTimeMillis() + refreshTokenValidTime);
+    }
+}

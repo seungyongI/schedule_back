@@ -41,5 +41,17 @@ public class UserController {
         return ResponseEntity.ok(imageUrl); // 이미지 URL 반환
     }
 
+    @DeleteMapping(value = "/delete/{idx}")
+    public ResponseEntity<String> deleteUser(
+            @PathVariable(name = "idx") Long idx,
+            @RequestHeader(name = "Authorization") String token) {
+        // JWT 토큰에서 Bearer를 제거하고 실제 토큰을 추출
+        String authToken = token.replace("Bearer ", "");
+
+        userService.deleteUser(idx, authToken);
+        return ResponseEntity.status(HttpStatus.OK).body("Success Delete Account");
+    }
+
+
 }
 

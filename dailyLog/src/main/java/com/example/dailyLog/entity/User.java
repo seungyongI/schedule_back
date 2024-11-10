@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -60,8 +61,14 @@ public class User {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "token_expiry")
-    private LocalDateTime tokenExpiry;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "access_token_expiry")
+    private Date accessTokenExpiry;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = " refresh_token_expiry")
+    private Date refreshTokenExpiry;
+
 
     @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
     @JsonIgnore

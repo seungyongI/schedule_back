@@ -9,10 +9,13 @@ import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.exception.commonException.error.BizException;
+import com.example.dailyLog.exception.loginException.LoginErrorCode;
+import com.example.dailyLog.exception.loginException.UserPKException;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
+import com.example.dailyLog.security.providers.JwtTokenProvider;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.security.auth.login.LoginException;
 import java.util.Optional;
 
 @Service
@@ -36,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
     private final EntityManager entityManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
@@ -107,5 +112,20 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             throw new RuntimeException("프로필 이미지 업데이트 중 오류 발생", e);
         }
+    }
+    @Transactional
+    @Override
+    public void deleteUser(Long idx, String token) {
+        String userIdFromToken = jwtTokenProvider.getUserPk(token);
+
+        if (!userIdFromToken.equals(String.valueOf(idx))) {
+            throw new UserPKException(LoginErrorCode.USER_PK);
+        }
+
+        User user = userRepository.findById(idx).orElseThrow(
+                () -> new BizException(CommonErrorCode.NOT_FOUND)
+        );
+
+        userRepository.deleteById(user.getIdx());
     }
 }

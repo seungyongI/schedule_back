@@ -1,17 +1,19 @@
 package com.example.dailyLog.service;
 
 import com.example.dailyLog.constant.Provider;
-import com.example.dailyLog.dto.request.KakaoUserRequestDto;
-import com.example.dailyLog.dto.response.KakaoUserResponseDto;
+import com.example.dailyLog.constant.Theme;
+import com.example.dailyLog.dto.KakaoTokenDto;
+import com.example.dailyLog.dto.request.KakaoUserInfoDto;
+import com.example.dailyLog.dto.response.KakaoLoginResponseDto;
+import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.repository.UserRepository;
+import com.example.dailyLog.security.CustomUserDetails;
 import com.example.dailyLog.security.providers.JwtTokenProvider;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,7 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,81 +32,92 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ModelMapper modelMapper;
+    private final Environment environment;
 
-    @Value("${kakao.client-id}")
-    private String clientId;
-
-    @Value("${kakao.client-secret}")
-    private String clientSecret;
-
-    @Value("${kakao.redirect-uri}")
-    private String redirectUri;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
-    @Cacheable(value = "kakaoAccessToken", key = "#code")
     public String getKakaoAccessToken(String code) {
         String url = "https://kauth.kakao.com/oauth/token";
-        RestTemplate restTemplate = new RestTemplate();
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", clientId);
-        body.add("redirect_uri", redirectUri);
+        body.add("client_id", environment.getProperty("kakao.client-id"));
+        body.add("redirect_uri", environment.getProperty("kakao.redirect-uri"));
         body.add("code", code);
-        body.add("client_secret", clientSecret);
+        body.add("client_secret", environment.getProperty("kakao.client-secret"));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        try {
+            System.out.println("Request Body: " + body);
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<KakaoUserRequestDto> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, KakaoUserRequestDto.class);
-
-        return response.getBody().getAccessToken();
-    }
-
-    @Override
-    @Cacheable(value = "kakaoUserInfo", key = "#accessToken")
-    public KakaoUserResponseDto getKakaoUserInfo(String accessToken) {
-        String url = "https://kapi.kakao.com/v2/user/me";
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(null, headers);
-        ResponseEntity<KakaoUserRequestDto> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, KakaoUserRequestDto.class);
-
-        KakaoUserRequestDto kakaoUserRequestDto = response.getBody();
-        KakaoUserResponseDto kakaoUserResponseDto = modelMapper.map(kakaoUserRequestDto, KakaoUserResponseDto.class);
-        return kakaoUserResponseDto;
-    }
-
-    @Override
-    public User createKakaoUser(KakaoUserResponseDto kakaoUserResponseDto) {
-        User user = userRepository.findByEmail(kakaoUserResponseDto.getEmail()).orElse(null);
-
-        if (user == null) {
-            ProfileImage profileImage = new ProfileImage();
-            profileImage.setImgUrl(kakaoUserResponseDto.getProfileImageUrl());
-
-            user = User.builder()
-                    .email(kakaoUserResponseDto.getEmail())
-                    .userName(kakaoUserResponseDto.getNickname())
-                    .profileImage(profileImage)
-                    .provider(Provider.KAKAO)
-                    .build();
-
-            userRepository.save(user);
+            return sendRequestForToken(url, body).getAccess_token();
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Failed to get Kakao Access Token: " + e.getMessage());
         }
+    }
 
-        return user;
+    private KakaoTokenDto sendRequestForToken(String url, MultiValueMap<String, String> body) {
+        return restTemplate.postForObject(url, new HttpEntity<>(body, createHeaders()), KakaoTokenDto.class);
+    }
+
+    @Override
+    public KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
+        String url = "https://kapi.kakao.com/v2/user/me";
+
+        HttpHeaders headers = createHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        try {
+            ResponseEntity<KakaoUserInfoDto> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), KakaoUserInfoDto.class);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Failed to get Kakao User Info: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public User createKakaoUser(KakaoUserInfoDto kakaoUserInfoDto) {
+        if (kakaoUserInfoDto.getKakaoAccount() == null || kakaoUserInfoDto.getKakaoAccount().getEmail() == null) {
+            throw new RuntimeException("Failed to retrieve email from Kakao response");
+        }
+        return userRepository.findByEmail(kakaoUserInfoDto.getKakaoAccount().getEmail()).orElseGet(() -> createUserEntity(kakaoUserInfoDto));
+    }
+
+    private User createUserEntity(KakaoUserInfoDto kakaoUserInfoDto) {
+        ProfileImage profileImage = new ProfileImage();
+        String profileImageUrl = kakaoUserInfoDto.getKakaoAccount().getProfile().getProfileImageUrl();
+        if (profileImageUrl == null || profileImageUrl.isEmpty()) {
+            profileImage.setImgUrl("default_profile_image_url");  // 기본 이미지 URL을 설정
+            profileImage.setImgName("default_image_name");  // 기본 이미지 이름을 설정
+            profileImage.setOriImgName("default_original_name"); // 기본 원본 이미지 이름 설정
+        } else {
+            profileImage.setImgUrl(profileImageUrl);
+            profileImage.setImgName("profile_image");
+            profileImage.setOriImgName("profile_image_original");
+        }
+        Calendars calendars = Calendars.builder().theme(Theme.LIGHT).build();
+
+        User user = User.builder()
+                .email(kakaoUserInfoDto.getKakaoAccount().getEmail())
+                .password(UUID.randomUUID().toString())
+                .userName(kakaoUserInfoDto.getKakaoAccount().getProfile().getNickname())
+                .profileImage(profileImage)
+                .provider(Provider.KAKAO)
+                .calendars(calendars)
+                .build();
+
+        return userRepository.save(user);
     }
 
     @Override
     public String createJwtToken(User user) {
-        return jwtTokenProvider.createToken(user.getEmail());
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        return jwtTokenProvider.createAccessToken(userDetails.getEmail());
     }
 
+    private HttpHeaders createHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        return headers;
+    }
 }
