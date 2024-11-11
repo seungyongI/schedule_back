@@ -81,6 +81,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
+
     // 연달력 전체 일정 조회
     @Transactional
     @Override
@@ -109,6 +110,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ServiceException("Failed to find schedule in ScheduleService.findAllYearSchedule", e);
         }
     }
+
 
     // 개별 날짜 일정 조회
     @Transactional
@@ -157,6 +159,38 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ServiceException("Failed to find schedule in ScheduleService.findScheduleByDay", e);
         }
     }
+
+
+    // 일정 1개 조회
+    @Transactional
+    @Override
+    public ScheduleResponseDayDto findScheduleByOne(Long scheduleIdx){
+        // 유효성 검사
+        Schedule schedule = scheduleRepository.findById(scheduleIdx)
+                .orElseThrow(() -> new ScheduleNotFoundException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
+
+        try{
+            List<String> imageUrls = schedule.getScheduleImages()
+                    .stream()
+                    .map(ScheduleImage::getImgUrl)
+                    .collect(Collectors.toList());
+
+            return ScheduleResponseDayDto.builder()
+                    .title(schedule.getTitle())
+                    .content(schedule.getContent())
+                    .start(schedule.getStart())
+                    .end(schedule.getEnd())
+                    .location(schedule.getLocation())
+                    .color(schedule.getColor())
+                    .images(imageUrls)
+                    .repeatType(schedule.getRepeatType())
+                    .repeatEndDate(schedule.getRepeatEndDate())
+                    .build();
+        } catch (Exception e) {
+            throw new ServiceException("Failed to find schedule in ScheduleService.findScheduleByOne", e);
+        }
+    }
+
 
     // 일정 입력
     @Transactional
@@ -228,13 +262,15 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-    // 일정 삭제 메서드 (별도의 비동기 트랜잭션으로 삭제 처리)
+
+    // 일정 수정을 위해 필요한 삭제 메서드 (별도의 비동기 트랜잭션으로 삭제 처리)
     @Async
     @Transactional
     public CompletableFuture<Void> deleteExistingSchedules(Long repeatGroupId, LocalDateTime startDate) {
         scheduleRepository.deleteAfterDate(repeatGroupId, startDate);
         return CompletableFuture.completedFuture(null);
     }
+
 
     // 일정 수정
     @Transactional

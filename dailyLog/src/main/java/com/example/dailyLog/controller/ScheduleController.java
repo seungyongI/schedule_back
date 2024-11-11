@@ -62,6 +62,16 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleResponseDayDto);
     }
 
+    // 일정 1개 조회
+    @GetMapping("/{idx}")
+    public ResponseEntity<ScheduleResponseDayDto> getOneSchedule(
+            @PathVariable(name = "idx") Long idx){
+        ScheduleResponseDayDto scheduleResponseDayDto = scheduleService.findScheduleByOne(idx);
+        return ResponseEntity.ok(scheduleResponseDayDto);
+    }
+
+
+
     // 일정 입력
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveSchedule(
@@ -84,7 +94,7 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
     }
 
-
+    // 일정 삭제
     @DeleteMapping(value = "/delete/{idx}")
     public ResponseEntity<String> deleteSchedule(
             @PathVariable(name = "idx") Long idx,
