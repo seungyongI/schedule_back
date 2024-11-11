@@ -56,10 +56,6 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
         }
     }
 
-    private String sendRequestForTokenString(String url, MultiValueMap<String, String> body) {
-        return restTemplate.postForObject(url, new HttpEntity<>(body, createHeaders()), String.class);
-    }
-
     private KakaoTokenDto sendRequestForToken(String url, MultiValueMap<String, String> body) {
         return restTemplate.postForObject(url, new HttpEntity<>(body, createHeaders()), KakaoTokenDto.class);
     }
