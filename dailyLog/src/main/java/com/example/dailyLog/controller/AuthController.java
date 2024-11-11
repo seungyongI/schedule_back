@@ -79,7 +79,7 @@ public class AuthController {
     public ResponseEntity<LoginResponseDto> kakaoLogin(@RequestParam(value = "code") String code) {
         String accessToken = kakaoLoginService.getKakaoAccessToken(code);
         KakaoUserInfoDto kakaoUserInfo = kakaoLoginService.getKakaoUserInfo(accessToken);
-        User user = kakaoLoginService.createKakaoUser(kakaoUserInfo);
+        User user = kakaoLoginService.createKakaoUser(kakaoUserInfo, code);
 
         // JWT 생성 및 저장
         LoginResponseDto responseDto = loginService.generateAndSaveTokens(user);
@@ -87,5 +87,3 @@ public class AuthController {
         return ResponseEntity.ok(responseDto);
     }
 }
-
-

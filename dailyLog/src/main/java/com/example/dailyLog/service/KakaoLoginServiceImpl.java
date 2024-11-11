@@ -4,7 +4,6 @@ import com.example.dailyLog.constant.Provider;
 import com.example.dailyLog.constant.Theme;
 import com.example.dailyLog.dto.KakaoTokenDto;
 import com.example.dailyLog.dto.request.KakaoUserInfoDto;
-import com.example.dailyLog.dto.response.KakaoLoginResponseDto;
 import com.example.dailyLog.entity.Calendars;
 import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
@@ -12,7 +11,6 @@ import com.example.dailyLog.repository.UserRepository;
 import com.example.dailyLog.security.CustomUserDetails;
 import com.example.dailyLog.security.providers.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -50,10 +48,16 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
         try {
             System.out.println("Request Body: " + body);
 
+//            String test = sendRequestForTokenString(url,body);
+//            System.out.println("test = "+test);
             return sendRequestForToken(url, body).getAccess_token();
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Failed to get Kakao Access Token: " + e.getMessage());
         }
+    }
+
+    private String sendRequestForTokenString(String url, MultiValueMap<String, String> body) {
+        return restTemplate.postForObject(url, new HttpEntity<>(body, createHeaders()), String.class);
     }
 
     private KakaoTokenDto sendRequestForToken(String url, MultiValueMap<String, String> body) {
@@ -76,14 +80,16 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
     }
 
     @Override
-    public User createKakaoUser(KakaoUserInfoDto kakaoUserInfoDto) {
+    public User createKakaoUser(KakaoUserInfoDto kakaoUserInfoDto, String accessToken) {
         if (kakaoUserInfoDto.getKakaoAccount() == null || kakaoUserInfoDto.getKakaoAccount().getEmail() == null) {
             throw new RuntimeException("Failed to retrieve email from Kakao response");
         }
-        return userRepository.findByEmail(kakaoUserInfoDto.getKakaoAccount().getEmail()).orElseGet(() -> createUserEntity(kakaoUserInfoDto));
+        return userRepository.findByEmail(kakaoUserInfoDto.getKakaoAccount().getEmail())
+                .map(user -> updateUserEntity(user, kakaoUserInfoDto, accessToken))
+                .orElseGet(() -> createUserEntity(kakaoUserInfoDto, accessToken));
     }
 
-    private User createUserEntity(KakaoUserInfoDto kakaoUserInfoDto) {
+    private User createUserEntity(KakaoUserInfoDto kakaoUserInfoDto, String accessToken) {
         ProfileImage profileImage = new ProfileImage();
         String profileImageUrl = kakaoUserInfoDto.getKakaoAccount().getProfile().getProfileImageUrl();
         if (profileImageUrl == null || profileImageUrl.isEmpty()) {
@@ -104,15 +110,21 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
                 .profileImage(profileImage)
                 .provider(Provider.KAKAO)
                 .calendars(calendars)
+                .accessToken(accessToken)
                 .build();
+
+        profileImage.setUser(user);
 
         return userRepository.save(user);
     }
 
-    @Override
-    public String createJwtToken(User user) {
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        return jwtTokenProvider.createAccessToken(userDetails.getEmail());
+    private User updateUserEntity(User user, KakaoUserInfoDto kakaoUserInfoDto, String accessToken) {
+        user.setAccessToken(accessToken);
+        String profileImageUrl = kakaoUserInfoDto.getKakaoAccount().getProfile().getProfileImageUrl();
+        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+            user.getProfileImage().setImgUrl(profileImageUrl);
+        }
+        return userRepository.save(user);
     }
 
     private HttpHeaders createHeaders() {
