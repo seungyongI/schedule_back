@@ -61,4 +61,13 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleImage> scheduleImages = new ArrayList<>();
 
+    // 날짜 유효성 검사
+    @PrePersist
+    @PreUpdate
+    private void validateDates() {
+        if (end.isBefore(start)) {
+            throw new IllegalArgumentException("End time must be after the start time.");
+        }
+    }
+
 }

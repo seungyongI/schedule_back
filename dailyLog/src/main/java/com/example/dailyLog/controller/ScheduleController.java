@@ -11,6 +11,7 @@ import com.example.dailyLog.exception.calendarsException.CalendarsNotFoundExcept
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.service.ScheduleService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,6 +63,7 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleResponseDayDto);
     }
 
+
     // 일정 1개 조회
     @GetMapping("/{idx}")
     public ResponseEntity<ScheduleResponseDayDto> getOneSchedule(
@@ -71,11 +73,10 @@ public class ScheduleController {
     }
 
 
-
     // 일정 입력
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveSchedule(
-            @RequestPart(name = "scheduleRequest") ScheduleRequestInsertDto scheduleRequestInsertDto,
+            @RequestPart(name = "scheduleRequest") @Valid ScheduleRequestInsertDto scheduleRequestInsertDto,
             @RequestPart(name = "imageFiles", required = false) @Schema(type = "array", format = "binary", description = "이미지 파일들") List<MultipartFile> imageFileList) {
 
         if (imageFileList == null) {
@@ -86,13 +87,15 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Schedule created successfully");
     }
 
+
     // 일정 수정
-    @PutMapping(value = "/update")
-    public ResponseEntity<String> updateSchedule(@RequestPart(name = "scheduleRequest") ScheduleRequestUpdateDto scheduleRequestUpdateDto,
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateSchedule(@RequestPart(name = "scheduleRequest") @Valid ScheduleRequestUpdateDto scheduleRequestUpdateDto,
                                                  @RequestPart(name = "imageFiles", required = false) List<MultipartFile> imageFileList) {
         scheduleService.updateSchedule(scheduleRequestUpdateDto, imageFileList);
         return ResponseEntity.status(HttpStatus.OK).body("Schedule updated successfully");
     }
+
 
     // 일정 삭제
     @DeleteMapping(value = "/delete/{idx}")
@@ -104,6 +107,4 @@ public class ScheduleController {
         scheduleService.deleteSchedule(idx, deleteAllRepeats, deleteOnlyThis, deleteAfter);
         return ResponseEntity.status(HttpStatus.OK).body("Schedule deleted successfully");
     }
-
-
 }

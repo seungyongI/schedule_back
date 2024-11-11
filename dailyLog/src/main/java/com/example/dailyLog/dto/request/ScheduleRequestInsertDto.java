@@ -3,6 +3,7 @@ package com.example.dailyLog.dto.request;
 import com.example.dailyLog.constant.Color;
 import com.example.dailyLog.constant.RepeatType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
@@ -35,5 +36,12 @@ public class ScheduleRequestInsertDto {
         private RepeatType repeatType;  // 반복 유형: NONE, DAILY, WEEKLY, MONTHLY, YEARLY
 
         private LocalDate repeatEndDate;  // 반복 종료 일자 (반복이 언제까지 지속되는지)
+
+
+        // 날짜 유효성 검사
+        @AssertTrue(message = "End time must be after the start time.")
+        public boolean isEndAfterStart() {
+                return end == null || start == null || !end.isBefore(start);
+        }
 
 }
