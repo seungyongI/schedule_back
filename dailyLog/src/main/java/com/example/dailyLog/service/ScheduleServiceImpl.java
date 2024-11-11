@@ -47,6 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final CalendarRepository calendarRepository;
     private final ScheduleImageRepository scheduleImageRepository;
     private final ImageService imageService;
+    private final FileService fileService;
 
     // 월달력 전체 일정 조회
     @Transactional
@@ -368,8 +369,9 @@ public class ScheduleServiceImpl implements ScheduleService {
             // 이미지 삭제
             List<String> deleteImageList = scheduleRequestUpdateDto.getDeletedImageList();
             if (deleteImageList != null && !deleteImageList.isEmpty()) {
-                for (String imageId : deleteImageList) {
-                    scheduleImageRepository.deleteByImgUrl(imageId);
+                for (String imageUrl : deleteImageList) {
+                    fileService.deleteFile(imageUrl);
+                    scheduleImageRepository.deleteByImgUrl(imageUrl);
                 }
             }
 
