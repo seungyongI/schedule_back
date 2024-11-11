@@ -42,6 +42,8 @@ public class UserServiceImpl implements UserService {
     private final EntityManager entityManager;
     private final JwtTokenProvider jwtTokenProvider;
 
+
+    // 회원가입
     @Override
     @Transactional
     public User createUser(UserRequestInsertDto userRequestInsertDto) {
@@ -67,11 +69,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+    // 회원 찾기
     @Override
     public User findUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
     }
 
+
+    // 닉네임 수정
     @Override
     @Transactional
     public void updateUserName(@Valid UserRequestUpdateDto userRequestUpdateDto) {
@@ -90,6 +96,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+    // 프로필 사진 수정
     @Override
     @Transactional
     public void updateProfileImage(Long idx, MultipartFile imageFile) {
@@ -113,6 +121,9 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("프로필 이미지 업데이트 중 오류 발생", e);
         }
     }
+
+
+    // 회원탈퇴(작동X)
     @Transactional
     @Override
     public void deleteUser(Long idx, String token) {
