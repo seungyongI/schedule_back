@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return createErrorResponse(CommonErrorCode.DATABASE_INTEGRITY_ERROR);
     }
 
+    @ExceptionHandler(MyInternalServerError.class)
+    public ResponseEntity<ErrorResponse> handleMyInternalServerError(MyInternalServerError e){
+        return createErrorResponse(e.getErrorCode());
+    }
+
 
     // 비즈니스 로직 예외
     @ExceptionHandler(BizException.class)

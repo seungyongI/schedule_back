@@ -13,6 +13,7 @@ public enum CommonErrorCode implements ErrorCode {
     EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "외부 API 호출에 실패했습니다."),
     SERVER_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "서버 응답 시간이 초과되었습니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근이 허용되지 않습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류가 발생했습니다."),
 
     // 비즈니스 로직 예외
     NOT_FOUND(HttpStatus.BAD_REQUEST, "해당하는 글이 없습니다."),

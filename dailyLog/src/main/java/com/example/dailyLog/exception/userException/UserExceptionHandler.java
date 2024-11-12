@@ -27,4 +27,9 @@ public class UserExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e){
         return createErrorResponse(e.getErrorCode());
     }
+
+    @ExceptionHandler(ValidationError.class)
+    public ResponseEntity<ErrorResponse> handleValidationError(ValidationError e){
+        return createErrorResponse(e.getErrorCode());
+    }
 }
