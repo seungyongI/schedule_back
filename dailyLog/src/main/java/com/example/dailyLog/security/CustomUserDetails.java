@@ -13,6 +13,7 @@ import java.util.Collections;
 @AllArgsConstructor
 @Getter
 @Builder
+@Setter
 public class CustomUserDetails implements UserDetails {
     private Long idx;
     private String email;
@@ -36,7 +37,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
+    public String getPassword(){
         return password;
     }
 

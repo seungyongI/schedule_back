@@ -1,18 +1,17 @@
 package com.example.dailyLog.dto.response;
 
-import com.example.dailyLog.entity.Calendars;
-import com.example.dailyLog.entity.ProfileImage;
 import lombok.*;
 
 @Getter
 @Builder
+@Setter
 @AllArgsConstructor
 public class LoginResponseDto {
-    private final Long idx;
-    private final String accessToken;
-    private final String email;
-    private final String userName;
-    private final String profileImageUrl;
-    private final String refreshToken;
-    private final Long calendarIdx;
+    private Long idx;
+    private String accessToken;
+    private String email;
+    private String userName;
+    private String profileImageUrl;
+    private String refreshToken;
+    private Long calendarIdx;
 }

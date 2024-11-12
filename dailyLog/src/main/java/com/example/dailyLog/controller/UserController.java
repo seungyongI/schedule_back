@@ -30,6 +30,8 @@ public class UserController {
     @PostMapping(value = "/updateProfileImage/{idx}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProfileImage(@PathVariable(name = "idx") Long idx,
                                                      @RequestPart(name = "imageFiles") MultipartFile imageFile) {
+        System.out.println("Received file name: " + imageFile.getOriginalFilename());
+        System.out.println("Received file size: " + imageFile.getSize());
         userService.updateProfileImage(idx, imageFile);
         return ResponseEntity.status(HttpStatus.OK).body("Profile updated successfully");
     }

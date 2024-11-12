@@ -97,7 +97,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalDate startOfYear = LocalDate.of(year, 1, 1);
             LocalDate endOfYear = LocalDate.of(year, 12, 31);
 
-            List<Schedule> schedules = scheduleRepository.findByStartBetween(startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59));
+            List<Schedule> schedules = scheduleRepository.findByCalendarsIdxAndStartBetween(calendarIdx,startOfYear.atStartOfDay(), endOfYear.atTime(23, 59, 59));
 
             return schedules.stream()
                     .map(schedule -> ScheduleResponseYearDto.builder()

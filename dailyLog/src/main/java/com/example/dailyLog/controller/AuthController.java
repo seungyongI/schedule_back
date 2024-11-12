@@ -5,6 +5,7 @@ import com.example.dailyLog.dto.request.KakaoUserInfoDto;
 import com.example.dailyLog.dto.request.LoginRequestDto;
 import com.example.dailyLog.dto.request.UserRequestInsertDto;
 import com.example.dailyLog.dto.response.LoginResponseDto;
+import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.security.CustomUserDetails;
 import com.example.dailyLog.service.KakaoLoginService;
@@ -71,6 +72,7 @@ public class AuthController {
         user.setProvider(Provider.LOCAL);
 
         LoginResponseDto responseDto = loginService.generateAndSaveTokens(user);
+        System.out.println(responseDto);
 
         return ResponseEntity.ok(responseDto);
     }

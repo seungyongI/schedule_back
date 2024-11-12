@@ -40,7 +40,7 @@ public class LoginServiceImpl implements LoginService {
         String accessToken = createAndSaveAccessToken(user);
         String refreshToken = createAndSaveRefreshToken(user);
 
-        userRepository.save(user);
+        User dbUser = userRepository.save(user);
 
         return LoginResponseDto.builder()
                 .idx(user.getIdx())
@@ -48,7 +48,7 @@ public class LoginServiceImpl implements LoginService {
                 .refreshToken(refreshToken)
                 .email(user.getEmail())
                 .userName(user.getUserName())
-                .profileImageUrl(user.getProfileImage() != null ? user.getProfileImage().getImgUrl() : "")
+                .profileImageUrl(dbUser.getProfileImage() != null ? dbUser.getProfileImage().getImgUrl() : "")
                 .calendarIdx(user.getCalendars().getIdx())
                 .build();
     }
