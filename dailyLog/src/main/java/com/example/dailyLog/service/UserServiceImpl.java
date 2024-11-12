@@ -9,8 +9,12 @@ import com.example.dailyLog.entity.ProfileImage;
 import com.example.dailyLog.entity.User;
 import com.example.dailyLog.exception.commonException.CommonErrorCode;
 import com.example.dailyLog.exception.commonException.error.BizException;
+import com.example.dailyLog.exception.commonException.error.MyInternalServerError;
+import com.example.dailyLog.exception.loginException.DuplicateEmailException;
 import com.example.dailyLog.exception.loginException.LoginErrorCode;
 import com.example.dailyLog.exception.loginException.UserPKException;
+import com.example.dailyLog.exception.userException.UserErrorCode;
+import com.example.dailyLog.exception.userException.ValidationError;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
 import com.example.dailyLog.repository.UserRepository;
@@ -18,20 +22,26 @@ import com.example.dailyLog.security.CustomUserDetails;
 import com.example.dailyLog.security.providers.JwtTokenProvider;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.security.auth.login.LoginException;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -41,12 +51,22 @@ public class UserServiceImpl implements UserService {
     private final ImageService imageService;
     private final EntityManager entityManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final Validator validator;
 
 
     // 회원가입
     @Override
     @Transactional
-    public User createUser(UserRequestInsertDto userRequestInsertDto) {
+    public User createUser(@Valid UserRequestInsertDto userRequestInsertDto) {
+
+        Set<ConstraintViolation<UserRequestInsertDto>> violations = validator.validate(userRequestInsertDto);
+        if (!violations.isEmpty()) {
+            String errorMessage = violations.stream()
+                    .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                    .collect(Collectors.joining(", "));
+            throw new ValidationError(UserErrorCode.VALIDATION_ERROR);
+        }
+
         try {
             Calendars calendars = Calendars.builder().theme(Theme.LIGHT).build();
             log.info("calendar = {}", calendarRepository.save(calendars));
@@ -63,9 +83,9 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(user);
 
         } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+            throw new DuplicateEmailException(LoginErrorCode.DUPLICATE_EMAIL);
         } catch (Exception e) {
-            throw new RuntimeException("회원 가입 중 오류 발생", e);
+            throw new MyInternalServerError(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
