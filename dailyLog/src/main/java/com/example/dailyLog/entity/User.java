@@ -55,18 +55,18 @@ public class User {
     @JsonManagedReference
     private ProfileImage profileImage;
 
-    @Column(name = "access_token")
+    @Column(name = "access_token", nullable = false)
     private String accessToken;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "access_token_expiry")
+    @Column(name = "access_token_expiry", nullable = false)
     private Date accessTokenExpiry;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = " refresh_token_expiry")
+    @Column(name = " refresh_token_expiry", nullable = false)
     private Date refreshTokenExpiry;
 
 

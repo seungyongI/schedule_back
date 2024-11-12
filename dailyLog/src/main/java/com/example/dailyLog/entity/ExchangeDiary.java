@@ -27,7 +27,7 @@ public class ExchangeDiary {
     @JoinColumn(name = "user2_id", nullable = false)
     private User user2;
 
-    @Column(name = "group_name")
+    @Column(name = "group_name", nullable = false)
     private String groupName;
 
     @Enumerated(EnumType.STRING)

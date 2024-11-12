@@ -51,7 +51,7 @@ public class Schedule {
     @Column(name = "repeat_end_date")
     private LocalDate repeatEndDate;
 
-    @Column(name = "repeat_group_id")
+    @Column(name = "repeat_group_id", nullable = false)
     private Long repeatGroupId;
 
     @ManyToOne
