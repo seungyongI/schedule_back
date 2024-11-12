@@ -53,6 +53,7 @@ public class AuthController {
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto) {
         Authentication authentication = authenticationManager.authenticate(
@@ -76,6 +77,7 @@ public class AuthController {
 
         return ResponseEntity.ok(responseDto);
     }
+
 
     @GetMapping("/kakao/login")
     public ResponseEntity<LoginResponseDto> kakaoLogin(@RequestParam(value = "code") String code) {

@@ -41,6 +41,7 @@ public class DiaryServiceImpl implements DiaryService{
     private final CalendarRepository calendarRepository;
     private final DiaryImageRepository diaryImageRepository;
     private final ImageService imageService;
+    private final FileService fileService;
 
 
     // 월달력 전체 일기 조회(마커)
@@ -258,8 +259,9 @@ public class DiaryServiceImpl implements DiaryService{
     // 이미지 삭제
             List<String> deleteImageList = diaryRequestUpdateDto.getDeletedImageList();
             if (deleteImageList != null && !deleteImageList.isEmpty()) {
-                for (String imageId : deleteImageList) {
-                    diaryImageRepository.deleteByImgUrl(imageId);
+                for (String imageUrl : deleteImageList) {
+                    fileService.deleteFile(imageUrl);
+                    diaryImageRepository.deleteByImgUrl(imageUrl);
                 }
             }
 
