@@ -128,8 +128,8 @@ public class UserServiceImpl implements UserService {
             ProfileImage oldProfileImage = updateUser.getProfileImage();
             if (oldProfileImage != null) {
                 updateUser.setProfileImage(null);
-                entityManager.flush();
                 profileImageRepository.delete(oldProfileImage);
+                entityManager.flush();
             }
 
             if (imageFile != null) {
