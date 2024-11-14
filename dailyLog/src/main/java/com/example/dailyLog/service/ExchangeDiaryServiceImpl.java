@@ -98,6 +98,7 @@ public class ExchangeDiaryServiceImpl implements ExchangeDiaryService{
             reverseExchangeDiary.setUser1(receiver);
             reverseExchangeDiary.setUser2(requester);
             reverseExchangeDiary.setStatus(ExchangeDiaryStatus.ACCEPTED);
+            reverseExchangeDiary.setGroupName(exchangeDiaryRequest.getGroupName());
             exchangeDiaryRepository.save(reverseExchangeDiary);
         }
     }

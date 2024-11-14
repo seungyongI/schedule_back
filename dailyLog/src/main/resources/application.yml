@@ -46,16 +46,13 @@ kakao:
   redirect-uri: "http://localhost:5173/kakaologin"
 
 # 로컬 이미지 저장 루트
-ImgLocation: "D:/images"
-ProfileImgLocation: "D:/profileImages"
-uploadPath: "file:///D:/images/"
-profileUploadPath: "file:///D:/profileImages/"
-
-## 서버 이미지 저장 루트
-#ImgLocation: "/app/images"
-#ProfileImgLocation: "/app/profileImages"
+#ImgLocation: "D:/images"
+#ProfileImgLocation: "D:/profileImages"
 #uploadPath: "file:///D:/images/"
 #profileUploadPath: "file:///D:/profileImages/"
 
-
-
+# 서버 이미지 저장 루트
+ImgLocation: "/app/images"
+ProfileImgLocation: "/app/profileImages"
+uploadPath: "file:///D:/images/"
+profileUploadPath: "file:///D:/profileImages/"

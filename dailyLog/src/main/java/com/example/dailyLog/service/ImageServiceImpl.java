@@ -137,7 +137,7 @@ public class ImageServiceImpl implements ImageService {
         ProfileImage profileImage = profileImageRepository.findByUserIdx(userIdx).orElse(null);
         if (profileImage == null || profileImage.getImgUrl() == null || profileImage.getImgUrl().isEmpty()) {
             log.info("사용자 {}에 대한 프로필 이미지가 없으므로 기본 이미지를 반환합니다.", userIdx);
-            return "/src/resources/static/images/default.png"; // 기본 이미지 URL 설정
+            return "/defaultImages/default.jpg"; // 기본 이미지 URL 설정
         }
         log.info("사용자 {}의 프로필 이미지 URL: {}", userIdx, profileImage.getImgUrl());
         return profileImage.getImgUrl();

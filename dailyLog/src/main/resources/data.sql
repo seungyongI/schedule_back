@@ -28,9 +28,9 @@ INSERT INTO diary (d_idx, d_title, d_content, d_date, d_category, cal_idx) VALUE
 (5, 'Day 5', 'Random thoughts', '2024-01-05', 'ETC', 5);
 
 -- INSERT INTO 'schedule' table
-INSERT INTO schedule (s_idx, s_title, s_content, s_start, s_end, s_location, s_color, cal_idx) VALUES
-(1, 'Meeting', 'Team meeting', '2024-01-10 10:00:00', '2024-01-10 11:00:00', 'Conference Room', 'BLUE', 1),
-(2, 'Workout', 'Morning workout', '2024-01-11 06:00:00', '2024-01-11 07:00:00', 'Gym', 'GREEN', 2),
-(3, 'Lunch with client', 'Business lunch', '2024-01-12 12:00:00', '2024-01-12 13:00:00', 'Restaurant', 'YELLOW', 3),
-(4, 'Coding Session', 'Project coding', '2024-01-13 14:00:00', '2024-01-13 16:00:00', 'Office', 'VIOLET', 4),
-(5, 'Daily walk', 'Evening walk', '2024-01-14 18:00:00', '2024-01-14 19:00:00', 'Park', 'ORANGE', 5);
+--INSERT INTO schedule (s_idx, s_title, s_content, s_start, s_end, s_location, s_color, cal_idx) VALUES
+--(1, 'Meeting', 'Team meeting', '2024-01-10 10:00:00', '2024-01-10 11:00:00', 'Conference Room', 'BLUE', 1),
+--(2, 'Workout', 'Morning workout', '2024-01-11 06:00:00', '2024-01-11 07:00:00', 'Gym', 'GREEN', 2),
+--(3, 'Lunch with client', 'Business lunch', '2024-01-12 12:00:00', '2024-01-12 13:00:00', 'Restaurant', 'YELLOW', 3),
+--(4, 'Coding Session', 'Project coding', '2024-01-13 14:00:00', '2024-01-13 16:00:00', 'Office', 'VIOLET', 4),
+--(5, 'Daily walk', 'Evening walk', '2024-01-14 18:00:00', '2024-01-14 19:00:00', 'Park', 'ORANGE', 5);
