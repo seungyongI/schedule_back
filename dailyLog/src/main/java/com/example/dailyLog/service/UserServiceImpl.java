@@ -14,6 +14,7 @@ import com.example.dailyLog.exception.loginException.DuplicateEmailException;
 import com.example.dailyLog.exception.loginException.LoginErrorCode;
 import com.example.dailyLog.exception.loginException.UserPKException;
 import com.example.dailyLog.exception.userException.UserErrorCode;
+import com.example.dailyLog.exception.userException.UserNotFoundException;
 import com.example.dailyLog.exception.userException.ValidationError;
 import com.example.dailyLog.repository.CalendarRepository;
 import com.example.dailyLog.repository.ProfileImageRepository;
@@ -121,10 +122,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateProfileImage(Long idx, MultipartFile imageFile) {
-        try {
+
             User updateUser = userRepository.findById(idx)
-                    .orElseThrow(() -> new BizException(CommonErrorCode.NOT_FOUND));
+                    .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
             // 기존 이미지 삭제 로직 추가
+        try {
             ProfileImage oldProfileImage = updateUser.getProfileImage();
             if (oldProfileImage != null) {
                 updateUser.setProfileImage(null);
