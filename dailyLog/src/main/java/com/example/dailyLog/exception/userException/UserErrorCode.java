@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 public enum UserErrorCode implements ErrorCode {
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "유효성 검사 실패"),
     ;
 
 
