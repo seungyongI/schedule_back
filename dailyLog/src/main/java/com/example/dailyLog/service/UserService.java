@@ -13,5 +13,5 @@ public interface UserService {
     User findUserById(Long id);
     void updateUserName(@Valid UserRequestUpdateDto userRequestUpdateDto);
     void updateProfileImage(Long id, MultipartFile imageFile);
-    void deleteUser(Long idx, String token);
+    void deleteUser(String email, String authToken);
 }

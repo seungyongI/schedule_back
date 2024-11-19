@@ -36,7 +36,6 @@ public class ImageServiceImpl implements ImageService {
     private final ProfileImageRepository profileImageRepository;
     private final FileService fileService;
 
-
     // 유효성 검사 메소드
     public void validateImageFile(MultipartFile imageFile) {
         if (imageFile == null || imageFile.isEmpty()) {
@@ -48,7 +47,6 @@ public class ImageServiceImpl implements ImageService {
             throw new InvalidFileName(ImageErrorCode.INVALID_FILE_NAME);
         }
     }
-
 
     @Transactional
     @Override
@@ -74,7 +72,6 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
-
     @Transactional
     @Override
     public ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule) {
@@ -98,7 +95,6 @@ public class ImageServiceImpl implements ImageService {
             throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }
     }
-
 
     @Transactional
     @Override
@@ -125,6 +121,48 @@ public class ImageServiceImpl implements ImageService {
 
             user.setProfileImage(profileImage);
             return profileImageRepository.save(profileImage);
+        } catch (Exception e) {
+            throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
+        }
+    }
+
+    // 카카오 유저 이미지를 받아 저장하는 메서드
+    @Transactional
+    @Override
+    public ProfileImage saveProfileImageFromUrl(byte[] imageBytes, User user) {
+        try {
+            // 기본 프로필 이미지 URL과 파일명 설정
+            String oriImgName;
+            String savedFileName;
+            String imageUrl;
+
+            if (imageBytes == null || imageBytes.length == 0) {
+                // 이미지 데이터가 없으면 기본 이미지 설정
+                oriImgName = "default_original_name";
+                savedFileName = "default_image_name.jpg";
+                imageUrl = "/defaultImages/" + savedFileName; // 기본 이미지가 저장된 경로
+
+                ProfileImage profileImage = new ProfileImage();
+                profileImage.setImgName(savedFileName);
+                profileImage.setOriImgName(oriImgName);
+                profileImage.setImgUrl(imageUrl);
+                profileImage.setUser(user);
+
+                return profileImageRepository.save(profileImage);
+            } else {
+                // 카카오 프로필 이미지가 존재하는 경우 저장
+                oriImgName = "kakao_profile_image.jpg";
+                savedFileName = fileService.uploadFile(profileImageLocation, oriImgName, imageBytes);
+                imageUrl = "/profileImages/" + savedFileName;
+
+                ProfileImage profileImage = new ProfileImage();
+                profileImage.setImgName(savedFileName);
+                profileImage.setOriImgName(oriImgName);
+                profileImage.setImgUrl(imageUrl);
+                profileImage.setUser(user);
+
+                return profileImageRepository.save(profileImage);
+            }
         } catch (Exception e) {
             throw new FileUploadError(ImageErrorCode.FILE_UPLOAD_ERROR);
         }

@@ -272,7 +272,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         return CompletableFuture.completedFuture(null);
     }
 
-
     // 일정 수정
     @Transactional
     @Override

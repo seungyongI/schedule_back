@@ -145,17 +145,16 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    // 회원탈퇴(작동X)
     @Transactional
     @Override
-    public void deleteUser(Long idx, String token) {
-        String userIdFromToken = jwtTokenProvider.getUserPk(token);
+    public void deleteUser(String email, String authToken) {
+        String userIdFromToken = jwtTokenProvider.getUserPk(authToken);
 
-        if (!userIdFromToken.equals(String.valueOf(idx))) {
+        if (!userIdFromToken.equals(email)) {
             throw new UserPKException(LoginErrorCode.USER_PK);
         }
 
-        User user = userRepository.findById(idx).orElseThrow(
+        User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new BizException(CommonErrorCode.NOT_FOUND)
         );
 

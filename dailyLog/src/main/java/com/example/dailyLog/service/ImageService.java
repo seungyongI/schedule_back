@@ -8,4 +8,5 @@ public interface ImageService {
     ScheduleImage saveScheduleImage(MultipartFile imageFile, Schedule schedule) throws Exception;
     ProfileImage saveProfileImage(MultipartFile imageFile, User user) throws Exception ;
     String getProfileImage(Long idx);
+    ProfileImage saveProfileImageFromUrl(byte[] imageBytes, User user);
 }

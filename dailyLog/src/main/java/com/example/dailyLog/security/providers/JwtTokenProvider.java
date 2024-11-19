@@ -66,12 +66,14 @@ public class JwtTokenProvider {
     }
 
     public String getUserPk(String token) {
+        System.out.println("token = " + token);
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+
     }
 
     public String resolveToken(HttpServletRequest request) {
