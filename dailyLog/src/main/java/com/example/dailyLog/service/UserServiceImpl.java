@@ -54,7 +54,6 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final Validator validator;
 
-
     // 회원가입
     @Override
     @Transactional
