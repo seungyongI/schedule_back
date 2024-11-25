@@ -100,6 +100,17 @@ public class FriendServiceImpl implements FriendService{
         friendRepository.save(friendRequest);
     }
 
+    @Transactional
+    @Override
+    public void deleteFriend(Long userId, Long deletedFriendId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+        User friend = userRepository.findById(deletedFriendId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid friend ID"));
+
+        friendRepository.deleteByRequesterAndReceiver(user, friend);
+        friendRepository.deleteByRequesterAndReceiver(friend, user);
+    }
     // 친구 목록 조회
     @Transactional
     @Override
