@@ -18,6 +18,8 @@ public interface FriendService {
 
     void rejectFriendRequest(Long friendRequestId);
 
+    void deleteFriend(Long userId, Long deletedFriendId);
+
     List<FriendListResponseDto> getFriendsList(Long userId);
 
     List<UserSearchResponseDto> searchUsersByUserName(Long userId, String userName);

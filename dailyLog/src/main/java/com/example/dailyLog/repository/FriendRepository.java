@@ -19,6 +19,9 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     // 두 유저 간의 친구 상태 조회 (중복 요청 방지)
     Optional<Friend> findByRequesterAndReceiver(User requester, User receiver);
 
+    // 친구 삭제
+    void deleteByRequesterAndReceiver(User requester, User receiver);
+
     //친구 검색 관련
     @Query("SELECT f FROM Friend f WHERE (f.requester = :user OR f.receiver = :user) AND f.status = 'ACCEPTED'")
     List<Friend> findFriendsByUser(@Param("user") User user);

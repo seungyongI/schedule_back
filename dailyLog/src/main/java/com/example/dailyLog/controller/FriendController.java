@@ -45,6 +45,14 @@ public class FriendController {
         return ResponseEntity.ok("Friend request rejected.");
     }
 
+    // 친구 삭제
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteFriend(@RequestParam(name = "userId") Long userId,
+                                               @RequestParam(name = "FriendId") Long deleteFriendId) {
+        friendService.deleteFriend(userId, deleteFriendId);
+        return ResponseEntity.ok("Friend deleted.");
+    }
+
     // 친구 목록 조회
     @GetMapping("/{idx}/list")
     public ResponseEntity<List<FriendListResponseDto>> getFriendsList(@PathVariable(name = "idx") Long userId) {
