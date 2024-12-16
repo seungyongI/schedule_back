@@ -18,8 +18,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByCalendarsIdxAndStartBetween(@Param("calendarIdx") Long calendarIdx, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     // 일간 일정 조회
-    @Query("SELECT s FROM Schedule s WHERE s.start >= :start AND s.end <= :end AND s.calendars.idx = :calendarIdx")
-    List<Schedule> findSchedulesInDay(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("calendarIdx") Long calendarIdx);
+    @Query("SELECT s FROM Schedule s WHERE "
+            + "((s.start <= :end AND s.end >= :start) AND s.calendars.idx = :calendarIdx)")
+    List<Schedule> findSchedulesInDay(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("calendarIdx") Long calendarIdx
+    );
 
     List<Schedule> findByStartBetween(LocalDateTime start, LocalDateTime end);
 
