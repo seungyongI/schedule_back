@@ -73,6 +73,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .map(schedule -> ScheduleResponseMonthDto.builder()
                             .title(schedule.getTitle())
                             .start(schedule.getStart())
+                            .end(schedule.getEnd())
                             .color(schedule.getColor())
                             .build())
                     .sorted(Comparator.comparing(ScheduleResponseMonthDto::getStart))
@@ -220,7 +221,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .build();
                 scheduleRepository.save(createSchedule);
 
-                //이미지 저장 로직
+                // 이미지 저장 로직
                 for (MultipartFile file : imageFileList) {
                     if (!file.isEmpty()) {
                         ScheduleImage scheduleImage = imageService.saveScheduleImage(file, createSchedule);
@@ -230,10 +231,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
 
                 if (scheduleRequestInsertDto.getRepeatType() == RepeatType.NONE) {
-
                     break; // 반복 없음 처리
                 }
 
+                // 반복 일정일 경우 시작/종료 날짜 갱신
                 switch (scheduleRequestInsertDto.getRepeatType()) {
                     case DAILY:
                         currentStart = currentStart.plusDays(1);
@@ -250,8 +251,6 @@ public class ScheduleServiceImpl implements ScheduleService {
                     case YEARLY:
                         currentStart = currentStart.plusYears(1);
                         currentEnd = currentEnd.plusYears(1);
-                        break;
-                    case NONE:
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid repeat type");

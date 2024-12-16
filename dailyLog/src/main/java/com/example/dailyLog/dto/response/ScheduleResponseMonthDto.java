@@ -15,6 +15,8 @@ public class ScheduleResponseMonthDto {
     private String title;
 
     private LocalDateTime start;
+    private LocalDateTime end;
+
 
     private Color color;
 
