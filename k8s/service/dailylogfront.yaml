@@ -1,51 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment # pod 여러개
 metadata:
-  name: dailylog-service-deployment
+  name: dailylog-front-service-deployment
 spec: # 어떻게 만들지에 대한 내용
   replicas: 1 # pod 몇 개 만들래
   selector:
     matchLabels:
-      app: dailylog-service # 쿠버네티스 안에서 변수명
+      app: dailylog-front-service # 쿠버네티스 안에서 변수명
   template:
     metadata:
       labels:
-        app: dailylog-service # 서비스에서 찾는 변수명
+        app: dailylog-front-service # 서비스에서 찾는 변수명
     spec: # pod 하나하나에 대한 내용
       containers:
-        - name: dailylog-service
-          image: jeun0415/dailylog-service:NJ.k8.01 # dockerhub에 있는 image
+        - name: dailylog-front-service
+          image: jeun0415/dailylog-front:NJ.k8.03 # dockerhub에 있는 image
           ports:
-            - containerPort: 50000
+            - containerPort: 5173
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mariadb://mariadb:3306/newjeans?serverTimezone=Asia/Seoul"
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: NJ-k8s-configmap
-#                  key: spring-datasource-url-dailyLog
-            - name: SPRING_DATASOURCE_USERNAME
-              value: "root"
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: NJ-k8s-configmap
-#                  key: spring-datasource-username
-            - name: SERVER_PORT
-              value: "50000"
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: NJ-k8s-configmap
-#                  key: dailylog-service-port
+            - name: VITE_API_URL
+              value: "http://112.222.157.156:10004"
 
 --- # 환경을 두 개 지정할 때 쓰는 구분자
 apiVersion: v1
 kind: Service
 metadata:
-  name: dailylog-service
+  name: dailylog-front-service
 spec:
   type: LoadBalancer
   ports:
-    - port: 50000
-      targetPort: 50000
+    - port: 5173
+      targetPort: 5173
+#      nodePort: 30002
   selector:
-    app: dailylog-service
+    app: dailylog-front-service
